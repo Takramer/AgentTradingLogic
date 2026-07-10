@@ -33,7 +33,6 @@ weighted primary-leg score separates winners better than the flat count.
 
 import argparse
 import json
-import os
 from collections import defaultdict
 
 from .market_data import fetch_bars, fetch_bars_batch_massive, _data_source
@@ -55,11 +54,17 @@ def _max_hold(strategy, ticker, cfg):
     return int(exits.get("max_hold_sessions", 10))
 
 
-def simulate_long(bars, t, stop, target, max_hold):
+def simulate_long(bars, t, stop, target, max_hold, atr=None, exits_cfg=None):
     """
     Fill at bars[t+1] open; walk forward up to max_hold sessions.
     Returns (reason, exit_price, r_multiple, sessions_held) or None if no fill bar.
     R = (exit - entry) / (entry - stop).
+
+    Mirrors the live exit engine (order_plan.py): hard stop, target,
+    breakeven trail once close >= entry + trail_trigger_mult*ATR, and a
+    ratchet-only chandelier stop at highest-high - chandelier_atr_mult*ATR.
+    Trail levels are updated from a bar only AFTER that bar's exit checks,
+    so a bar's own high can't move a stop it then hits.
     """
     if t + 1 >= len(bars):
         return None  # no next bar to fill on
@@ -68,15 +73,35 @@ def simulate_long(bars, t, stop, target, max_hold):
     if risk <= 0:
         return None  # degenerate stop (at/above entry)
 
+    exits_cfg = exits_cfg or {}
+    trail_at = chand_dist = None
+    if atr and atr > 0:
+        trail_at   = entry + float(exits_cfg.get("trail_trigger_mult", 1.5)) * atr
+        chand_dist = float(exits_cfg.get("chandelier_atr_mult", 3.0)) * atr
+
+    cur_stop = stop
+    hi_mark  = entry
     last = min(t + max_hold, len(bars) - 1)
     for k in range(t + 1, last + 1):
         b = bars[k]
         held = k - t
+        stop_label = "Trail" if cur_stop > stop else "SL"
+        # Gap-aware fills: an open beyond the level fills at the open.
         # Pessimistic ordering: check stop before target within the same bar.
-        if b["low"] <= stop:
-            return ("SL", stop, (stop - entry) / risk, held)
+        if b["open"] <= cur_stop:
+            return (stop_label, b["open"], (b["open"] - entry) / risk, held)
+        if b["open"] >= target:
+            return ("TP", b["open"], (b["open"] - entry) / risk, held)
+        if b["low"] <= cur_stop:
+            return (stop_label, cur_stop, (cur_stop - entry) / risk, held)
         if b["high"] >= target:
             return ("TP", target, (target - entry) / risk, held)
+        # Update trailing levels for subsequent bars.
+        hi_mark = max(hi_mark, b["high"])
+        if trail_at is not None and b["close"] >= trail_at:
+            cur_stop = max(cur_stop, entry)  # breakeven trail
+        if chand_dist is not None:
+            cur_stop = max(cur_stop, hi_mark - chand_dist)  # chandelier, ratchet-only
     # Time stop at the close of the last held bar.
     exit_price = bars[last]["close"]
     return ("Time", exit_price, (exit_price - entry) / risk, last - t)
@@ -183,7 +208,9 @@ def run_backtest_on(cfg, bars_map, spy_bars, min_score=3, forced_strategy=None,
                 if s["score"] < min_score:
                     continue
                 sim = simulate_long(bars, t, s["stop"], s["target"],
-                                    _max_hold(strategy, ticker, cfg))
+                                    _max_hold(strategy, ticker, cfg),
+                                    atr=s.get("atr"),
+                                    exits_cfg=cfg.get("exits", {}))
                 if sim is None:
                     continue
                 reason, exit_price, r, held = sim
@@ -283,7 +310,6 @@ def summarize(trades):
 
 
 def main():
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
     ap = argparse.ArgumentParser(description="Walk-forward backtest of the Nydex engine.")
     ap.add_argument("--config", default="config.json")
     ap.add_argument("--lookback-days", type=int, default=400)

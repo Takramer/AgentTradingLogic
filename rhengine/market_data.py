@@ -73,6 +73,7 @@ def _safe_ticker(t):
     Alpaca IEX uses BRK.B (not BRK-B or BRK/B).
     """
     clean = str(t).upper().strip()
+    clean = re.sub(r"[-/]", ".", clean)  # BRK-B / BRK/B -> BRK.B (Alpaca format)
     clean = re.sub(r"[^A-Z.]", "", clean)
     if not clean:
         raise ValueError(f"Invalid ticker symbol: {t!r}")
@@ -125,9 +126,17 @@ def fetch_bars(ticker, interval="1d", lookback_days=90):
     if not res.ok:
         raise ConnectionError(f"Alpaca HTTP {res.status_code} for {ticker}: {res.text[:200]}")
 
-    raw = res.json().get("bars", [])
+    body = res.json()
+    raw  = body.get("bars", [])
     if not raw:
         raise ValueError(f"No bar data returned for {ticker}")
+    if body.get("next_page_token"):
+        # ponytail: no pagination — with sort=asc a truncated response silently
+        # drops the NEWEST bars, so fail loud instead of trading on stale data.
+        raise ConnectionError(
+            f"Alpaca response for {ticker} was truncated (next_page_token set). "
+            "Reduce lookback_days or add pagination before using this interval."
+        )
 
     return [
         {
@@ -257,6 +266,13 @@ def _fetch_bars_batch_alpaca(tickers, interval="1d", lookback_days=90, verbose=T
         raise ConnectionError(f"Alpaca HTTP {res.status_code} for batch: {res.text[:200]}")
 
     payload = res.json()
+    if payload.get("next_page_token"):
+        # ponytail: shared 10k-bar cap across all symbols; with sort=asc the
+        # NEWEST bars are the ones dropped — fail loud, don't trade truncated.
+        raise ConnectionError(
+            "Alpaca batch response was truncated (next_page_token set). "
+            "Fetch fewer symbols per batch / smaller lookback, or add pagination."
+        )
     raw_by_symbol = payload.get("bars", {})
 
     for symbol in requested_symbols:
@@ -338,7 +354,13 @@ def _massive_fetch_day(date_iso, key, max_wait=30):
 
 def _massive_day(date_iso, key, allow_fetch=True):
     """Cached whole-market bars for a date. Non-trading days cache as {} so they
-    are never re-fetched. Only past dates are cached (today may be incomplete)."""
+    are never re-fetched. Only past dates are cached (today may be incomplete).
+
+    ponytail: days are fetched adjusted-as-of-fetch-date and cached forever, so a
+    later stock split leaves a silent price/volume discontinuity mid-series (fake
+    PEAD events / breakouts / bad ATR for that ticker). Ceiling accepted for now;
+    upgrade path: delete the cached window for a ticker's split date range (or
+    `rm -r massive_cache` to rebuild) when a watchlist name splits."""
     path = os.path.join(_MASSIVE_CACHE, f"{date_iso}.json.gz")
     if os.path.exists(path):
         try:

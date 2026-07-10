@@ -3,7 +3,7 @@
  "cases": {
   "uptrend": {
    "regime": "uptrend",
-   "vix_regime": "panic",
+   "vix_regime": "fear_spiking",
    "strategies": {
     "vwap": [
      {
@@ -37,9 +37,9 @@
       ],
       "direction": "bull",
       "entry": 134.3144,
-      "target": 142.8789,
-      "stop": 129.1757,
-      "atr": 3.4258
+      "target": 142.2717,
+      "stop": 129.54,
+      "atr": 3.1829
      }
     ],
     "bollinger": null,
@@ -52,12 +52,12 @@
       "change": 0.3617267539563254,
       "score": 3,
       "weighted_score": 4,
-      "strength": 1.4924,
+      "strength": 0.1927,
       "legs": [
        {
         "name": "Residual Momentum (2-bar)",
         "pass": true,
-        "val": "RA-Res: 1.492 prev: 1.946 (\u03b2=-0.05)"
+        "val": "RA-Res: 0.193 prev: 0.459 (\u03b2=-0.05)"
        },
        {
         "name": "Above EMA21",
@@ -77,9 +77,9 @@
       ],
       "direction": "bull",
       "entry": 134.3144,
-      "target": 142.8789,
-      "stop": 129.1757,
-      "atr": 3.4258
+      "target": 142.2717,
+      "stop": 129.54,
+      "atr": 3.1829
      }
     ],
     "pead": null
@@ -121,9 +121,9 @@
       ],
       "direction": "bear",
       "entry": 70.8352,
-      "target": 66.7018,
-      "stop": 73.3153,
-      "atr": 1.6534
+      "target": 66.4612,
+      "stop": 73.4596,
+      "atr": 1.7496
      }
     ],
     "bollinger": null,
@@ -136,12 +136,12 @@
       "change": -0.630151898592125,
       "score": 3,
       "weighted_score": 4,
-      "strength": 2.1986,
+      "strength": 0.6271,
       "legs": [
        {
         "name": "Residual Momentum (2-bar)",
         "pass": true,
-        "val": "RA-Res: -2.199 prev: -2.197 (\u03b2=0.19)"
+        "val": "RA-Res: -0.627 prev: -0.628 (\u03b2=0.19)"
        },
        {
         "name": "Below EMA21",
@@ -161,9 +161,9 @@
       ],
       "direction": "bear",
       "entry": 70.8352,
-      "target": 66.7018,
-      "stop": 73.3153,
-      "atr": 1.6534
+      "target": 66.4612,
+      "stop": 73.4596,
+      "atr": 1.7496
      }
     ],
     "pead": null
@@ -205,9 +205,9 @@
       ],
       "direction": "bear",
       "entry": 97.5,
-      "target": 87.1802,
-      "stop": 103.6919,
-      "atr": 4.1279
+      "target": 87.714,
+      "stop": 103.3716,
+      "atr": 3.9144
      }
     ],
     "bollinger": [
@@ -243,8 +243,8 @@
       "direction": "bull",
       "entry": 97.5,
       "target": 99.9485,
-      "stop": 91.3081,
-      "atr": 4.1279
+      "stop": 91.6284,
+      "atr": 3.9144
      },
      {
       "ticker": "TEST",
@@ -277,9 +277,9 @@
       ],
       "direction": "bear",
       "entry": 97.5,
-      "target": 91.3081,
-      "stop": 103.6919,
-      "atr": 4.1279
+      "target": 91.6284,
+      "stop": 103.3716,
+      "atr": 3.9144
      }
     ],
     "macd": [
@@ -289,7 +289,7 @@
       "change": 3.1746031746031744,
       "score": 2,
       "weighted_score": 2,
-      "strength": -0.0988,
+      "strength": -0.1042,
       "legs": [
        {
         "name": "MACD Cross \u2191",
@@ -314,9 +314,9 @@
       ],
       "direction": "bull",
       "entry": 97.5,
-      "target": 107.8198,
-      "stop": 91.3081,
-      "atr": 4.1279
+      "target": 107.286,
+      "stop": 91.6284,
+      "atr": 3.9144
      },
      {
       "ticker": "TEST",
@@ -324,7 +324,7 @@
       "change": 3.1746031746031744,
       "score": 2,
       "weighted_score": 2,
-      "strength": 0.0988,
+      "strength": 0.1042,
       "legs": [
        {
         "name": "MACD Cross \u2193",
@@ -349,9 +349,9 @@
       ],
       "direction": "bear",
       "entry": 97.5,
-      "target": 87.1802,
-      "stop": 103.6919,
-      "atr": 4.1279
+      "target": 87.714,
+      "stop": 103.3716,
+      "atr": 3.9144
      }
     ],
     "consolidation": null,
@@ -362,12 +362,12 @@
       "change": 3.1746031746031744,
       "score": 3,
       "weighted_score": 3,
-      "strength": 0.2734,
+      "strength": 0.263,
       "legs": [
        {
         "name": "Residual Momentum (2-bar)",
         "pass": false,
-        "val": "RA-Res: -0.273 prev: 0.064 (\u03b2=0.30)"
+        "val": "RA-Res: -0.263 prev: 0.078 (\u03b2=0.30)"
        },
        {
         "name": "Below EMA21",
@@ -387,9 +387,9 @@
       ],
       "direction": "bear",
       "entry": 97.5,
-      "target": 87.1802,
-      "stop": 103.6919,
-      "atr": 4.1279
+      "target": 87.714,
+      "stop": 103.3716,
+      "atr": 3.9144
      }
     ],
     "pead": null
@@ -431,9 +431,9 @@
       ],
       "direction": "bull",
       "entry": 106.0,
-      "target": 112.254,
-      "stop": 102.2476,
-      "atr": 2.5016
+      "target": 112.411,
+      "stop": 102.1534,
+      "atr": 2.5644
      }
     ],
     "bollinger": [
@@ -468,9 +468,9 @@
       ],
       "direction": "bull",
       "entry": 106.0,
-      "target": 109.7524,
-      "stop": 102.2476,
-      "atr": 2.5016
+      "target": 109.8466,
+      "stop": 102.1534,
+      "atr": 2.5644
      }
     ],
     "macd": [
@@ -480,7 +480,7 @@
       "change": 5.682951146560322,
       "score": 2,
       "weighted_score": 3,
-      "strength": 0.1171,
+      "strength": 0.1143,
       "legs": [
        {
         "name": "MACD Cross \u2191",
@@ -505,9 +505,9 @@
       ],
       "direction": "bull",
       "entry": 106.0,
-      "target": 112.254,
-      "stop": 102.2476,
-      "atr": 2.5016
+      "target": 112.411,
+      "stop": 102.1534,
+      "atr": 2.5644
      }
     ],
     "consolidation": [
@@ -527,7 +527,7 @@
        {
         "name": "ADX Low (Ranging)",
         "pass": true,
-        "val": "ADX 20.1 < 25"
+        "val": "ADX 22.9 < 25"
        },
        {
         "name": "Breakout + Volume",
@@ -542,9 +542,9 @@
       ],
       "direction": "bull",
       "entry": 106.0,
-      "target": 112.254,
-      "stop": 102.2476,
-      "atr": 2.5016
+      "target": 112.411,
+      "stop": 102.1534,
+      "atr": 2.5644
      },
      {
       "ticker": "TEST",
@@ -562,7 +562,7 @@
        {
         "name": "ADX Low (Ranging)",
         "pass": true,
-        "val": "ADX 20.1 < 25"
+        "val": "ADX 22.9 < 25"
        },
        {
         "name": "Breakdown + Volume",
@@ -577,9 +577,9 @@
       ],
       "direction": "bear",
       "entry": 106.0,
-      "target": 99.746,
-      "stop": 109.7524,
-      "atr": 2.5016
+      "target": 99.589,
+      "stop": 109.8466,
+      "atr": 2.5644
      }
     ],
     "residualmomentum": [
@@ -589,12 +589,12 @@
       "change": 5.682951146560322,
       "score": 2,
       "weighted_score": 2,
-      "strength": -0.3677,
+      "strength": -0.3706,
       "legs": [
        {
         "name": "Residual Momentum (2-bar)",
         "pass": false,
-        "val": "RA-Res: -0.368 prev: -0.412 (\u03b2=0.09)"
+        "val": "RA-Res: -0.371 prev: -0.415 (\u03b2=0.09)"
        },
        {
         "name": "Above EMA21",
@@ -614,9 +614,9 @@
       ],
       "direction": "bull",
       "entry": 106.0,
-      "target": 112.254,
-      "stop": 102.2476,
-      "atr": 2.5016
+      "target": 112.411,
+      "stop": 102.1534,
+      "atr": 2.5644
      }
     ],
     "pead": null
@@ -637,12 +637,12 @@
       "change": 0.4901145657797485,
       "score": 3,
       "weighted_score": 4,
-      "strength": 0.3705,
+      "strength": 0.3355,
       "legs": [
        {
         "name": "Residual Momentum (2-bar)",
         "pass": true,
-        "val": "RA-Res: 0.370 prev: 0.355 (\u03b2=0.02)"
+        "val": "RA-Res: 0.335 prev: 0.320 (\u03b2=0.02)"
        },
        {
         "name": "Above EMA21",
@@ -662,9 +662,9 @@
       ],
       "direction": "bull",
       "entry": 58.6192,
-      "target": 62.2283,
-      "stop": 56.4537,
-      "atr": 1.4437
+      "target": 61.9377,
+      "stop": 56.6281,
+      "atr": 1.3274
      }
     ],
     "pead": [
@@ -674,12 +674,12 @@
       "change": 0.4901145657797485,
       "score": 3,
       "weighted_score": 4,
-      "strength": 3.2709,
+      "strength": 3.5574,
       "legs": [
        {
         "name": "Earnings Surprise \u2191",
         "pass": true,
-        "val": "+3.3ATR 6d ago"
+        "val": "+3.6ATR 6d ago"
        },
        {
         "name": "Drift Intact",
@@ -699,9 +699,9 @@
       ],
       "direction": "bull",
       "entry": 58.6192,
-      "target": 62.2283,
-      "stop": 56.4537,
-      "atr": 1.4437
+      "target": 61.9377,
+      "stop": 56.6281,
+      "atr": 1.3274
      }
     ]
    }
@@ -746,9 +746,9 @@
       ],
       "direction": "bull",
       "entry": 470.2834,
-      "target": 499.5299,
-      "stop": 452.7355,
-      "atr": 11.6986
+      "target": 498.7234,
+      "stop": 453.2194,
+      "atr": 11.376
      }
     ],
     "pead": null

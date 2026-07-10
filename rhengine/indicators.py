@@ -183,19 +183,28 @@ def calc_macd(closes, fast=12, slow=26, sig=9):
 
 
 def calc_atr(bars, period=14):
-    """Average True Range over last `period` bars."""
-    last = bars[-period:]
-    trs  = []
-    for j, b in enumerate(last):
-        if j == 0:
-            trs.append(b["high"] - b["low"])
-        else:
-            trs.append(max(
-                b["high"] - b["low"],
-                abs(b["high"] - last[j - 1]["close"]),
-                abs(b["low"]  - last[j - 1]["close"]),
-            ))
-    return _mean(trs)
+    """Wilder-smoothed Average True Range.
+
+    TR uses the prior close (gap-aware) whenever a prior bar exists.
+    Seed = simple mean of the first `period` TRs, then Wilder recursion
+    ATR = (prev*(period-1) + TR) / period over the remaining history.
+    """
+    trs = []
+    for j in range(1, len(bars)):
+        b, pb = bars[j], bars[j - 1]
+        trs.append(max(
+            b["high"] - b["low"],
+            abs(b["high"] - pb["close"]),
+            abs(b["low"]  - pb["close"]),
+        ))
+    if not trs:
+        return bars[-1]["high"] - bars[-1]["low"] if bars else 0.0
+    if len(trs) < period:
+        return _mean(trs)
+    atr = _mean(trs[:period])
+    for tr in trs[period:]:
+        atr = (atr * (period - 1) + tr) / period
+    return atr
 
 
 def calc_adx(bars, period=14):
@@ -227,7 +236,12 @@ def calc_adx(bars, period=14):
 
     if len(dx_arr) < period:
         return None
-    return _mean(dx_arr[-period:])
+    # Wilder-smoothed DX: seed = mean of first `period` DX values, then
+    # ADX = (prev*(period-1) + DX) / period
+    adx = _mean(dx_arr[:period])
+    for dx in dx_arr[period:]:
+        adx = (adx * (period - 1) + dx) / period
+    return adx
 
 
 def _calc_ols(x, y):
@@ -430,7 +444,7 @@ def score_bollinger(ticker, bars, thresholds):
     # Hard ADX gate — band-walking in a real trend produces false Bollinger signals.
     # Price keeps tagging the band and "closing inside" while the trend just continues.
     # This is a hard NO, not a leg vote — if trending, skip mean reversion entirely.
-    adx      = calc_adx(bars[-60:], 14)
+    adx      = calc_adx(bars, 14)
     adx_gate = thresholds.get("adxMax", 30)
     if adx is not None and adx > adx_gate:
         return None
@@ -565,7 +579,7 @@ def score_macd_trend(ticker, bars, thresholds):
         {"name": second_name,     "pass": bear_second, "val": bear_second_val},
         {"name": "Below EMA50",   "pass": bear_ema,   "val": ema_bear_val},
         {"name": "RSI Momentum",
-         "pass": ri is not None and 30 < ri < (100 - rsi_min),
+         "pass": ri is not None and (100 - rsi_max) < ri < (100 - rsi_min),
          "val":  f"RSI {ri:.1f}" if ri else "—"},
     ]
     stop_mult, target_mult = _exit_params(thresholds)
@@ -603,8 +617,8 @@ def score_consolidation(ticker, bars, thresholds):
     range_thresh    = thresholds.get("rangeWidth",  0.08)
     vol_mult        = thresholds.get("volMult",     1.3)
 
-    adx    = calc_adx(bars[-60:], 14)
-    recent = bars[i - 19 : i]
+    adx    = calc_adx(bars, 14)
+    recent = bars[i - 20 : i]
     if not recent:
         return None
 
@@ -684,6 +698,7 @@ def score_residual_momentum(ticker, bars, thresholds, spy_bars=None):
     reg_n = min(L, 36)
     ols   = _calc_ols(spy_rets[:reg_n], stock_rets[:reg_n])
     beta  = ols["beta"]
+    alpha = ols["alpha"]
 
     SKIP, FORM = 1, 12
     form_end   = L - SKIP
@@ -693,7 +708,7 @@ def score_residual_momentum(ticker, bars, thresholds, spy_bars=None):
     if len(form_stock) < 6:
         return None
 
-    residuals = [form_stock[j] - beta * form_spy[j] for j in range(len(form_stock))]
+    residuals = [form_stock[j] - (alpha + beta * form_spy[j]) for j in range(len(form_stock))]
     mean_res  = _mean(residuals)
     n         = len(residuals)
     variance  = sum((r - mean_res) ** 2 for r in residuals) / (n - 1) if n > 1 else 0
@@ -708,7 +723,7 @@ def score_residual_momentum(ticker, bars, thresholds, spy_bars=None):
     prev_form_stock = stock_rets[prev_form_start:prev_form_end]
     prev_form_spy   = spy_rets[prev_form_start:prev_form_end]
     if len(prev_form_stock) >= 6:
-        prev_residuals  = [prev_form_stock[j] - beta * prev_form_spy[j] for j in range(len(prev_form_stock))]
+        prev_residuals  = [prev_form_stock[j] - (alpha + beta * prev_form_spy[j]) for j in range(len(prev_form_stock))]
         prev_mean_res   = _mean(prev_residuals)
         prev_n          = len(prev_residuals)
         prev_var        = sum((r - prev_mean_res) ** 2 for r in prev_residuals) / (prev_n - 1) if prev_n > 1 else 0
@@ -729,9 +744,6 @@ def score_residual_momentum(ticker, bars, thresholds, spy_bars=None):
     avg_vol = _mean(volumes[max(0, i-20):i]) or 1
 
     min_ra   = thresholds.get("minResidualRA", 0.15)
-    vol_mult = thresholds.get("volMult", 1.1)
-    vol_pass = volumes[i] > avg_vol * vol_mult
-    vol_val  = f"+{(volumes[i]/avg_vol - 1)*100:.0f}% vs avg"
     ri       = rsi[i]
     e21, e50 = ema21[i], ema50[i]
 
