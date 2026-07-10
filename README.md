@@ -1,4 +1,4 @@
-# robinhood-agent — shared trading engine
+# AgentTradingLogic — shared trading engine
 
 Single source of truth for the 6-strategy signal engine shared by
 **RobinhoodAgent** (autonomous Python app) and **Nydex** (client-side React app).
