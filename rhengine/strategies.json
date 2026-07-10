@@ -1,0 +1,138 @@
+{
+  "_spec_version": 1,
+  "_notes": "Canonical strategy spec — single source of truth shared by RobinhoodAgent (Python) and Nydex (JS). Threshold defaults are RobinhoodAgent's walk-forward-tuned values (they win over Nydex UI defaults where they differ, e.g. bollinger adxMax 35). legs/slider metadata come from Nydex for its UI. exits = global exit engine params (RobinhoodAgent order_plan/backtest).",
+  "regime_routing": {
+    "uptrend": "residualmomentum",
+    "downtrend": "residualmomentum",
+    "choppy": "bollinger",
+    "_note": "MACD retired from auto-routing: no OOS edge in uptrends (optimize.py walk-forward). Still available manually."
+  },
+  "exits": {
+    "stop_atr_mult": 1.0,
+    "target_atr_mult": 2.0,
+    "trail_trigger_mult": 1.5,
+    "chandelier_atr_mult": 3.0,
+    "max_hold_sessions": 10,
+    "leveraged_max_hold_sessions": 3
+  },
+  "strategies": {
+    "vwap": {
+      "id": "vwap",
+      "name": "VWAP Confluence",
+      "description": "Anchored-VWAP reclaim/rejection, EMA trend stack, volume confirmation, RSI momentum reset. Best in trending conditions.",
+      "regime": null,
+      "legs": [
+        {"abbr": "VWAP", "full": "Anchored Volume Weighted Average Price", "desc": "VWAP anchored at the most recent swing extreme. A reclaim above signals bullish bias; a rejection signals bearish."},
+        {"abbr": "EMA", "full": "Exponential Moving Average", "desc": "Bullish stack = 9 EMA > 21 EMA > 50 EMA. Bearish is the inverse."},
+        {"abbr": "VOL", "full": "Volume Spike", "desc": "Current bar volume vs the 20-bar average on a directional candle."},
+        {"abbr": "RSI", "full": "Relative Strength Index", "desc": "Reset = RSI dipped under the midline then crossed back above."}
+      ],
+      "thresholds": {
+        "volMult": {"default": 1.15, "min": 1.0, "max": 2.0, "step": 0.05, "label": "Volume Threshold"},
+        "rsiLow": {"default": 50, "min": 40, "max": 60, "step": 1, "label": "RSI Midline"},
+        "rsiHigh": {"default": 70, "min": 60, "max": 85, "step": 1, "label": "RSI Ceiling"},
+        "vwapAnchorLookback": {"default": 30, "min": 10, "max": 60, "step": 5, "label": "VWAP Anchor Lookback"},
+        "stopAtrMult": {"default": 1.5, "min": 0.5, "max": 3.0, "step": 0.25, "label": "Stop (ATR mult)"},
+        "targetAtrMult": {"default": 2.5, "min": 1.0, "max": 4.0, "step": 0.25, "label": "Target (ATR mult)"}
+      }
+    },
+    "bollinger": {
+      "id": "bollinger",
+      "name": "Bollinger Band Mean Reversion",
+      "description": "Band tag + RSI exhaustion + close back inside with volume. Hard-gated by ADX; choppy/range markets only.",
+      "regime": "choppy",
+      "legs": [
+        {"abbr": "BB", "full": "Bollinger Bands", "desc": "Price tagging outer bands signals potential exhaustion and mean reversion."},
+        {"abbr": "RSI", "full": "Relative Strength Index", "desc": "Oversold on lower-band tag (bull), overbought on upper-band tag (bear)."},
+        {"abbr": "VOL", "full": "Volume Spike", "desc": "Volume surge on the reversal candle."},
+        {"abbr": "CLOSE", "full": "Close Inside Band", "desc": "Prior bar tagged the band; current candle closes back inside."}
+      ],
+      "thresholds": {
+        "volMult": {"default": 1.1, "min": 1.0, "max": 2.0, "step": 0.05, "label": "Volume Threshold"},
+        "rsiLow": {"default": 35, "min": 20, "max": 45, "step": 1, "label": "RSI Oversold"},
+        "rsiHigh": {"default": 65, "min": 55, "max": 80, "step": 1, "label": "RSI Overbought"},
+        "adxMax": {"default": 35, "min": 15, "max": 45, "step": 1, "label": "ADX Trend Gate"},
+        "stopAtrMult": {"default": 1.5, "min": 0.5, "max": 3.0, "step": 0.25, "label": "Stop (ATR mult)"},
+        "targetAtrMult": {"default": 1.5, "min": 1.0, "max": 4.0, "step": 0.25, "label": "Target (ATR mult)"}
+      }
+    },
+    "macd": {
+      "id": "macd",
+      "name": "MACD Trend Continuation",
+      "description": "Early-stage MACD/signal cross with EMA50 trend confirmation and RSI band. Retired from auto-routing (no OOS edge); manual use only.",
+      "regime": null,
+      "legs": [
+        {"abbr": "MACD", "full": "Moving Average Convergence Divergence", "desc": "MACD crossing its signal line."},
+        {"abbr": "SUB-0", "full": "Early-Stage Sub-Zero Cross", "desc": "Cross fires while MACD and signal are still below zero (bull) / above zero (bear)."},
+        {"abbr": "EMA50", "full": "50-Period EMA", "desc": "Price on the right side of EMA50 confirms trend context."},
+        {"abbr": "RSI", "full": "Relative Strength Index", "desc": "Momentum quality band: trending but not overextended."}
+      ],
+      "thresholds": {
+        "volMult": {"default": 1.1, "min": 1.0, "max": 2.0, "step": 0.05, "label": "Volume Threshold"},
+        "rsiLow": {"default": 45, "min": 35, "max": 55, "step": 1, "label": "RSI Min (Bull)"},
+        "rsiHigh": {"default": 75, "min": 60, "max": 85, "step": 1, "label": "RSI Max (Bull)"},
+        "stopAtrMult": {"default": 1.5, "min": 0.5, "max": 3.0, "step": 0.25, "label": "Stop (ATR mult)"},
+        "targetAtrMult": {"default": 2.5, "min": 1.0, "max": 4.0, "step": 0.25, "label": "Target (ATR mult)"}
+      }
+    },
+    "consolidation": {
+      "id": "consolidation",
+      "name": "Consolidation Breakout",
+      "description": "BB + range compression with low ADX, then a confirmed breakout bar with volume; 'held' leg filters single-bar fakeouts.",
+      "regime": null,
+      "legs": [
+        {"abbr": "COMP", "full": "Volatility Compression", "desc": "BB width AND 20-bar range both tight — the stock is coiling."},
+        {"abbr": "ADX", "full": "Average Directional Index", "desc": "ADX below threshold confirms range, not trend."},
+        {"abbr": "BO+VOL", "full": "Breakout + Volume", "desc": "Close breaks outside the 20-bar range with above-average volume."},
+        {"abbr": "HELD", "full": "Clean Break (Held)", "desc": "Breakout bar's low/high stays near the range boundary — conviction, not a wick fakeout."}
+      ],
+      "thresholds": {
+        "bbWidth": {"default": 0.06, "min": 0.02, "max": 0.12, "step": 0.01, "label": "BB Squeeze Width"},
+        "adxMax": {"default": 25, "min": 15, "max": 35, "step": 1, "label": "Max ADX (Ranging)"},
+        "rangeWidth": {"default": 0.08, "min": 0.03, "max": 0.15, "step": 0.01, "label": "Max Range Width"},
+        "volMult": {"default": 1.3, "min": 1.1, "max": 2.5, "step": 0.05, "label": "Volume Multiplier"},
+        "stopAtrMult": {"default": 1.5, "min": 0.5, "max": 3.0, "step": 0.25, "label": "Stop (ATR mult)"},
+        "targetAtrMult": {"default": 2.5, "min": 1.0, "max": 4.0, "step": 0.25, "label": "Target (ATR mult)"}
+      }
+    },
+    "residualmomentum": {
+      "id": "residualmomentum",
+      "name": "Residual Momentum",
+      "description": "OLS-strips SPY beta to isolate idiosyncratic alpha momentum; 2-bar hold plus EMA and RSI confirmation. Auto-routed in uptrend and downtrend regimes.",
+      "regime": "uptrend|downtrend",
+      "legs": [
+        {"abbr": "RA-RES", "full": "Residual Momentum (2-bar Hold)", "desc": "Risk-adjusted residual above threshold on two consecutive bars."},
+        {"abbr": "EMA21", "full": "Price vs 21-bar EMA", "desc": "Price on the right side of its 21-bar EMA."},
+        {"abbr": "EMA CROSS", "full": "EMA21 vs EMA50 Alignment", "desc": "Faster EMA on the correct side of the slower EMA."},
+        {"abbr": "RSI", "full": "RSI Momentum Band", "desc": "RSI in the momentum zone, not overbought/oversold."}
+      ],
+      "thresholds": {
+        "minResidualRA": {"default": 0.15, "min": 0.05, "max": 0.5, "step": 0.01, "label": "Min Residual RA Score"},
+        "volMult": {"default": 1.1, "min": 1.0, "max": 2.0, "step": 0.05, "label": "Volume Multiplier"},
+        "stopAtrMult": {"default": 1.5, "min": 0.5, "max": 3.0, "step": 0.25, "label": "Stop (ATR mult)"},
+        "targetAtrMult": {"default": 2.5, "min": 1.0, "max": 4.0, "step": 0.25, "label": "Target (ATR mult)"}
+      }
+    },
+    "pead": {
+      "id": "pead",
+      "name": "Post-Earnings Announcement Drift",
+      "description": "Event-driven, regime-agnostic sleeve: detects an earnings-like gap (price move + volume spike), then rides the drift 1-10 sessions with trend and momentum confirmation. Runs alongside the regime strategy; pools merged by (ticker, direction) keeping the stronger setup. Upgrade path: replace the price-proxy event detector with a real earnings/SUE feed (Nydex api/sue.js via FMP).",
+      "regime": "always-on",
+      "legs": [
+        {"abbr": "EVENT", "full": "Earnings Surprise", "desc": "A recent bar with an outsized move (ATR multiples) on outsized volume — an earnings-like event in the drift window."},
+        {"abbr": "DRIFT", "full": "Drift Intact", "desc": "Price still on the event side of the event close — the drift hasn't reversed."},
+        {"abbr": "EMA20", "full": "Price vs 20-bar EMA", "desc": "Price on the event side of its 20-bar EMA."},
+        {"abbr": "RSI", "full": "RSI Momentum", "desc": "RSI in the directional momentum band (45-80 bull, 20-55 bear)."}
+      ],
+      "thresholds": {
+        "peadWindow": {"default": 40, "min": 20, "max": 60, "step": 5, "label": "Event Scan Window"},
+        "moveMult": {"default": 2.0, "min": 1.5, "max": 4.0, "step": 0.25, "label": "Event Move (ATR mult)"},
+        "volMult": {"default": 2.0, "min": 1.5, "max": 4.0, "step": 0.25, "label": "Event Volume Mult"},
+        "driftMin": {"default": 1, "min": 1, "max": 5, "step": 1, "label": "Drift Min (days)"},
+        "driftMax": {"default": 10, "min": 5, "max": 20, "step": 1, "label": "Drift Max (days)"},
+        "stopAtrMult": {"default": 1.5, "min": 0.5, "max": 3.0, "step": 0.25, "label": "Stop (ATR mult)"},
+        "targetAtrMult": {"default": 2.5, "min": 1.0, "max": 4.0, "step": 0.25, "label": "Target (ATR mult)"}
+      }
+    }
+  }
+}

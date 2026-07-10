@@ -1,0 +1,758 @@
+{
+ "_note": "Golden vectors: score_ticker(bars, strategy, spec defaults). Regenerate ONLY with gen_fixtures.py after a deliberate engine change.",
+ "cases": {
+  "uptrend": {
+   "regime": "uptrend",
+   "vix_regime": "panic",
+   "strategies": {
+    "vwap": [
+     {
+      "ticker": "TEST",
+      "price": 134.3144,
+      "change": 0.3617267539563254,
+      "score": 2,
+      "weighted_score": 2,
+      "strength": 1.7476,
+      "legs": [
+       {
+        "name": "AVWAP Reclaim",
+        "pass": false,
+        "val": "AVWAP $126.18"
+       },
+       {
+        "name": "EMA Stack Bull",
+        "pass": true,
+        "val": "9>132.4 21>128.9"
+       },
+       {
+        "name": "Volume Spike",
+        "pass": true,
+        "val": "+75% vs avg"
+       },
+       {
+        "name": "RSI Reset \u2191",
+        "pass": false,
+        "val": "RSI 98.2"
+       }
+      ],
+      "direction": "bull",
+      "entry": 134.3144,
+      "target": 142.8789,
+      "stop": 129.1757,
+      "atr": 3.4258
+     }
+    ],
+    "bollinger": null,
+    "macd": null,
+    "consolidation": null,
+    "residualmomentum": [
+     {
+      "ticker": "TEST",
+      "price": 134.3144,
+      "change": 0.3617267539563254,
+      "score": 3,
+      "weighted_score": 4,
+      "strength": 1.4924,
+      "legs": [
+       {
+        "name": "Residual Momentum (2-bar)",
+        "pass": true,
+        "val": "RA-Res: 1.492 prev: 1.946 (\u03b2=-0.05)"
+       },
+       {
+        "name": "Above EMA21",
+        "pass": true,
+        "val": "EMA21 $128.87"
+       },
+       {
+        "name": "EMA21 > EMA50",
+        "pass": true,
+        "val": "EMA50 $121.72"
+       },
+       {
+        "name": "RSI Momentum",
+        "pass": false,
+        "val": "RSI 98.2"
+       }
+      ],
+      "direction": "bull",
+      "entry": 134.3144,
+      "target": 142.8789,
+      "stop": 129.1757,
+      "atr": 3.4258
+     }
+    ],
+    "pead": null
+   }
+  },
+  "downtrend": {
+   "regime": "downtrend",
+   "vix_regime": "fear_spiking",
+   "strategies": {
+    "vwap": [
+     {
+      "ticker": "TEST",
+      "price": 70.8352,
+      "change": -0.630151898592125,
+      "score": 2,
+      "weighted_score": 2,
+      "strength": 1.7,
+      "legs": [
+       {
+        "name": "AVWAP Rejection",
+        "pass": false,
+        "val": "AVWAP $76.51"
+       },
+       {
+        "name": "EMA Stack Bear",
+        "pass": true,
+        "val": "9<72.5 21<74.7"
+       },
+       {
+        "name": "Volume Spike",
+        "pass": true,
+        "val": "+70% vs avg"
+       },
+       {
+        "name": "RSI Rollover \u2193",
+        "pass": false,
+        "val": "RSI 0.7"
+       }
+      ],
+      "direction": "bear",
+      "entry": 70.8352,
+      "target": 66.7018,
+      "stop": 73.3153,
+      "atr": 1.6534
+     }
+    ],
+    "bollinger": null,
+    "macd": null,
+    "consolidation": null,
+    "residualmomentum": [
+     {
+      "ticker": "TEST",
+      "price": 70.8352,
+      "change": -0.630151898592125,
+      "score": 3,
+      "weighted_score": 4,
+      "strength": 2.1986,
+      "legs": [
+       {
+        "name": "Residual Momentum (2-bar)",
+        "pass": true,
+        "val": "RA-Res: -2.199 prev: -2.197 (\u03b2=0.19)"
+       },
+       {
+        "name": "Below EMA21",
+        "pass": true,
+        "val": "EMA21 $74.74"
+       },
+       {
+        "name": "EMA21 < EMA50",
+        "pass": true,
+        "val": "EMA50 $79.89"
+       },
+       {
+        "name": "RSI Weak",
+        "pass": false,
+        "val": "RSI 0.7"
+       }
+      ],
+      "direction": "bear",
+      "entry": 70.8352,
+      "target": 66.7018,
+      "stop": 73.3153,
+      "atr": 1.6534
+     }
+    ],
+    "pead": null
+   }
+  },
+  "choppy_reversal": {
+   "regime": "downtrend",
+   "vix_regime": "panic",
+   "strategies": {
+    "vwap": [
+     {
+      "ticker": "TEST",
+      "price": 97.5,
+      "change": 3.1746031746031744,
+      "score": 2,
+      "weighted_score": 2,
+      "strength": 1.9,
+      "legs": [
+       {
+        "name": "AVWAP Rejection",
+        "pass": false,
+        "val": "AVWAP $99.85"
+       },
+       {
+        "name": "EMA Stack Bear",
+        "pass": true,
+        "val": "9<98.9 21<99.5"
+       },
+       {
+        "name": "Volume Spike",
+        "pass": true,
+        "val": "+90% vs avg"
+       },
+       {
+        "name": "RSI Rollover \u2193",
+        "pass": false,
+        "val": "RSI 45.5"
+       }
+      ],
+      "direction": "bear",
+      "entry": 97.5,
+      "target": 87.1802,
+      "stop": 103.6919,
+      "atr": 4.1279
+     }
+    ],
+    "bollinger": [
+     {
+      "ticker": "TEST",
+      "price": 97.5,
+      "change": 3.1746031746031744,
+      "score": 3,
+      "weighted_score": 4,
+      "strength": 11.8094,
+      "legs": [
+       {
+        "name": "BB Lower Tag",
+        "pass": true,
+        "val": "Lower $96.67"
+       },
+       {
+        "name": "Close Inside BB",
+        "pass": true,
+        "val": "Mid $99.95"
+       },
+       {
+        "name": "RSI Oversold",
+        "pass": false,
+        "val": "RSI 45.5"
+       },
+       {
+        "name": "Volume Spike",
+        "pass": true,
+        "val": "+90% vs avg"
+       }
+      ],
+      "direction": "bull",
+      "entry": 97.5,
+      "target": 99.9485,
+      "stop": 91.3081,
+      "atr": 4.1279
+     },
+     {
+      "ticker": "TEST",
+      "price": 97.5,
+      "change": 3.1746031746031744,
+      "score": 2,
+      "weighted_score": 2,
+      "strength": -11.8094,
+      "legs": [
+       {
+        "name": "BB Upper Tag",
+        "pass": false,
+        "val": "Upper $103.54"
+       },
+       {
+        "name": "Close Inside BB",
+        "pass": true,
+        "val": "Mid $99.95"
+       },
+       {
+        "name": "RSI Overbought",
+        "pass": false,
+        "val": "RSI 45.5"
+       },
+       {
+        "name": "Volume Spike",
+        "pass": true,
+        "val": "+90% vs avg"
+       }
+      ],
+      "direction": "bear",
+      "entry": 97.5,
+      "target": 91.3081,
+      "stop": 103.6919,
+      "atr": 4.1279
+     }
+    ],
+    "macd": [
+     {
+      "ticker": "TEST",
+      "price": 97.5,
+      "change": 3.1746031746031744,
+      "score": 2,
+      "weighted_score": 2,
+      "strength": -0.0988,
+      "legs": [
+       {
+        "name": "MACD Cross \u2191",
+        "pass": false,
+        "val": "MACD -0.443"
+       },
+       {
+        "name": "Early-Stage (Sub-0)",
+        "pass": true,
+        "val": "MACD -0.443 / Sig -0.036"
+       },
+       {
+        "name": "Above EMA50",
+        "pass": false,
+        "val": "EMA50 $99.79"
+       },
+       {
+        "name": "RSI Momentum",
+        "pass": true,
+        "val": "RSI 45.5"
+       }
+      ],
+      "direction": "bull",
+      "entry": 97.5,
+      "target": 107.8198,
+      "stop": 91.3081,
+      "atr": 4.1279
+     },
+     {
+      "ticker": "TEST",
+      "price": 97.5,
+      "change": 3.1746031746031744,
+      "score": 2,
+      "weighted_score": 2,
+      "strength": 0.0988,
+      "legs": [
+       {
+        "name": "MACD Cross \u2193",
+        "pass": false,
+        "val": "MACD -0.443"
+       },
+       {
+        "name": "Early-Stage (Sub-0)",
+        "pass": false,
+        "val": "MACD -0.443 / Sig -0.036"
+       },
+       {
+        "name": "Below EMA50",
+        "pass": true,
+        "val": "EMA50 $99.79"
+       },
+       {
+        "name": "RSI Momentum",
+        "pass": true,
+        "val": "RSI 45.5"
+       }
+      ],
+      "direction": "bear",
+      "entry": 97.5,
+      "target": 87.1802,
+      "stop": 103.6919,
+      "atr": 4.1279
+     }
+    ],
+    "consolidation": null,
+    "residualmomentum": [
+     {
+      "ticker": "TEST",
+      "price": 97.5,
+      "change": 3.1746031746031744,
+      "score": 3,
+      "weighted_score": 3,
+      "strength": 0.2734,
+      "legs": [
+       {
+        "name": "Residual Momentum (2-bar)",
+        "pass": false,
+        "val": "RA-Res: -0.273 prev: 0.064 (\u03b2=0.30)"
+       },
+       {
+        "name": "Below EMA21",
+        "pass": true,
+        "val": "EMA21 $99.52"
+       },
+       {
+        "name": "EMA21 < EMA50",
+        "pass": true,
+        "val": "EMA50 $99.79"
+       },
+       {
+        "name": "RSI Weak",
+        "pass": true,
+        "val": "RSI 45.5"
+       }
+      ],
+      "direction": "bear",
+      "entry": 97.5,
+      "target": 87.1802,
+      "stop": 103.6919,
+      "atr": 4.1279
+     }
+    ],
+    "pead": null
+   }
+  },
+  "squeeze_breakout": {
+   "regime": "uptrend",
+   "vix_regime": "fear_spiking",
+   "strategies": {
+    "vwap": [
+     {
+      "ticker": "TEST",
+      "price": 106.0,
+      "change": 5.682951146560322,
+      "score": 2,
+      "weighted_score": 2,
+      "strength": 2.2,
+      "legs": [
+       {
+        "name": "AVWAP Reclaim",
+        "pass": false,
+        "val": "AVWAP $102.27"
+       },
+       {
+        "name": "EMA Stack Bull",
+        "pass": true,
+        "val": "9>101.5 21>101.2"
+       },
+       {
+        "name": "Volume Spike",
+        "pass": true,
+        "val": "+120% vs avg"
+       },
+       {
+        "name": "RSI Reset \u2191",
+        "pass": false,
+        "val": "RSI 84.5"
+       }
+      ],
+      "direction": "bull",
+      "entry": 106.0,
+      "target": 112.254,
+      "stop": 102.2476,
+      "atr": 2.5016
+     }
+    ],
+    "bollinger": [
+     {
+      "ticker": "TEST",
+      "price": 106.0,
+      "change": 5.682951146560322,
+      "score": 2,
+      "weighted_score": 2,
+      "strength": 12.6036,
+      "legs": [
+       {
+        "name": "BB Lower Tag",
+        "pass": false,
+        "val": "Lower $99.84"
+       },
+       {
+        "name": "Close Inside BB",
+        "pass": true,
+        "val": "Mid $101.11"
+       },
+       {
+        "name": "RSI Oversold",
+        "pass": false,
+        "val": "RSI 84.5"
+       },
+       {
+        "name": "Volume Spike",
+        "pass": true,
+        "val": "+120% vs avg"
+       }
+      ],
+      "direction": "bull",
+      "entry": 106.0,
+      "target": 109.7524,
+      "stop": 102.2476,
+      "atr": 2.5016
+     }
+    ],
+    "macd": [
+     {
+      "ticker": "TEST",
+      "price": 106.0,
+      "change": 5.682951146560322,
+      "score": 2,
+      "weighted_score": 3,
+      "strength": 0.1171,
+      "legs": [
+       {
+        "name": "MACD Cross \u2191",
+        "pass": true,
+        "val": "MACD 0.212"
+       },
+       {
+        "name": "Early-Stage (Sub-0)",
+        "pass": false,
+        "val": "MACD 0.212 / Sig -0.081"
+       },
+       {
+        "name": "Above EMA50",
+        "pass": true,
+        "val": "EMA50 $100.99"
+       },
+       {
+        "name": "RSI Momentum",
+        "pass": false,
+        "val": "RSI 84.5"
+       }
+      ],
+      "direction": "bull",
+      "entry": 106.0,
+      "target": 112.254,
+      "stop": 102.2476,
+      "atr": 2.5016
+     }
+    ],
+    "consolidation": [
+     {
+      "ticker": "TEST",
+      "price": 106.0,
+      "change": 5.682951146560322,
+      "score": 3,
+      "weighted_score": 4,
+      "strength": 2.2,
+      "legs": [
+       {
+        "name": "Volatility Compression",
+        "pass": true,
+        "val": "BB 4.9% \u00b7 Range 3.8%"
+       },
+       {
+        "name": "ADX Low (Ranging)",
+        "pass": true,
+        "val": "ADX 20.1 < 25"
+       },
+       {
+        "name": "Breakout + Volume",
+        "pass": true,
+        "val": "+120% vs avg"
+       },
+       {
+        "name": "Clean Break (Held)",
+        "pass": false,
+        "val": "Low $99.17 vs Range $102.84"
+       }
+      ],
+      "direction": "bull",
+      "entry": 106.0,
+      "target": 112.254,
+      "stop": 102.2476,
+      "atr": 2.5016
+     },
+     {
+      "ticker": "TEST",
+      "price": 106.0,
+      "change": 5.682951146560322,
+      "score": 2,
+      "weighted_score": 2,
+      "strength": 2.2,
+      "legs": [
+       {
+        "name": "Volatility Compression",
+        "pass": true,
+        "val": "BB 4.9% \u00b7 Range 3.8%"
+       },
+       {
+        "name": "ADX Low (Ranging)",
+        "pass": true,
+        "val": "ADX 20.1 < 25"
+       },
+       {
+        "name": "Breakdown + Volume",
+        "pass": false,
+        "val": "+120% vs avg"
+       },
+       {
+        "name": "Clean Break (Held)",
+        "pass": false,
+        "val": "High $107.13 vs Range $98.79"
+       }
+      ],
+      "direction": "bear",
+      "entry": 106.0,
+      "target": 99.746,
+      "stop": 109.7524,
+      "atr": 2.5016
+     }
+    ],
+    "residualmomentum": [
+     {
+      "ticker": "TEST",
+      "price": 106.0,
+      "change": 5.682951146560322,
+      "score": 2,
+      "weighted_score": 2,
+      "strength": -0.3677,
+      "legs": [
+       {
+        "name": "Residual Momentum (2-bar)",
+        "pass": false,
+        "val": "RA-Res: -0.368 prev: -0.412 (\u03b2=0.09)"
+       },
+       {
+        "name": "Above EMA21",
+        "pass": true,
+        "val": "EMA21 $101.19"
+       },
+       {
+        "name": "EMA21 > EMA50",
+        "pass": true,
+        "val": "EMA50 $100.99"
+       },
+       {
+        "name": "RSI Momentum",
+        "pass": false,
+        "val": "RSI 84.5"
+       }
+      ],
+      "direction": "bull",
+      "entry": 106.0,
+      "target": 112.254,
+      "stop": 102.2476,
+      "atr": 2.5016
+     }
+    ],
+    "pead": null
+   }
+  },
+  "earnings_gap_drift": {
+   "regime": "uptrend",
+   "vix_regime": "fear_spiking",
+   "strategies": {
+    "vwap": null,
+    "bollinger": null,
+    "macd": null,
+    "consolidation": null,
+    "residualmomentum": [
+     {
+      "ticker": "TEST",
+      "price": 58.6192,
+      "change": 0.4901145657797485,
+      "score": 3,
+      "weighted_score": 4,
+      "strength": 0.3705,
+      "legs": [
+       {
+        "name": "Residual Momentum (2-bar)",
+        "pass": true,
+        "val": "RA-Res: 0.370 prev: 0.355 (\u03b2=0.02)"
+       },
+       {
+        "name": "Above EMA21",
+        "pass": true,
+        "val": "EMA21 $54.95"
+       },
+       {
+        "name": "EMA21 > EMA50",
+        "pass": true,
+        "val": "EMA50 $53.16"
+       },
+       {
+        "name": "RSI Momentum",
+        "pass": false,
+        "val": "RSI 94.4"
+       }
+      ],
+      "direction": "bull",
+      "entry": 58.6192,
+      "target": 62.2283,
+      "stop": 56.4537,
+      "atr": 1.4437
+     }
+    ],
+    "pead": [
+     {
+      "ticker": "TEST",
+      "price": 58.6192,
+      "change": 0.4901145657797485,
+      "score": 3,
+      "weighted_score": 4,
+      "strength": 3.2709,
+      "legs": [
+       {
+        "name": "Earnings Surprise \u2191",
+        "pass": true,
+        "val": "+3.3ATR 6d ago"
+       },
+       {
+        "name": "Drift Intact",
+        "pass": true,
+        "val": "vs event $57.19"
+       },
+       {
+        "name": "Above EMA20",
+        "pass": true,
+        "val": "EMA20 $55.06"
+       },
+       {
+        "name": "RSI Momentum",
+        "pass": false,
+        "val": "RSI 94.4"
+       }
+      ],
+      "direction": "bull",
+      "entry": 58.6192,
+      "target": 62.2283,
+      "stop": 56.4537,
+      "atr": 1.4437
+     }
+    ]
+   }
+  },
+  "spy_uptrend": {
+   "regime": "uptrend",
+   "vix_regime": "fear_spiking",
+   "strategies": {
+    "vwap": null,
+    "bollinger": null,
+    "macd": null,
+    "consolidation": null,
+    "residualmomentum": [
+     {
+      "ticker": "TEST",
+      "price": 470.2834,
+      "change": 0.12618942636079006,
+      "score": 2,
+      "weighted_score": 2,
+      "strength": 0.0,
+      "legs": [
+       {
+        "name": "Residual Momentum (2-bar)",
+        "pass": false,
+        "val": "RA-Res: 0.000 prev: 0.000 (\u03b2=1.00)"
+       },
+       {
+        "name": "Above EMA21",
+        "pass": true,
+        "val": "EMA21 $457.60"
+       },
+       {
+        "name": "EMA21 > EMA50",
+        "pass": true,
+        "val": "EMA50 $444.41"
+       },
+       {
+        "name": "RSI Momentum",
+        "pass": false,
+        "val": "RSI 97.9"
+       }
+      ],
+      "direction": "bull",
+      "entry": 470.2834,
+      "target": 499.5299,
+      "stop": 452.7355,
+      "atr": 11.6986
+     }
+    ],
+    "pead": null
+   }
+  }
+ }
+}

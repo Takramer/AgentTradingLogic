@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rhengine"
+version = "0.1.0"
+description = "Shared trading signal engine: 6-strategy scorer, regime classifier, market data adapters, walk-forward backtest"
+requires-python = ">=3.9"
+dependencies = ["requests>=2.31.0"]
+
+[tool.setuptools]
+packages = ["rhengine"]
+
+[tool.setuptools.package-data]
+rhengine = ["strategies.json"]
