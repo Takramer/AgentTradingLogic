@@ -113,7 +113,8 @@ def simulate_long(bars, t, stop, target, max_hold, atr=None, exits_cfg=None):
 def load_bars(cfg, lookback_days=400, verbose=True):
     """Fetch daily bars once; returns (bars_map, spy_bars). Per-symbol because the
     batch endpoint shares a single 10k-bar cap that truncates long windows."""
-    watchlist = cfg["watchlist"]
+    from .data_local import resolve_watchlist
+    watchlist = resolve_watchlist(cfg, verbose=verbose)  # "all" -> cached universe
     spy_ticker = cfg.get("spy_ticker", "SPY")
     interval = cfg["strategy"].get("interval", "1d")
 

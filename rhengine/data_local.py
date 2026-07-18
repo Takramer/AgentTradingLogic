@@ -241,6 +241,73 @@ def synthetic_universe(n_tickers=8, n_bars=300, seed=42):
     return bars_map, spy
 
 
+# ------------------------------------------------------- full universe ----
+
+def massive_universe(lookback_sessions=20, min_price=1.0, min_dollar_vol=500_000.0,
+                     plain_symbols_only=True, verbose=True):
+    """Every ticker in the Massive cache's most recent `lookback_sessions`
+    cached days, filtered only for basic tradeability:
+
+      min_price      — median close floor (default $1: drops sub-dollar names
+                       whose spreads/halts make fills fictional)
+      min_dollar_vol — median close*volume floor (default $500k/day: a signal
+                       you can't fill isn't a signal)
+      plain_symbols_only — drop warrants/units/preferreds (symbols with . or /)
+
+    Set the floors to 0 in config to truly scan everything. Requires cached
+    Massive data (run `py -m rhengine.market_data backfill` first)."""
+    from .market_data import _MASSIVE_CACHE
+    import statistics
+    days = sorted(f for f in os.listdir(_MASSIVE_CACHE) if f.endswith(".json.gz"))
+    if not days:
+        raise RuntimeError("massive_cache is empty — run "
+                           "`py -m rhengine.market_data backfill` first")
+    closes, dollars = {}, {}
+    used = 0
+    for fname in reversed(days):
+        if used >= lookback_sessions:
+            break
+        with gzip.open(os.path.join(_MASSIVE_CACHE, fname), "rt") as f:
+            day = json.load(f)
+        if not day:
+            continue  # holiday
+        used += 1
+        for t, bar in day.items():
+            c, v = bar[3], bar[4]
+            closes.setdefault(t, []).append(c)
+            dollars.setdefault(t, []).append(c * v)
+    out = []
+    for t, cs in closes.items():
+        if plain_symbols_only and not t.isalpha():
+            continue
+        if statistics.median(cs) < min_price:
+            continue
+        if statistics.median(dollars[t]) < min_dollar_vol:
+            continue
+        out.append(t)
+    out.sort()
+    if verbose:
+        print("  Universe: {} of {} cached tickers pass filters "
+              "(min_price={}, min_dollar_vol={:,.0f})".format(
+                  len(out), len(closes), min_price, min_dollar_vol))
+    return out
+
+
+def resolve_watchlist(cfg, verbose=True):
+    """cfg watchlist, or the whole cached market when watchlist is \"all\".
+    Universe floors come from cfg[\"universe_filters\"] (optional)."""
+    wl = cfg.get("watchlist", [])
+    if wl != "all":
+        return wl
+    uf = cfg.get("universe_filters", {})
+    return massive_universe(
+        lookback_sessions=int(uf.get("lookback_sessions", 20)),
+        min_price=float(uf.get("min_price", 1.0)),
+        min_dollar_vol=float(uf.get("min_dollar_volume", 500_000.0)),
+        plain_symbols_only=bool(uf.get("plain_symbols_only", True)),
+        verbose=verbose)
+
+
 # ----------------------------------------------------------- dispatcher ----
 
 def load_bars_any(cfg, lookback_days=400, verbose=True):
@@ -252,6 +319,9 @@ def load_bars_any(cfg, lookback_days=400, verbose=True):
         from .backtest import load_bars
         return load_bars(cfg, lookback_days=lookback_days, verbose=verbose)
 
+    if cfg.get("watchlist") == "all":
+        raise ValueError('watchlist "all" requires data_source "massive" — '
+                         'Yahoo fetches one symbol at a time and would take hours')
     watchlist = cfg["watchlist"]
     spy_ticker = cfg.get("spy_ticker", "SPY")
     fetch = list(dict.fromkeys(watchlist + [spy_ticker]))

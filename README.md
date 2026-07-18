@@ -33,12 +33,14 @@ and test `indicators.js` against `fixtures/` with vitest (sync pass deferred).
 ## Simulation & backtesting (standalone, no API keys)
 
 The repo ships its own `config.json` (`data_source: "yahoo"`) so every tool
-below runs from this directory with zero credentials. Yahoo daily bars are
-consolidated-volume, split/dividend-adjusted, and cached for the day in
-`yahoo_cache/`. With keys in `secrets.json`, swap `data_source` to `massive`
-(real SIP volume; run `py -m rhengine.market_data backfill 400` once to build
-the cache at Polygon's 5-req/min free tier) or `alpaca` (instant but IEX-only
-volume, ~2-3% of consolidated — weakens the volume legs).
+below runs from this directory. The shipped config uses `data_source:
+"massive"` with `watchlist: "all"` — the **entire US market** (~7k tradeable
+tickers after `universe_filters` floors; zero the floors to scan literally
+everything) served instantly from the local whole-market cache. Build/extend
+the cache once with `py -m rhengine.market_data backfill 730` (Polygon free
+tier: 5 req/min, ~2 years max history). Alternatives: `yahoo` (keyless,
+per-symbol — use an explicit watchlist, not "all") or `alpaca` (instant but
+IEX-only volume, ~2-3% of consolidated — weakens the volume legs).
 
 ```bash
 # 1. Signal-level backtest (R-multiples, by score tier / strategy / exit)
