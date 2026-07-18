@@ -182,6 +182,22 @@ def calc_macd(closes, fast=12, slow=26, sig=9):
     return {"macd": macd_line, "signal": sig_full, "hist": hist}
 
 
+def calc_keltner_squeeze(bars, closes, period=20, atr_mult=1.5, bb_mult=2):
+    """True if the Bollinger Bands (period, bb_mult) are fully inside the
+    Keltner Channels (EMA(period) ± atr_mult*ATR) at the LAST bar — the TTM
+    Squeeze "on" condition. Returns None when there isn't enough history."""
+    if len(bars) < period + 15:
+        return None
+    bb = calc_bb(closes, period, bb_mult)[-1]
+    if not bb:
+        return None
+    mid = calc_ema(closes, period)[-1]
+    atr = calc_atr(bars, 14)
+    if mid is None or not atr:
+        return None
+    return bb["upper"] < mid + atr_mult * atr and bb["lower"] > mid - atr_mult * atr
+
+
 def calc_atr(bars, period=14):
     """Wilder-smoothed Average True Range.
 
@@ -632,6 +648,17 @@ def score_consolidation(ticker, bars, thresholds):
     is_tight   = bb_width    < bb_width_thresh
     is_ranging = (adx < adx_thresh) if adx is not None else True
     is_narrow  = range_width < range_thresh
+
+    # TTM Squeeze gate (optional): require the BBs to have been fully inside the
+    # Keltner Channels on a recent bar, so the breakout is a squeeze *release*.
+    # squeezeBars = how far back a squeeze-on bar may sit (0 disables the gate).
+    squeeze_bars = int(thresholds.get("squeezeBars", 0))
+    if squeeze_bars > 0:
+        squeezed = any(
+            calc_keltner_squeeze(bars[:i - k + 1], closes[:i - k + 1])
+            for k in range(1, squeeze_bars + 1)
+        )
+        is_tight = is_tight and squeezed
     bull_break = closes[i] > range_high and closes[prev] <= range_high
     bear_break = closes[i] < range_low  and closes[prev] >= range_low
 
@@ -747,9 +774,33 @@ def score_residual_momentum(ticker, bars, thresholds, spy_bars=None):
     ri       = rsi[i]
     e21, e50 = ema21[i], ema50[i]
 
+    # RRG-style rotation filter (optional, rrgMode=1): only take names rotating
+    # OUT of the Lagging/Improving quadrant — RS-Ratio proxy below 100 (price/SPY
+    # ratio under its 60-bar average) with RS-Momentum rising (NE heading) and a
+    # minimum distance from the (100,100) origin. Contrarian to ranking on raw
+    # residual strength: catches accelerating laggards instead of extended leaders.
+    # ponytail: JdK proxy via SMA-normalized ratios, not true JdK normalization;
+    # distance floor fixed at 2 — expose as a threshold if it ever needs tuning.
+    rrg_bull = rrg_bear = True
+    if int(thresholds.get("rrgMode", 0)):
+        k = min(len(bars), len(spy_bars))
+        rs = [bars[-k + j]["close"] / spy_bars[-k + j]["close"] for j in range(k)]
+        if k >= 75:
+            def _rsr(idx):   # RS-Ratio proxy at series index (from end)
+                window = rs[idx - 60:idx]
+                return 100.0 * rs[idx - 1] / (_mean(window) or 1)
+            rsr, rsr_prev = _rsr(k), _rsr(k - 5)
+            dist = abs(rsr - 100.0)
+            # rising RS-Ratio == RS-Momentum > 100 (RS-Mom is the ROC of RS-Ratio)
+            rising = rsr > rsr_prev
+            rrg_bull = rsr < 100.0 and rising and dist > 2.0
+            rrg_bear = rsr > 100.0 and not rising and dist > 2.0
+        else:
+            rrg_bull = rrg_bear = False
+
     bull_legs = [
         {"name": "Residual Momentum (2-bar)",
-         "pass": risk_adj > min_ra and prev_risk_adj > min_ra,
+         "pass": risk_adj > min_ra and prev_risk_adj > min_ra and rrg_bull,
          "val":  f"RA-Res: {risk_adj:.3f} prev: {prev_risk_adj:.3f} (β={beta:.2f})"},
         {"name": "Above EMA21",
          "pass": e21 is not None and price > e21,
@@ -763,7 +814,7 @@ def score_residual_momentum(ticker, bars, thresholds, spy_bars=None):
     ]
     bear_legs = [
         {"name": "Residual Momentum (2-bar)",
-         "pass": risk_adj < -min_ra and prev_risk_adj < -min_ra,
+         "pass": risk_adj < -min_ra and prev_risk_adj < -min_ra and rrg_bear,
          "val":  f"RA-Res: {risk_adj:.3f} prev: {prev_risk_adj:.3f} (β={beta:.2f})"},
         {"name": "Below EMA21",
          "pass": e21 is not None and price < e21,
@@ -1049,7 +1100,23 @@ def score_ticker(ticker, bars, strategy, thresholds, spy_bars=None):
         "residualmomentum":  lambda t, b, th: score_residual_momentum(t, b, th, spy_bars),
     }.get(strategy, score_vwap)
 
-    return fn(ticker, bars, thresholds)
+    results = fn(ticker, bars, thresholds)
+
+    # Stage Analysis gate (optional, stageFilter=1): Weinstein 150d-SMA regime.
+    # Bull setups only when price is above a rising 150d SMA (Stage 2); bear
+    # setups only below a falling one (Stage 4). Skipped when history < 160 bars.
+    if results and int(thresholds.get("stageFilter", 0)) and len(bars) >= 160:
+        closes = [b["close"] for b in bars]
+        sma_now  = _mean(closes[-150:])
+        sma_prev = _mean(closes[-160:-10])
+        price = closes[-1]
+        stage2 = price > sma_now and sma_now > sma_prev
+        stage4 = price < sma_now and sma_now < sma_prev
+        results = [s for s in results
+                   if (s["direction"] == "bull" and stage2)
+                   or (s["direction"] == "bear" and stage4)] or None
+
+    return results
 
 
 def score_all_tickers(bars_map, strategy, thresholds, min_score=4,

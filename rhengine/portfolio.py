@@ -62,7 +62,7 @@ def _schedule(trades, sessions):
 
 
 def simulate_portfolio(trades, sessions, start_equity=10_000.0, risk_pct=1.0,
-                       max_positions=5, max_new_per_day=2):
+                       max_positions=5, max_new_per_day=2, max_heat_pct=10.0):
     """Replay trades chronologically under capital constraints.
 
     Returns dict with:
@@ -101,8 +101,15 @@ def simulate_portfolio(trades, sessions, start_equity=10_000.0, risk_pct=1.0,
             if len(open_pos) >= max_positions or new_today >= max_new_per_day:
                 skipped_slots.append(s)
                 continue
+            # Portfolio heat cap: total open risk (capital lost if every stop
+            # hits at once) may not exceed max_heat_pct of current equity.
+            risk_dollars = equity * (risk_pct / 100.0)
+            open_heat = sum(q["risk_dollars"] for q in open_pos)
+            if open_heat + risk_dollars > equity * (max_heat_pct / 100.0):
+                skipped_slots.append(s)
+                continue
             p = dict(s)
-            p["risk_dollars"] = equity * (risk_pct / 100.0)
+            p["risk_dollars"] = risk_dollars
             open_pos.append(p)
             held_tickers.add(p["ticker"])
             taken.append(p)
@@ -205,6 +212,8 @@ def main():
                     help="percent of current equity risked per trade (default 1)")
     ap.add_argument("--max-positions", type=int, default=5)
     ap.add_argument("--max-new-per-day", type=int, default=2)
+    ap.add_argument("--max-heat-pct", type=float, default=10.0,
+                    help="cap on total open risk as %% of equity (default 10)")
     ap.add_argument("--equity-csv", default=None, help="write equity curve CSV")
     ap.add_argument("--trades-csv", default=None, help="write taken trades CSV")
     args = ap.parse_args()
@@ -224,7 +233,8 @@ def main():
                                 start_equity=args.start_equity,
                                 risk_pct=args.risk_pct,
                                 max_positions=args.max_positions,
-                                max_new_per_day=args.max_new_per_day)
+                                max_new_per_day=args.max_new_per_day,
+                                max_heat_pct=args.max_heat_pct)
     print_report(result)
 
     if args.equity_csv:

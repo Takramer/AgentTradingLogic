@@ -74,6 +74,21 @@ class TestPipeline(unittest.TestCase):
         # risking 1% per trade keeps drawdown far from ruin on any sample
         self.assertLess(st["max_drawdown_pct"], 100.0)
 
+    def test_portfolio_heat_cap(self):
+        sessions = ["2026-01-{:02d}".format(d) for d in range(1, 29)]
+        trades = [{"ticker": "T{}".format(k), "signal_date": "2026-01-01",
+                   "sessions_held": 12, "r_multiple": 1.0, "score": 4}
+                  for k in range(8)]
+        capped = simulate_portfolio(trades, sessions, risk_pct=3.0,
+                                    max_positions=8, max_new_per_day=8,
+                                    max_heat_pct=10.0)
+        # 3 x 3% = 9% fits under the 10% heat cap; a 4th (12%) must not
+        self.assertEqual(len(capped["taken"]), 3)
+        uncapped = simulate_portfolio(trades, sessions, risk_pct=3.0,
+                                      max_positions=8, max_new_per_day=8,
+                                      max_heat_pct=100.0)
+        self.assertEqual(len(uncapped["taken"]), 8)
+
     def test_monte_carlo_deterministic(self):
         rs = [t["r_multiple"] for t in self.trades] or [1.0, -1.0, 0.5]
         a = run_monte_carlo(rs, paths=200, seed=9)
