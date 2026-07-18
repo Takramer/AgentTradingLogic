@@ -118,7 +118,13 @@ def load_bars(cfg, lookback_days=400, verbose=True):
     if verbose:
         print(f"Fetching {len(fetch)} symbols, {lookback_days}d of history "
               f"(source={_data_source()})...")
-    if _data_source() == "massive":
+    if cfg.get("data_source") == "yahoo" or _data_source() == "yahoo":
+        # Credential-free daily data (consolidated volume, adjusted) — the
+        # default for standalone simulation work; see data_local.py.
+        from .data_local import fetch_yahoo_batch
+        bars_map = fetch_yahoo_batch(fetch, lookback_days=lookback_days,
+                                     verbose=verbose)["bars"]
+    elif _data_source() == "massive":
         # One cached whole-market pass covers every ticker — no per-symbol cap or
         # rate-limit fan-out. Cache depth bounds how far back the backtest can go.
         bars_map = fetch_bars_batch_massive(fetch, lookback_days=lookback_days,

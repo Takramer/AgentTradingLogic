@@ -4,5 +4,7 @@ __pycache__/
 secrets.json
 .env*
 massive_cache/
+yahoo_cache/
+*.csv
 *.joblib
 *.egg-info/
