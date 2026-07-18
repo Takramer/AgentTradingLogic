@@ -68,12 +68,15 @@ def simulate_long(bars, t, stop, target, max_hold, atr=None, exits_cfg=None):
     """
     if t + 1 >= len(bars):
         return None  # no next bar to fill on
+    exits_cfg = exits_cfg or {}
     entry = bars[t + 1]["open"]
     risk = entry - stop
-    if risk <= 0:
-        return None  # degenerate stop (at/above entry)
-
-    exits_cfg = exits_cfg or {}
+    # Degenerate-risk guard: a gap-down fill landing near the stop shrinks the
+    # risk denominator toward zero, producing absurd R-multiples in backtests
+    # and absurd position sizes in anything that sizes off risk. Skip fills
+    # whose stop distance is under min_stop_pct of entry (default 0.3%).
+    if risk <= 0 or risk < entry * float(exits_cfg.get("min_stop_pct", 0.003)):
+        return None
     trail_at = chand_dist = None
     if atr and atr > 0:
         trail_at   = entry + float(exits_cfg.get("trail_trigger_mult", 1.5)) * atr
@@ -114,17 +117,21 @@ def load_bars(cfg, lookback_days=400, verbose=True):
     spy_ticker = cfg.get("spy_ticker", "SPY")
     interval = cfg["strategy"].get("interval", "1d")
 
+    # The passed config wins; the cwd config.json (via _data_source) is only a
+    # fallback so app-side callers that don't set the key keep working.
+    source = cfg.get("data_source") or _data_source()
+
     fetch = list(dict.fromkeys(watchlist + [spy_ticker]))
     if verbose:
         print(f"Fetching {len(fetch)} symbols, {lookback_days}d of history "
-              f"(source={_data_source()})...")
-    if cfg.get("data_source") == "yahoo" or _data_source() == "yahoo":
+              f"(source={source})...")
+    if source == "yahoo":
         # Credential-free daily data (consolidated volume, adjusted) — the
         # default for standalone simulation work; see data_local.py.
         from .data_local import fetch_yahoo_batch
         bars_map = fetch_yahoo_batch(fetch, lookback_days=lookback_days,
                                      verbose=verbose)["bars"]
-    elif _data_source() == "massive":
+    elif source == "massive":
         # One cached whole-market pass covers every ticker — no per-symbol cap or
         # rate-limit fan-out. Cache depth bounds how far back the backtest can go.
         bars_map = fetch_bars_batch_massive(fetch, lookback_days=lookback_days,
