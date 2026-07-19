@@ -68,6 +68,9 @@ def main():
     ap.add_argument("--lookback-days", type=int, default=400)
     ap.add_argument("--cost-bps", type=float, default=5.0)
     ap.add_argument("--split", type=float, default=0.7)
+    ap.add_argument("--regime", default=None,
+                    help="restrict to signals fired in this SPY regime (e.g. "
+                         "choppy) — ablate a strategy only where routing uses it")
     ap.add_argument("--min-trades", type=int, default=300,
                     help="flag configs under this many total trades (sources: "
                          "~300 = minimum statistical confidence)")
@@ -87,10 +90,12 @@ def main():
 
     trades = run_backtest_on(cfg, bars_map, spy_bars, min_score=2,
                              forced_strategy=args.strategy,
-                             cost_bps=args.cost_bps)
-    print("\nAblation — {} | legs: {} | {} emitted trades | split {} ({})"
+                             cost_bps=args.cost_bps,
+                             regime_only=args.regime)
+    print("\nAblation — {} | legs: {} | {} emitted trades | split {} ({}){}"
           .format(args.strategy, ", ".join(leg_names), len(trades),
-                  args.split, split_date))
+                  args.split, split_date,
+                  " | regime={}".format(args.regime) if args.regime else ""))
 
     rows = evaluate_masks(trades, len(leg_names), split_date)
     rows.sort(key=lambda r: _pf(r[2]), reverse=True)  # rank by OOS PF
