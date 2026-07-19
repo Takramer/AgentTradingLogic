@@ -16,6 +16,7 @@ those stay app-side.
 | `rhengine/portfolio.py` | Account-level equity simulation: replays backtest trades with fixed-fractional sizing, position caps, per-day entry limits → equity curve, CAGR, max DD, Sharpe |
 | `rhengine/montecarlo.py` | Bootstrap Monte Carlo over trade R-multiples → outcome/drawdown distributions, P(loss), P(ruin) |
 | `rhengine/optimize.py` | Threshold sweeps (OAT / grid) with in-sample/out-of-sample splits, plus expanding-window walk-forward fold evaluation |
+| `rhengine/ablate_vbt.py` | VectorBT full-matrix rule ablation: every combination of each strategy's legs re-derived as vectorized signals and backtested, ranked by profit factor (`py -m rhengine.ablate_vbt`) |
 | `rhengine/charts.py` | Dependency-free ASCII charts (equity curve, drawdown, histograms) — auto-shown by portfolio/montecarlo, or standalone: `py -m rhengine.charts --equity-csv equity_curve.csv --trades-csv backtest_trades.csv` |
 | `rhengine/strategies.json` | **Canonical spec** — per-strategy legs, threshold defaults/ranges, exits, regime routing. Threshold defaults are the walk-forward-tuned values |
 | `fixtures/` | Golden vectors: deterministic bar series + expected `score_ticker` output. The cross-runtime drift guard |

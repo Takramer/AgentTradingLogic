@@ -6,7 +6,15 @@
   "strategy": {
     "mode": "auto",
     "interval": "1d",
-    "thresholds": {}
+    "thresholds": {
+      "residualmomentum": {
+        "legMask": 1
+      },
+      "macd": {
+        "legMask": 3
+      }
+    },
+    "_thresholds_note": "Ablation cuts 2026-07-18 (docs/notebooklm-findings.md 4.1): residualmomentum trades its primary RA-RES leg alone (confirmations are OOS drag, t=-3.5 for the full set vs +8.9 primary-only); macd reduced to CROSS+SUB-0 (OOS PF 1.37). Spec defaults stay legMask=0 for Nydex JS compatibility; the cut lives in this config. Bollinger keeps all 4 legs (only OOS-positive config in choppy)."
   },
   "exits": {
     "stop_atr_mult": 1.5,

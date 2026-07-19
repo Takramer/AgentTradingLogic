@@ -40,7 +40,8 @@ def main():
     regime = classify_spy_regime(spy_bars)
 
     if args.all:
-        strategies = list(load_spec()["strategies"].keys())
+        strategies = [k for k, v in load_spec()["strategies"].items()
+                      if not v.get("retired")]
     elif args.strategy:
         strategies = [args.strategy]
     else:

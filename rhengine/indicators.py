@@ -1116,6 +1116,30 @@ def score_ticker(ticker, bars, strategy, thresholds, spy_bars=None):
                    if (s["direction"] == "bull" and stage2)
                    or (s["direction"] == "bear" and stage4)] or None
 
+    # Leg-mask gate (optional, legMask=bitmask, 0=off): ablation-driven leg
+    # reduction (docs/notebooklm-findings.md 4.1; validated 2026-07-18: e.g.
+    # residualmomentum's confirmation legs are OOS drag — legMask=1 trades the
+    # primary leg alone). Bit i set = leg i must actually pass; unmasked legs
+    # are bypassed (annotated, counted as passing) so the setup's score clears
+    # downstream min_score gates. Emission still requires the engine's >=2
+    # passing-leg floor, matching what the ablation measured.
+    mask = int(thresholds.get("legMask", 0))
+    if results and mask:
+        kept = []
+        for s in results:
+            legs = s["legs"]
+            if not all(l["pass"] for i, l in enumerate(legs) if (mask >> i) & 1):
+                continue
+            s = dict(s)
+            s["legs"] = [l if (mask >> i) & 1 else
+                         {"name": l["name"], "pass": True,
+                          "val": l["val"] + " (bypassed)"}
+                         for i, l in enumerate(legs)]
+            s["score"] = len(legs)
+            s["weighted_score"] = len(legs) + 1
+            kept.append(s)
+        results = kept or None
+
     return results
 
 

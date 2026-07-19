@@ -177,7 +177,7 @@
     "macd": {
       "id": "macd",
       "name": "MACD Trend Continuation",
-      "description": "Early-stage MACD/signal cross with EMA50 trend confirmation and RSI band. Retired from auto-routing (no OOS edge); manual use only.",
+      "description": "Early-stage MACD/signal cross with EMA50 trend confirmation and RSI band. Retired from auto-routing (no OOS edge); manual use only. Ablation 2026-07-18: CROSS+SUB-0 (legMask=3) is the OOS-strongest form (PF 1.37); EMA50/RSI legs are dead weight.",
       "regime": null,
       "legs": [
         {
@@ -243,13 +243,21 @@
           "max": 1,
           "step": 1,
           "label": "Stage Filter (150d SMA)"
+        },
+        "legMask": {
+          "default": 0,
+          "min": 0,
+          "max": 15,
+          "step": 1,
+          "label": "Active Leg Bitmask (0=all)"
         }
       }
     },
     "consolidation": {
       "id": "consolidation",
       "name": "Consolidation Breakout",
-      "description": "BB + range compression with low ADX, then a confirmed breakout bar with volume; 'held' leg filters single-bar fakeouts.",
+      "retired": true,
+      "description": "RETIRED 2026-07-18 per full-matrix ablation: the COMP compression leg is toxic (median PF 0.69 on vs 1.01 off; every COMP combination PF<1 over 730d full market). Kept for manual/research use only; excluded from scan --all. Original: BB + range compression with low ADX, then a confirmed breakout bar with volume; 'held' leg filters single-bar fakeouts.",
       "regime": null,
       "legs": [
         {
@@ -360,6 +368,13 @@
         }
       ],
       "thresholds": {
+        "legMask": {
+          "default": 0,
+          "min": 0,
+          "max": 15,
+          "step": 1,
+          "label": "Active Leg Bitmask (0=all)"
+        },
         "minResidualRA": {
           "default": 0.15,
           "min": 0.05,

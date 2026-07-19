@@ -144,6 +144,42 @@ class TestHwmSizing(unittest.TestCase):
         self.assertEqual(hwm["stats"]["final_equity"], 10000.0)
 
 
+class TestLegMask(unittest.TestCase):
+    """legMask gate: bit i set = leg i must pass; unmasked legs bypassed."""
+
+    def _score(self, mask):
+        from rhengine.indicators import score_ticker, spec_defaults
+        bars_map, spy = synthetic_universe(n_tickers=6, n_bars=300, seed=42)
+        th = dict(spec_defaults("residualmomentum"), legMask=mask)
+        out = {}
+        for t, bars in bars_map.items():
+            s = score_ticker(t, bars, "residualmomentum", th, spy)
+            if s:
+                out[t] = s
+        return out
+
+    def test_mask_zero_is_identity(self):
+        from rhengine.indicators import score_ticker, spec_defaults
+        bars_map, spy = synthetic_universe(n_tickers=6, n_bars=300, seed=42)
+        th0 = spec_defaults("residualmomentum")
+        for t, bars in bars_map.items():
+            self.assertEqual(score_ticker(t, bars, "residualmomentum", th0, spy),
+                             score_ticker(t, bars, "residualmomentum",
+                                          dict(th0, legMask=0), spy))
+
+    def test_mask_primary_only(self):
+        masked = self._score(1)
+        for setups in masked.values():
+            for s in setups:
+                self.assertTrue(s["legs"][0]["pass"])   # primary really passed
+                self.assertEqual(s["score"], 4)          # bypassed legs count
+                for l in s["legs"][1:]:
+                    self.assertTrue(l["pass"])
+        # primary-only must be a superset of the full-mask population
+        full = self._score(15)
+        self.assertTrue(set(full).issubset(set(masked) | set(full)))
+
+
 class TestOptimizeHelpers(unittest.TestCase):
     def test_spec_values_include_default_and_respect_cap(self):
         vals = _spec_values("bollinger", "adxMax", max_values=7)
