@@ -23,7 +23,7 @@ import random
 import statistics
 
 
-def run_monte_carlo(r_multiples, n_trades=None, paths=2000, risk_pct=1.0,
+def run_monte_carlo(r_multiples, n_trades=None, paths=20000, risk_pct=1.0,
                     start_equity=10_000.0, seed=1337, ruin_dd_pct=50.0):
     """Bootstrap `paths` sequences of `n_trades` R-multiples (sampled with
     replacement from the observed distribution) under fixed-fractional sizing.
@@ -129,7 +129,7 @@ def main():
     ap.add_argument("--min-score", type=int, default=3)
     ap.add_argument("--strategy", default=None)
     ap.add_argument("--cost-bps", type=float, default=0.0)
-    ap.add_argument("--paths", type=int, default=2000)
+    ap.add_argument("--paths", type=int, default=20000)  # sources: >= 20k runs
     ap.add_argument("--n-trades", type=int, default=None,
                     help="trades per path (default: as many as observed)")
     ap.add_argument("--risk-pct", type=float, default=1.0)

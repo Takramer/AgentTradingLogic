@@ -146,9 +146,100 @@ The engine stays signal-only; structure selection is a mapping layer.
 
 ---
 
-## Part 4 — Open research questions (for the next notebook/web pass)
+## Part 4 — Validation methodology (NOT BUILT — build these as engine tooling)
+
+### 4.1 Ablation testing of signal legs
+Determine which legs actually carry the edge and which are noise drag.
+- Method: make every rule/leg toggleable (they already are — each leg is a named dict in
+  `score_*`), then backtest **every permutation** of leg subsets. Example scale in the
+  sources: 5 toggleable rules → 200 configurations.
+- Rank configurations by **Profit Factor** (gross profit / gross loss), not total return.
+- Expected finding per the sources: complex filters often *hurt*; the stripped-down
+  version frequently has the highest PF.
+- Build spec: `rhengine/ablate.py` — enumerate leg-mask permutations per strategy
+  (require the primary leg always on; 3 confirmation legs → 8 masks — cheap), reuse
+  `run_backtest_on` with an added leg-mask hook, output a PF-ranked table with the same
+  IS/OOS split as `optimize.py`. A leg whose removal *raises* OOS PF is a deletion candidate.
+
+### 4.2 Monte Carlo design (extends `montecarlo.py`)
+- Runs: **≥ 20,000** simulated paths (current default: check `--runs`; raise if lower).
+- Extract: probability of gain, mean return, 20th/80th percentile return band, and
+  **worst-5% max-drawdown percentile**.
+- **Acceptance rule**: if the worst-5% max drawdown exceeds risk tolerance (sources'
+  example: 23% is a reject), reject the config or cut `--risk-pct`. Encode this as an
+  exit-code check so CI/agents can gate on it.
+- Sources don't distinguish trade-resampling vs block bootstrap — current per-trade
+  bootstrap is acceptable; block bootstrap remains an untested variant.
+
+### 4.3 Backtest hygiene checklist (audit every result against this)
+- **Survivorship bias**: today's index membership inflates results — dead/delisted
+  tickers are missing. Our 518-ticker list is *current* membership: results are
+  optimistic by construction. Mitigations: source a constituents-history dataset
+  (include dead tickers), or validate sleeves on sector ETFs (inherently
+  survivorship-free), and say which was used in every report.
+- **Look-ahead bias**: every signal may use only data available before entry
+  (engine enters next-session open — preserve this; `drop_partial_bar` guards intraday).
+- **Data snooping**: "if it needs a dozen finely tuned settings, it does not work."
+  Never promote a threshold that only wins in-sample (already the `optimize.py` bar).
+- **Costs**: zero-cost backtests are fiction — always pass `--cost-bps` (5 is our floor).
+- **Sample size**: ~9 trades = no conclusion; **~300 trades = minimum statistical
+  confidence**; check signals are spread over time, not clustered on one market event.
+
+### 4.4 Walk-forward refinements
+- Hold back the most recent 1–2 years as a blind test set touched once, at the end.
+- Rolling re-tune cadence: re-fit thresholds every **6 months** of walked-forward data
+  (the sources' "FWPT" — our expanding-window `--walk-forward N` approximates this;
+  a `--refit-every 126` sessions option would match it exactly).
+
+## Part 5 — ML layer (NOT BUILT — build after Part 4 tooling exists)
+
+### 5.1 Decision trees / random forests over setups
+- Goal: learn which setup *contexts* win — a meta-filter over engine signals, not a
+  replacement for them (this is the meta-labeling idea; the app side already reserves
+  meta-labeling ML, so build this in the consuming app, not the shared engine).
+- Features per the sources: volatility level, session/time-of-day, day-of-week, broad
+  market trend/regime, position direction. Add engine-native features: score,
+  weighted_score, strength, strategy key, ATR%, regime, VIX bucket.
+- Labels: trade R-multiple > 0 (sources don't cover triple-barrier/meta-labeling
+  specifics or depth/estimator params beyond "hundreds of trees" — use sklearn defaults,
+  `n_estimators=300`, shallow depth, and treat any deeper tuning as data-snooping risk).
+- Guards: strict train/hidden-test split; discard any learned pattern without an
+  economic rationale ("performs better when raining" test); watch feature importance —
+  legs whose features carry no importance corroborate Part 4.1 ablation deletions.
+
+### 5.2 Signal statistics before coding a strategy
+- **IC/IR**: rolling-window information correlation between signal value (e.g.
+  weighted_score or risk_adj) and forward returns; require a stable positive IC before
+  building an execution layer around a signal.
+- **t-stats** on mean trade R vs zero for every sleeve report (add to `_stats`).
+- Regime detection beyond price: sources describe a 3-view composite (trend + momentum
+  + value sentiment, "StormGuard-Armor"-style) for early bear detection — candidate
+  upgrade for `classify_spy_regime` (currently price/VIX only).
+- NN/RL position sizing is mentioned but is far down the backlog — skip until the
+  simpler layers are proven.
+
+## Part 6 — Portfolio risk engine (extends Part 2 / `portfolio.py`)
+- **Heat cap 10%**: implemented. Sources add: as heat approaches the cap, *scale down*
+  new position sizes before blocking outright (current impl blocks; scaling is an upgrade).
+- **Correlation scaling**: compute rolling correlation between open holdings; scale down
+  size for entries correlated with existing positions. Sector caps: limit total exposure
+  per sector (constituents CSV in the universe fetch carries GICS sector — wire it in).
+- **Drawdown de-risking**: reduce size after extended drawdowns; size risk off the
+  **high-watermark** equity, not current depleted equity, to avoid volatility drag
+  (one-line change in `simulate_portfolio`: `risk_dollars = hwm_equity * risk_pct`
+  — backtest both modes).
+- **Index removal while held**: not covered by the sources. House rule until researched:
+  treat removal from the S&P 500/NDX as a discretionary exit review (forced-seller flow
+  and liquidity loss), and refresh the universe list at least quarterly so scans don't
+  drift from live membership.
+
+## Part 7 — Open research questions (for the next notebook/web pass)
 - Keltner parameters and a true JdK RS-Ratio/RS-Momentum formula (sources only gave the
   BB side and quadrant/heading/distance rules).
 - Whether any source quantifies expected edge per filter — needed to prioritize retests.
 - Earnings-calendar feed to replace `detect_earnings_event()` price-proxy (upgrade path
   noted in `indicators.py`) and to implement "exit before the event" per 1.6.
+- Constituents-history / dead-ticker dataset source for survivorship-free backtests (4.3).
+- Triple-barrier labeling, purged/embargoed CV, White's reality check — absent from the
+  notebook; research externally before building Part 5 beyond defaults.
+- Index-rebalance handling while a position is held (6) — no source coverage.
