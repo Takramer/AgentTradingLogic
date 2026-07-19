@@ -136,6 +136,10 @@ def main():
     ap.add_argument("--start-equity", type=float, default=10_000)
     ap.add_argument("--ruin-dd-pct", type=float, default=50.0)
     ap.add_argument("--seed", type=int, default=1337)
+    ap.add_argument("--max-dd-tolerance-pct", type=float, default=None,
+                    help="acceptance gate (findings 4.2): exit 1 if the worst-5%% "
+                         "bootstrap max drawdown exceeds this — lets CI/agents "
+                         "reject a config mechanically")
     args = ap.parse_args()
 
     if args.trades_csv:
@@ -156,6 +160,16 @@ def main():
                          risk_pct=args.risk_pct, start_equity=args.start_equity,
                          seed=args.seed, ruin_dd_pct=args.ruin_dd_pct)
     print_report(mc)
+
+    if mc and args.max_dd_tolerance_pct is not None:
+        worst5 = mc["max_drawdown_pct"][95]
+        if worst5 > args.max_dd_tolerance_pct:
+            print("\nREJECT: worst-5% max drawdown {:.1f}% exceeds tolerance {:.1f}% "
+                  "— cut --risk-pct or fix the strategy.".format(
+                      worst5, args.max_dd_tolerance_pct))
+            raise SystemExit(1)
+        print("\nACCEPT: worst-5% max drawdown {:.1f}% within tolerance {:.1f}%."
+              .format(worst5, args.max_dd_tolerance_pct))
 
 
 if __name__ == "__main__":

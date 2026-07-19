@@ -231,6 +231,10 @@ def run_backtest_on(cfg, bars_map, spy_bars, min_score=3, forced_strategy=None,
                 r_net = r - _cost_r(bars[t + 1]["open"], s["stop"], cost_bps)
                 trades.append({
                     "ticker": ticker,
+                    # Leg pass-mask ("1101" = legs 1,2,4 passed) — lets ablate.py
+                    # re-evaluate leg subsets over one backtest's trade list.
+                    "legs": "".join("1" if l.get("pass") else "0"
+                                    for l in s.get("legs", [])),
                     "strategy": strategy,
                     "regime": regime,
                     "vix_regime": estimate_vix_regime(spy_hist),
@@ -272,12 +276,20 @@ def _stats(trades):
     gross_win = sum(t["r_multiple"] for t in wins)
     gross_loss = -sum(t["r_multiple"] for t in trades if t["r_multiple"] <= 0)
     avg_r = sum(t["r_multiple"] for t in trades) / n
+    # t-stat of mean R vs zero — is the edge distinguishable from noise?
+    # |t| >= ~2 is the usual bar; tiny samples never clear it.
+    t_stat = 0.0
+    if n > 1:
+        var = sum((t["r_multiple"] - avg_r) ** 2 for t in trades) / (n - 1)
+        if var > 0:
+            t_stat = avg_r / ((var ** 0.5) / (n ** 0.5))
     return {
         "n": n,
         "win_rate": len(wins) / n,
         "avg_r": avg_r,
         "expectancy_r": avg_r,  # per-trade expectancy in R
         "profit_factor": (gross_win / gross_loss) if gross_loss > 0 else float("inf"),
+        "t_stat": t_stat,
     }
 
 
@@ -303,7 +315,8 @@ def summarize(trades):
     print("=" * 52)
     pf = "inf" if overall["profit_factor"] == float("inf") else f"{overall['profit_factor']:.2f}"
     print(f"Trades: {overall['n']}  |  Win rate: {overall['win_rate']*100:.1f}%  "
-          f"|  Avg R: {overall['avg_r']:+.2f}  |  Profit factor: {pf}")
+          f"|  Avg R: {overall['avg_r']:+.2f}  |  Profit factor: {pf}  "
+          f"|  t-stat: {overall['t_stat']:+.1f}")
     print("(R = risk per trade; +1.0 avg R would mean each trade nets one unit of risk)")
 
     by_score = defaultdict(list)

@@ -62,7 +62,8 @@ def _schedule(trades, sessions):
 
 
 def simulate_portfolio(trades, sessions, start_equity=10_000.0, risk_pct=1.0,
-                       max_positions=5, max_new_per_day=2, max_heat_pct=10.0):
+                       max_positions=5, max_new_per_day=2, max_heat_pct=10.0,
+                       size_from_hwm=False):
     """Replay trades chronologically under capital constraints.
 
     Returns dict with:
@@ -76,6 +77,9 @@ def simulate_portfolio(trades, sessions, start_equity=10_000.0, risk_pct=1.0,
         by_entry.setdefault(s["entry_date"], []).append(s)
 
     equity = float(start_equity)
+    hwm = equity           # high-watermark sizing base (findings Part 6):
+                           # sizing off depleted equity in a drawdown creates
+                           # volatility drag; hwm mode keeps risk dollars level
     open_pos = []          # each: scheduled trade + risk_dollars
     taken, skipped_slots, skipped_dup = [], [], []
     curve = []
@@ -103,7 +107,8 @@ def simulate_portfolio(trades, sessions, start_equity=10_000.0, risk_pct=1.0,
                 continue
             # Portfolio heat cap: total open risk (capital lost if every stop
             # hits at once) may not exceed max_heat_pct of current equity.
-            risk_dollars = equity * (risk_pct / 100.0)
+            hwm = max(hwm, equity)
+            risk_dollars = (hwm if size_from_hwm else equity) * (risk_pct / 100.0)
             open_heat = sum(q["risk_dollars"] for q in open_pos)
             if open_heat + risk_dollars > equity * (max_heat_pct / 100.0):
                 skipped_slots.append(s)
@@ -212,6 +217,9 @@ def main():
                     help="percent of current equity risked per trade (default 1)")
     ap.add_argument("--max-positions", type=int, default=5)
     ap.add_argument("--max-new-per-day", type=int, default=2)
+    ap.add_argument("--size-from-hwm", action="store_true",
+                    help="size risk off high-watermark equity instead of current "
+                         "equity (findings Part 6: avoids drawdown volatility drag)")
     ap.add_argument("--max-heat-pct", type=float, default=10.0,
                     help="cap on total open risk as %% of equity (default 10)")
     ap.add_argument("--equity-csv", default=None, help="write equity curve CSV")
@@ -234,6 +242,7 @@ def main():
                                 risk_pct=args.risk_pct,
                                 max_positions=args.max_positions,
                                 max_new_per_day=args.max_new_per_day,
+                                size_from_hwm=args.size_from_hwm,
                                 max_heat_pct=args.max_heat_pct)
     print_report(result)
 

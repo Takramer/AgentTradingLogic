@@ -100,6 +100,50 @@ class TestPipeline(unittest.TestCase):
         self.assertLessEqual(dd[50], dd[99])
 
 
+class TestAblation(unittest.TestCase):
+    def test_masks_partition_and_full_set(self):
+        from rhengine.ablate import evaluate_masks
+        trades = [
+            {"legs": "1111", "signal_date": "2024-01-05", "r_multiple": 1.0},
+            {"legs": "1100", "signal_date": "2024-01-06", "r_multiple": -1.0},
+            {"legs": "1010", "signal_date": "2024-06-05", "r_multiple": 0.5},
+            {"legs": "0111", "signal_date": "2024-06-06", "r_multiple": 2.0},
+        ]
+        rows = evaluate_masks(trades, 4, split_date="2024-03-01")
+        self.assertEqual(len(rows), 8)  # 2^3 confirmation subsets
+        by_mask = {a: (i, o) for a, i, o in rows}
+        # primary-only mask sees every trade whose leg 0 passed (3 of 4)
+        is_st, oos_st = by_mask[(0,)]
+        self.assertEqual((is_st["n"], oos_st["n"]), (2, 1))
+        # full mask keeps only the all-pass trade, in-sample side
+        is_st, oos_st = by_mask[(0, 1, 2, 3)]
+        self.assertEqual(is_st["n"], 1)
+        self.assertIsNone(oos_st)
+
+    def test_tstat_present(self):
+        from rhengine.backtest import _stats
+        st = _stats([{"r_multiple": r} for r in (1.0, 1.2, 0.8, 1.1, 0.9)])
+        self.assertGreater(st["t_stat"], 2.0)  # consistent positive edge
+
+
+class TestHwmSizing(unittest.TestCase):
+    def test_hwm_keeps_risk_level_in_drawdown(self):
+        sessions = ["2024-01-0{}".format(d) for d in range(1, 10)]
+        trades = [
+            {"ticker": "A", "signal_date": sessions[0], "sessions_held": 1,
+             "r_multiple": -1.0, "score": 4, "weighted_score": 4},
+            {"ticker": "B", "signal_date": sessions[2], "sessions_held": 1,
+             "r_multiple": 1.0, "score": 4, "weighted_score": 4},
+        ]
+        cur = simulate_portfolio(trades, sessions, risk_pct=5.0)
+        hwm = simulate_portfolio(trades, sessions, risk_pct=5.0,
+                                 size_from_hwm=True)
+        # current-equity mode: lose 500, then win 5% of 9500 -> 9975
+        self.assertEqual(cur["stats"]["final_equity"], 9975.0)
+        # hwm mode: second trade still risks 5% of the 10k watermark -> 10000
+        self.assertEqual(hwm["stats"]["final_equity"], 10000.0)
+
+
 class TestOptimizeHelpers(unittest.TestCase):
     def test_spec_values_include_default_and_respect_cap(self):
         vals = _spec_values("bollinger", "adxMax", max_values=7)
