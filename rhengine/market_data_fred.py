@@ -39,9 +39,7 @@ DEFAULT_SERIES = ["T10Y2Y", "BAMLH0A0HYM2", "VIXCLS"]
 _CACHE_DIR = "fred_cache"
 
 
-def _app_path(name):
-    p = os.path.join(os.getcwd(), name)
-    return p if os.path.exists(p) else os.path.join(os.path.dirname(__file__), name)
+from ._paths import app_path as _app_path  # robust resolver (walks up to repo root)
 
 
 def _fred_key():

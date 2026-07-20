@@ -45,11 +45,7 @@ KALSHI_HOSTS = [
 DAY_MS = 86_400_000
 
 
-def _app_path(name):
-    """Resolve app-owned files/dirs from the consuming app's cwd (same
-    convention as market_data._app_path)."""
-    p = os.path.join(os.getcwd(), name)
-    return p if os.path.exists(p) else os.path.join(os.path.dirname(__file__), name)
+from ._paths import app_path as _app_path  # robust resolver (walks up to repo root)
 
 
 _CACHE_DIR = "kalshi_cache"

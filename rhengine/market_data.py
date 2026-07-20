@@ -22,14 +22,7 @@ TF_MAP = {
 }
 
 
-def _app_path(name):
-    """Resolve app-owned files (secrets.json, config.json, massive_cache).
-
-    The engine is imported by consuming apps that own these files, so prefer
-    the process cwd (the app dir); fall back to the engine's own folder.
-    """
-    p = os.path.join(os.getcwd(), name)
-    return p if os.path.exists(p) else os.path.join(os.path.dirname(__file__), name)
+from ._paths import app_path as _app_path  # robust resolver (walks up to repo root)
 
 
 def _get_credentials():

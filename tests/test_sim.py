@@ -194,6 +194,52 @@ class TestOptimizeHelpers(unittest.TestCase):
         self.assertEqual(_cfg()["strategy"]["thresholds"], {})
 
 
+class TestAppPath(unittest.TestCase):
+    """Secrets/config must resolve from any cwd, not just the repo root."""
+
+    def test_resolves_repo_file_from_subdir(self):
+        import os
+        from rhengine._paths import app_path, _REPO_ROOT
+        # a file that exists at the repo root resolves from a nested cwd
+        target = "pyproject.toml"
+        if not os.path.exists(os.path.join(_REPO_ROOT, target)):
+            self.skipTest("pyproject.toml not at repo root")
+        old = os.getcwd()
+        sub = os.path.join(_REPO_ROOT, "rhengine")
+        try:
+            os.chdir(sub)
+            got = app_path(target)
+            self.assertTrue(os.path.exists(got))
+            self.assertEqual(os.path.realpath(got),
+                             os.path.realpath(os.path.join(_REPO_ROOT, target)))
+        finally:
+            os.chdir(old)
+
+    def test_missing_file_points_at_cwd(self):
+        import os
+        from rhengine._paths import app_path
+        got = app_path("definitely_not_a_real_file_xyz.json")
+        self.assertEqual(os.path.dirname(got), os.getcwd())
+
+
+class TestRegimeSplit(unittest.TestCase):
+    def test_buckets_partition_trades(self):
+        from rhengine.crossval import split_by_regime, regime_stability
+        trades = [
+            {"regime": "uptrend", "vix_regime": "calm", "r_multiple": 1.0},
+            {"regime": "uptrend", "vix_regime": "calm", "r_multiple": -1.0},
+            {"regime": "choppy", "vix_regime": "fear_spiking", "r_multiple": 0.5},
+            {"regime": "downtrend", "vix_regime": "panic", "r_multiple": -0.5},
+        ]
+        by = split_by_regime(trades, "regime")
+        self.assertEqual(sum(s["n"] for s in by.values()), len(trades))
+        self.assertEqual(by["uptrend"]["n"], 2)
+        rs = regime_stability(trades)
+        self.assertEqual(rs["regimes_scored"], 3)
+        # uptrend avg is 0.0 (+1,-1) so not positive; choppy is the only one >0
+        self.assertEqual(rs["positive_regimes"], ["choppy"])
+
+
 class TestCsvLoader(unittest.TestCase):
     def test_round_trip(self):
         rows = ("Date,Open,High,Low,Close,Volume\n"

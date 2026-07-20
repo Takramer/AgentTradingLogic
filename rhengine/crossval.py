@@ -98,6 +98,34 @@ def stability_summary(fold_rows):
     }
 
 
+# ----------------------------------------------------------- regime split --
+
+def split_by_regime(trades, key="regime"):
+    """Bucket ONE backtest's trades by a categorical field and stat each bucket.
+    key="regime" -> uptrend/downtrend/choppy (where the edge lives directionally);
+    key="vix_regime" -> calm..panic (does the edge survive high vol?).
+
+    Time-block CV shows WHEN the edge held; this shows under WHICH conditions —
+    the "subperiod / regime" test. Buckets are non-overlapping and exhaustive,
+    so summed n equals len(trades)."""
+    buckets = {}
+    for t in trades:
+        buckets.setdefault(t.get(key, "unknown"), []).append(t)
+    return {k: _stats(v) for k, v in buckets.items()}
+
+
+def regime_stability(trades):
+    """Per-regime and per-VIX-bucket stats plus a one-line verdict on whether
+    the edge is concentrated in a single regime (fragile) or broad (robust)."""
+    by_regime = split_by_regime(trades, "regime")
+    by_vix = split_by_regime(trades, "vix_regime")
+    scored = [(k, s) for k, s in by_regime.items() if s]
+    pos = [k for k, s in scored if s["avg_r"] > 0]
+    return {"by_regime": by_regime, "by_vix": by_vix,
+            "regimes_scored": len(scored), "regimes_positive": len(pos),
+            "positive_regimes": pos}
+
+
 # -------------------------------------------------------------- selection --
 
 def _eval_train(cfg, bars_map, spy_bars, strategy, overrides, min_score,
@@ -177,6 +205,9 @@ def main():
     ap.add_argument("--embargo-days", type=int, default=15,
                     help="calendar-day purge margin at block borders "
                          "(~max_hold_sessions in trading days; default 15)")
+    ap.add_argument("--by-regime", action="store_true",
+                    help="subperiod test: bucket trades by SPY regime and VIX "
+                         "bucket instead of by time block (where the edge lives)")
     ap.add_argument("--select", action="store_true",
                     help="leave-one-block-out candidate selection")
     ap.add_argument("--params", default=None,
@@ -194,6 +225,30 @@ def main():
     if args.max_tickers:
         bars_map = dict(list(bars_map.items())[:args.max_tickers])
         print(f"Universe capped at {len(bars_map)} tickers")
+
+    if args.by_regime:
+        trades = run_backtest_on(cfg, bars_map, spy_bars,
+                                 min_score=args.min_score,
+                                 forced_strategy=args.strategy,
+                                 cost_bps=args.cost_bps)
+        rs = regime_stability(trades)
+        print(f"\nRegime subperiod test — {len(trades)} trades | "
+              f"strategy: {args.strategy or 'auto-regime'}")
+        for title, buckets in (("SPY regime", rs["by_regime"]),
+                               ("VIX bucket", rs["by_vix"])):
+            print(f"\n  {title:<14} {_HDR}")
+            for k in sorted(buckets, key=lambda x: -(buckets[x]['n'] if buckets[x] else 0)):
+                print(f"  {k:<14} {_fmt(buckets[k])}")
+        print(f"\n  {rs['regimes_positive']}/{rs['regimes_scored']} regimes "
+              f"positive: {', '.join(rs['positive_regimes']) or 'none'}")
+        if rs["regimes_scored"] and rs["regimes_positive"] == 1:
+            print("  VERDICT: edge is concentrated in ONE regime — route the "
+                  "strategy only there, or it bleeds elsewhere.")
+        elif rs["regimes_positive"] >= max(2, rs["regimes_scored"] - 1):
+            print("  VERDICT: edge holds across regimes — broadly robust.")
+        else:
+            print("  VERDICT: mixed — positive in some regimes, negative in others.")
+        return
 
     if args.select:
         if not args.strategy or not args.params:
