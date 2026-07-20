@@ -155,27 +155,15 @@ class GateBook:
         return True
 
 
-def _backfill_cli():
-    """py -m rhengine.gates backfill [--max-requests N] [--config PATH]
-    Spends AV budget deliberately: tops up av_cache/ for the config
-    watchlist, stalest-first, inside the daily free-tier limit."""
-    import argparse
-    ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["backfill"])
-    ap.add_argument("--config", default="config.json")
-    ap.add_argument("--max-requests", type=int, default=20)
-    args = ap.parse_args()
-    with open(args.config) as f:
-        cfg = json.load(f)
-    from .data_local import resolve_watchlist
-    from .market_data_av import fetch_earnings_batch
-    watchlist = resolve_watchlist(cfg)
-    res = fetch_earnings_batch(watchlist, max_requests=args.max_requests)
-    missing = [s for s in watchlist if s not in res["events"]]
-    if missing:
-        print("  Still uncached ({}): re-run tomorrow (25 req/day budget)".format(
-            len(missing)))
-
-
 if __name__ == "__main__":
-    _backfill_cli()
+    # `py -m rhengine.gates backfill ...` delegates to the richer, resumable,
+    # liquidity-ranked runner in backfill.py (one source of truth).
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "backfill":
+        del sys.argv[1]
+        from .backfill import main as backfill_main
+        backfill_main()
+    else:
+        print("usage: py -m rhengine.gates backfill [--target-size N] "
+              "[--from-csv f] [--max-requests N] [--loop]\n"
+              "   or: py -m rhengine.backfill ...  (same runner)")

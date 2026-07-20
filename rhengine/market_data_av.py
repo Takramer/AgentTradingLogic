@@ -84,8 +84,26 @@ def parse_earnings(body):
     return events
 
 
+class RateLimited(ConnectionError):
+    """AV throttled this request (daily/per-minute budget). Transient — the
+    symbol is NOT negative-cached; a backfill run should stop for the day."""
+
+
+# AV signals throttle/error inside a 200 body via these keys, not HTTP status.
+_AV_NOTICE_KEYS = ("Information", "Note", "Error Message")
+
+
 def _cache_path(symbol):
     return os.path.join(_CACHE_DIR, symbol.upper() + ".json.gz")
+
+
+def _cache_write(symbol, blob):
+    os.makedirs(_CACHE_DIR, exist_ok=True)
+    path = _cache_path(symbol)
+    tmp = path + ".tmp"
+    with gzip.open(tmp, "wt", encoding="utf-8") as f:
+        json.dump(blob, f, separators=(",", ":"))
+    os.replace(tmp, path)
 
 
 def _cache_read(symbol):
@@ -105,7 +123,10 @@ def fetch_earnings(symbol, ttl_days=7, offline=False):
     offline=True replays any snapshot; failures fall back to stale."""
     blob = _cache_read(symbol)
     now = time.time()
-    if blob and (offline or now - blob.get("fetched_ts", 0) < ttl_days * 86400):
+    # A confirmed no-earnings symbol (ETF/fund) is cached permanently — its
+    # ttl never expires, so budget is never re-spent probing it.
+    if blob and (offline or blob.get("no_earnings")
+                 or now - blob.get("fetched_ts", 0) < ttl_days * 86400):
         return blob["events"]
     try:
         r = requests.get(AV_BASE, params={"function": "EARNINGS",
@@ -113,21 +134,26 @@ def fetch_earnings(symbol, ttl_days=7, offline=False):
                                           "apikey": _av_key()}, timeout=20)
         r.raise_for_status()
         body = r.json()
-        # AV signals budget exhaustion inside a 200 body, not via status code
-        if "quarterlyEarnings" not in body:
-            raise ConnectionError("AlphaVantage non-data response for {}: {}".format(
-                symbol, str(body)[:120]))
-        events = parse_earnings(body)
-    except (requests.RequestException, ValueError, ConnectionError) as e:
+    except (requests.RequestException, ValueError) as e:
         if blob:
             return blob["events"]
         raise ConnectionError("AlphaVantage fetch failed for {}: {}".format(symbol, e))
-    os.makedirs(_CACHE_DIR, exist_ok=True)
-    path = _cache_path(symbol)
-    tmp = path + ".tmp"
-    with gzip.open(tmp, "wt", encoding="utf-8") as f:
-        json.dump({"fetched_ts": now, "events": events}, f, separators=(",", ":"))
-    os.replace(tmp, path)
+
+    notice = next((body[k] for k in _AV_NOTICE_KEYS if k in body), None)
+    if notice is not None:
+        # Throttle or transient error — do NOT cache; let the caller stop/retry.
+        if blob:
+            return blob["events"]
+        raise RateLimited("AlphaVantage throttled/err for {}: {}".format(
+            symbol, str(notice)[:100]))
+    if "quarterlyEarnings" not in body:
+        # Clean empty response (no notice, no earnings) = a symbol AV has no
+        # earnings for. Negative-cache so it is never re-fetched.
+        _cache_write(symbol, {"fetched_ts": now, "no_earnings": True, "events": []})
+        return []
+
+    events = parse_earnings(body)
+    _cache_write(symbol, {"fetched_ts": now, "events": events})
     return events
 
 

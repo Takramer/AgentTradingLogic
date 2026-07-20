@@ -22,7 +22,14 @@ those stay app-side.
 | `rhengine/montecarlo.py` | Bootstrap Monte Carlo over trade R-multiples → outcome/drawdown distributions, P(loss), P(ruin) |
 | `rhengine/optimize.py` | Threshold sweeps (OAT / grid) with in-sample/out-of-sample splits, plus expanding-window walk-forward fold evaluation |
 | `rhengine/ablate_vbt.py` | VectorBT full-matrix rule ablation: every combination of each strategy's legs re-derived as vectorized signals and backtested, ranked by profit factor (`py -m rhengine.ablate_vbt`) |
+| `rhengine/ic.py` | Cross-sectional **Information Coefficient** + t-stats: does a higher score predict a better outcome among each day's candidates? Rank-IC per horizon (SPY-excess & raw), overlap-adjusted t, IC IR, score-tier monotonicity (`py -m rhengine.ic`) |
+| `rhengine/crossval.py` | Blocked time-series **cross-validation** with purge/embargo: per-block fold stability + leave-one-block-out selection stability. Answers "is the edge everywhere or one lucky quarter?" (`py -m rhengine.crossval`) |
+| `rhengine/sanity.py` | Ten-check **sanity battery** on a trade list (sample size, t-stat, outlier/cost/concentration/degenerate-R/monotonicity/exit-mix). PASS/WARN/FAIL with a nonzero exit code for CI/agent gating (`py -m rhengine.sanity --trades-csv …`) |
+| `rhengine/nulltest.py` | Random-entry permutation test: does the ENTRY signal beat luck, or is the edge just exit engine + drift? (`py -m rhengine.nulltest`) |
+| `rhengine/mc_refined.py` | Trade harvest + vectorized Monte Carlo for the ablation-refined strategy set (full path matrix for fan charts) |
 | `rhengine/charts.py` | Dependency-free ASCII charts (equity curve, drawdown, histograms) — auto-shown by portfolio/montecarlo, or standalone: `py -m rhengine.charts --equity-csv equity_curve.csv --trades-csv backtest_trades.csv` |
+| `rhengine/viz.py` | Matplotlib chart helpers (fan/hist/IC series/signed & paired bars/sweep/IS-OOS scatter/heatmap/equity-drawdown/check-table) shared by the notebooks — one validated palette so every lab reads as one system |
+| `notebooks/` | Five validation labs (below): open in Jupyter to *see* what the CLIs print — distributions, fans, per-fold bars |
 | `rhengine/strategies.json` | **Canonical spec** — per-strategy legs, threshold defaults/ranges, exits, regime routing. Threshold defaults are the walk-forward-tuned values |
 | `fixtures/` | Golden vectors: deterministic bar series + expected `score_ticker` output. The cross-runtime drift guard |
 | `gen_fixtures.py` | Regenerates the golden vectors (only after a deliberate engine change) |
@@ -68,6 +75,46 @@ Offline paths for experiments without any network: `data_local.synthetic_univers
 (seeded random walks) and `data_local.load_csv_dir()` (your own OHLCV CSVs) both
 produce the exact bar shape `run_backtest_on` consumes.
 
+### Deeper validation — is the edge real, or overfit / luck?
+
+Five more tools stress a configuration before it touches the live account. Each
+prints a verdict line and (via the notebooks) charts the distribution behind it.
+Always `--cost-bps 5`; cap the universe with `--max-tickers` while iterating.
+
+```bash
+# Ablation — which legs carry the edge, which are drag (cut candidates)?
+py -m rhengine.ablate --strategy residualmomentum --cost-bps 5
+py -m rhengine.ablate --strategy bollinger --regime choppy   # routed → ablate in-slot
+
+# Information Coefficient + t-stats — does a higher score rank a better outcome?
+py -m rhengine.ic --strategy residualmomentum --max-tickers 300
+
+# Blocked cross-validation — edge everywhere, or one lucky quarter?
+py -m rhengine.crossval --strategy bollinger --folds 5
+py -m rhengine.crossval --strategy bollinger --select --params volMult --folds 4
+
+# Sanity battery — ten mechanical lie-detectors (nonzero exit code gates CI)
+py -m rhengine.sanity --trades-csv backtest_trades.csv --strict
+
+# Random-entry null — does the ENTRY beat luck, or is it exit engine + drift?
+py -m rhengine.nulltest --strategy bollinger --max-tickers 300
+```
+
+**Notebooks** (`notebooks/`, ASCII-only so headless execute is safe): `ablation`,
+`walkforward` (IS/OOS + forward-walk progressive tuning), `ic_tstats`,
+`crossval_sanity`, `montecarlo_refined`. Each caches its trades CSV under
+`tests/results/` and only recomputes when its `REFRESH` flag is `True`; all draw
+through `rhengine/viz.py`. Run one headless (UTF-8 guard per the Windows notes):
+
+```powershell
+$env:PYTHONUTF8='1'; py -m jupyter execute --inplace notebooks/ablation.ipynb
+```
+
+**Agent skills** (`.claude/skills/`): `strat-refine` drives the token-frugal
+cut/add/alter refinement loop with the promotion bars above; `strat-data` plugs
+new data (source/universe/CSV) into the pipeline and regenerates the artifacts
+the notebooks consume.
+
 ### External gates (macro + real earnings surprise)
 
 `config.json`'s `external_gates` block (see the shipped config) turns on
@@ -89,6 +136,34 @@ py -m rhengine.backtest --strategy pead --csv pead_trades.csv
 before trusting a `pass`/`fail` split. `macro_risk_on` is `""` when a FRED
 series is missing or its last observation is >14 days stale at signal time;
 treat that as unknown, not as risk-on.
+
+#### Backfilling the earnings cache (the SUE gate's long pole)
+
+AlphaVantage's free tier is **25 requests/day**, and PEAD fires uniformly
+across the market (~4 earnings gaps/yr/ticker), so there is no Pareto
+shortcut — the cache fills over weeks, not minutes. `rhengine/backfill.py` is
+a resumable runner that targets the **tickers PEAD actually trades**
+(auto-discovered from a trade CSV), ranked **most-liquid-first** so partial
+coverage always covers the names you'd trade:
+
+```bash
+py -m rhengine.backfill --once --max-requests 20   # spend today's budget, exit
+py -m rhengine.backfill --loop                     # always-on: run daily forever
+py -m rhengine.backfill --from-csv tests/results/refined_trades.csv --strategy pead
+py -m rhengine.backfill --liquid-universe --target-size 300   # ignore CSV, pure liquidity
+```
+
+Coverage/ETA is written to `av_cache/_backfill_state.json` each run. ETFs and
+other no-earnings symbols are **negative-cached** (never re-fetched); a
+throttle response stops the run cleanly (budget spent, resume tomorrow).
+
+**Unattended (recommended):** a Windows Scheduled Task runs it daily —
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\register_backfill_task.ps1
+```
+registers `AgentTradingLogic-AVBackfill` (daily 06:00, logs to
+`av_cache\backfill.log`). The default 500-name target fills in ~25 days at
+20/day; check progress with `type av_cache\_backfill_state.json`.
 
 ## Tests
 
