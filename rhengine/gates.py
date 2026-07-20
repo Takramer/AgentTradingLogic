@@ -43,6 +43,18 @@ DAY_MS = 86_400_000
 _MACRO_STALE_MS = 14 * DAY_MS  # observation older than this at signal time = missing
 
 
+def _earnings_reader(source):
+    """Resolve the SUE earnings source module. Both expose the same read
+    surface (_cache_read(symbol) -> {"events": [...]}); sue_gate is shared
+    (market_data_av). 'av' = AlphaVantage deep retroactive history (25/day);
+    'finnhub' = the forward-accumulated bulk-calendar store (report-dated)."""
+    if source == "finnhub":
+        from . import market_data_finnhub as m
+    else:
+        from . import market_data_av as m
+    return m
+
+
 class GateBook:
     """Preloaded gate data + pure annotate()/keep(). All I/O lives in
     from_config(); the constructor takes plain data so tests and sweeps can
@@ -71,16 +83,17 @@ class GateBook:
         sue_events = macro_series = None
 
         if sue_cfg.get("enabled"):
-            from .market_data_av import _cache_read
+            source = sue_cfg.get("source", "av")  # "av" (deep history) | "finnhub"
+            reader = _earnings_reader(source)
             sue_events = {}
             for t in tickers:
-                blob = _cache_read(t)
+                blob = reader._cache_read(t)
                 if blob:
                     sue_events[t] = blob["events"]
             if verbose:
-                print("  Gates: SUE earnings cached for {}/{} tickers "
+                print("  Gates: SUE earnings (source={}) cached for {}/{} tickers "
                       "(missing annotate 'na'; backfill: py -m rhengine.gates "
-                      "backfill)".format(len(sue_events), len(tickers)))
+                      "backfill)".format(source, len(sue_events), len(tickers)))
 
         if macro_cfg.get("enabled"):
             from .market_data_fred import fetch_series, DEFAULT_SERIES

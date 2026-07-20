@@ -111,6 +111,7 @@ def sweep_oat(cfg, bars_map, spy_bars, strategy, params, min_score, cost_bps,
     print("candidates per param from strategies.json ranges\n")
     print("  {:<22} {:>8}   IS: {}   OOS: {}".format("param", "value", _HDR, _HDR))
 
+    all_rows = []
     for param in params:
         vals = _spec_values(strategy, param, max_values=max_values)
         rows = []
@@ -120,6 +121,9 @@ def sweep_oat(cfg, bars_map, spy_bars, strategy, params, min_score, cost_bps,
             _, oos_st = _evaluate(cfg, bars_map, spy_bars, strategy, {param: v},
                                   min_score, cost_bps, date_lo=split_date)
             rows.append((v, is_st, oos_st))
+            all_rows.append({"param": param, "value": v,
+                             "is_default": v == defaults.get(param),
+                             "is": is_st, "oos": oos_st})
         for v, is_st, oos_st in rows:
             mark = " *" if v == defaults.get(param) else "  "
             print("  {:<22} {:>8}{}  IS: {}   OOS: {}".format(
@@ -127,6 +131,7 @@ def sweep_oat(cfg, bars_map, spy_bars, strategy, params, min_score, cost_bps,
         best = max(rows, key=lambda r: _rank_key(r[1], min_trades))
         print("  {:<22} best-IS value {} (check its OOS line before trusting)\n"
               .format("", best[0]))
+    return all_rows
 
 
 def sweep_grid(cfg, bars_map, spy_bars, strategy, params, min_score, cost_bps,
@@ -177,6 +182,7 @@ def walk_forward(cfg, bars_map, spy_bars, strategy, params, min_score, cost_bps,
                 candidates.append({p: v})
 
     pooled = []
+    fold_log = []
     print("\nWalk-forward — {} | {} folds | {} candidates".format(
         strategy, folds, len(candidates)))
     for i in range(len(bounds) - 1):
@@ -193,6 +199,9 @@ def walk_forward(cfg, bars_map, spy_bars, strategy, params, min_score, cost_bps,
                                          date_lo=test_lo, date_hi=test_hi)
         pooled.extend(test_trades)
         label = ",".join("{}={}".format(k, v) for k, v in best.items()) or "(defaults)"
+        fold_log.append({"fold": i + 1, "train_hi": train_hi,
+                         "test_lo": test_lo, "test_hi": test_hi,
+                         "chosen": label, "train": best_st, "test": test_st})
         print("  fold {}: tuned<{}  chose {:<36} train[{}]  test[{}]".format(
             i + 1, train_hi, label[:36], _fmt(best_st), _fmt(test_st)))
 
@@ -200,7 +209,7 @@ def walk_forward(cfg, bars_map, spy_bars, strategy, params, min_score, cost_bps,
     print("\n  POOLED OUT-OF-SAMPLE ({} trades): {}".format(
         len(pooled), _fmt(st) if st else "none"))
     print("  ^ this line is the honest answer; whole-history numbers overfit.")
-    return pooled
+    return pooled, fold_log
 
 
 def main():

@@ -165,6 +165,21 @@ registers `AgentTradingLogic-AVBackfill` (daily 06:00, logs to
 `av_cache\backfill.log`). The default 500-name target fills in ~25 days at
 20/day; check progress with `type av_cache\_backfill_state.json`.
 
+#### Two earnings sources (set `external_gates.av_earnings_sue.source`)
+
+| source | history | rate | role |
+|---|---|---|---|
+| `av` (default) | ~30 yr retroactive, report-dated | 25/**day** | deep backtests **today** — the slow backfill above |
+| `finnhub` | last ~45 days + **forward** | 60/**min** | live gate + a store that **grows daily** into a backtestable report-dated history |
+
+Finnhub's free tier only serves a near-real-time window, so it can't fill
+history retroactively — but one bulk call captures the **whole market's**
+newly-reported surprises with no per-ticker budget. The daily scheduled task
+runs `py -m rhengine.market_data_finnhub snapshot`, appending to
+`finnhub_cache/earnings_store.json.gz`; over weeks this becomes a complete,
+report-dated SUE dataset. Switch the gate to it with `"source": "finnhub"`
+once enough window has accumulated (or for the live path immediately).
+
 ## Tests
 
 ```

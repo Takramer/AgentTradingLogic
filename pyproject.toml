@@ -9,6 +9,15 @@ description = "Shared trading signal engine: 6-strategy scorer, regime classifie
 requires-python = ">=3.9"
 dependencies = ["requests>=2.31.0"]
 
+[project.optional-dependencies]
+# Standalone simulation / validation tooling (backtest, montecarlo, ic,
+# crossval, sanity, viz + the notebooks/ labs). Kept out of the core engine
+# deps so the consuming apps install only `requests`.
+sim = ["numpy>=1.24", "pandas>=2.0", "matplotlib>=3.7"]
+# Full analysis stack including the vectorbt full-matrix ablation path.
+analysis = ["numpy>=1.24", "pandas>=2.0", "matplotlib>=3.7", "scipy>=1.10",
+            "vectorbt>=1.1.0", "nbformat", "nbclient", "ipykernel"]
+
 [tool.setuptools]
 packages = ["rhengine"]
 

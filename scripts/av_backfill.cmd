@@ -15,7 +15,16 @@ set "REPO=%~dp0.."
 cd /d "%REPO%"
 
 if not exist "av_cache" mkdir "av_cache"
-echo [%DATE% %TIME%] backfill run start >> "av_cache\backfill.log"
+echo [%DATE% %TIME%] run start >> "av_cache\backfill.log"
+
+REM 1. Finnhub bulk-calendar snapshot: ONE call captures the whole market's
+REM    newly-reported surprises (report-dated), appended to the growing store.
+REM    Budget-free (60/min tier), so it runs every day regardless.
+py -m rhengine.market_data_finnhub snapshot >> "av_cache\backfill.log" 2>&1
+
+REM 2. AlphaVantage deep-history backfill: spends up to 20 of the 25/day
+REM    budget on the stalest/most-liquid PEAD-signaler tickers, then exits.
 py -m rhengine.backfill --once --max-requests 20 >> "av_cache\backfill.log" 2>&1
-echo [%DATE% %TIME%] backfill run end (exit %ERRORLEVEL%) >> "av_cache\backfill.log"
+
+echo [%DATE% %TIME%] run end (exit %ERRORLEVEL%) >> "av_cache\backfill.log"
 endlocal

@@ -5,7 +5,9 @@
   "external_gates": {
     "_note": "External-leg gates (strategies.json external_legs) applied by gates.GateBook in the backtest loop, never inside indicators.py. mode 'annotate' adds sue/sue_pct/macro_risk_on columns to every trade (slice post-hoc in ablation/MC); 'filter' additionally drops non-passing trades (live-representative; sue 'na' and macro '' drop too). SUE backtests read av_cache/ only — backfill deliberately: py -m rhengine.gates backfill. kalshi/polymarket legs are scan-level and dormant until enabled.",
     "av_earnings_sue": {
+      "_source_note": "source: 'av' = AlphaVantage deep retroactive history (30y, 25 req/DAY, backfill via py -m rhengine.backfill) for backtests TODAY; 'finnhub' = the forward-accumulated bulk-calendar store (report-dated, whole market, grows daily via the scheduled snapshot) — use once enough window has accumulated, or for the live path.",
       "enabled": true,
+      "source": "av",
       "mode": "annotate",
       "driftMin": 1,
       "driftMax": 10,
