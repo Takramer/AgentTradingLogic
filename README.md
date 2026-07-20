@@ -17,6 +17,7 @@ those stay app-side.
 | `rhengine/market_data_polymarket.py` | Polymarket adapter, split per Polymarket's own APIs: Gamma (discovery), Data API (positions/trades/holders), CLOB prices-history → daily probability bars (cached in `polymarket_cache/`), `score_implied_prob` external leg. CLOB trading + perps are gated stubs |
 | `rhengine/market_data_fred.py` | FRED macro adapter: T10Y2Y / HY OAS / real VIX close, cached in `fred_cache/`; `macro_flags` portfolio-heat overlay (app-side, conventional thresholds) |
 | `rhengine/market_data_av.py` | AlphaVantage earnings-surprise adapter (real SUE feed — the PEAD upgrade path): cached in `av_cache/`, budget-aware batch (free tier = 25 req/day), `sue_gate` external leg |
+| `rhengine/gates.py` | External-gate seam: `GateBook` annotates every backtest trade with `sue`/`sue_pct`/`macro_risk_on` columns (slice post-hoc, ablation-style) or hard-filters in live-representative mode; `py -m rhengine.gates backfill` tops up the AV earnings cache inside the daily budget |
 | `rhengine/portfolio.py` | Account-level equity simulation: replays backtest trades with fixed-fractional sizing, position caps, per-day entry limits → equity curve, CAGR, max DD, Sharpe |
 | `rhengine/montecarlo.py` | Bootstrap Monte Carlo over trade R-multiples → outcome/drawdown distributions, P(loss), P(ruin) |
 | `rhengine/optimize.py` | Threshold sweeps (OAT / grid) with in-sample/out-of-sample splits, plus expanding-window walk-forward fold evaluation |
@@ -66,6 +67,28 @@ py -m rhengine.optimize --strategy residualmomentum --walk-forward 4 # honest OO
 Offline paths for experiments without any network: `data_local.synthetic_universe()`
 (seeded random walks) and `data_local.load_csv_dir()` (your own OHLCV CSVs) both
 produce the exact bar shape `run_backtest_on` consumes.
+
+### External gates (macro + real earnings surprise)
+
+`config.json`'s `external_gates` block (see the shipped config) turns on
+annotation columns for every trade `backtest.py` records — no separate run
+needed, ablate post-hoc:
+
+```bash
+# top up the AlphaVantage earnings cache for the watchlist (25 req/day free tier)
+py -m rhengine.gates backfill --max-requests 20
+
+py -m rhengine.backtest --strategy pead --csv pead_trades.csv
+# pead_trades.csv now has sue / sue_pct / macro_risk_on columns —
+# slice with pandas/ablate.py to compare sue=pass vs fail vs na before
+# flipping either gate's "mode" to "filter" (which drops non-passing trades
+# at record time — the live-representative setting).
+```
+
+`sue` is `"na"` for any ticker without a cached AlphaVantage report — backfill
+before trusting a `pass`/`fail` split. `macro_risk_on` is `""` when a FRED
+series is missing or its last observation is >14 days stale at signal time;
+treat that as unknown, not as risk-on.
 
 ## Tests
 

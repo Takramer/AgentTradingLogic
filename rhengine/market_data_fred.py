@@ -83,11 +83,13 @@ def fetch_series(series_id, lookback_days=400, offline=False):
         except Exception:
             blob = None
     today = datetime.now(timezone.utc).date().isoformat()
-    if blob and (offline or blob.get("fetched") == today):
-        return blob["obs"]
-
     start = datetime.now(timezone.utc).date().toordinal() - lookback_days
     start_iso = datetime.fromordinal(start).date().isoformat()
+    # A snapshot only satisfies a request it fully covers — a cached 120d
+    # window must not silently serve a 460d backtest (data_local period1 rule).
+    covers = blob and blob.get("start_iso", "9999") <= start_iso
+    if blob and (offline or (covers and blob.get("fetched") == today)):
+        return blob["obs"]
     try:
         r = requests.get(FRED_BASE, params={
             "series_id": series_id, "api_key": _fred_key(), "file_type": "json",
@@ -101,7 +103,8 @@ def fetch_series(series_id, lookback_days=400, offline=False):
     os.makedirs(_CACHE_DIR, exist_ok=True)
     tmp = path + ".tmp"
     with gzip.open(tmp, "wt", encoding="utf-8") as f:
-        json.dump({"fetched": today, "obs": obs}, f, separators=(",", ":"))
+        json.dump({"fetched": today, "start_iso": start_iso, "obs": obs},
+                  f, separators=(",", ":"))
     os.replace(tmp, path)
     return obs
 

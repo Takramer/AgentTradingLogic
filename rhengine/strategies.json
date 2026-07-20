@@ -16,7 +16,7 @@
     "leveraged_max_hold_sessions": 3
   },
   "external_legs": {
-    "_note": "Adapter-derived gating legs evaluated OUTSIDE score_ticker — indicators.py stays a pure OHLCV scorer and the golden vectors never move. Apps apply these as scan-level filters alongside any strategy (config.json prediction_markets toggles + thresholds). Scorers: market_data_kalshi.score_prob_shift, market_data_polymarket.score_implied_prob. Additive to the spec — not part of any strategy's legMask bit-width.",
+    "_note": "Adapter-derived gating legs evaluated OUTSIDE score_ticker — indicators.py stays a pure OHLCV scorer and the golden vectors never move. gates.GateBook applies them in the backtest loop per config.json external_gates (annotate/filter modes); apps use the same scorers at scan time. Scorers: market_data_kalshi.score_prob_shift, market_data_polymarket.score_implied_prob, market_data_av.sue_gate. Additive to the spec — not part of any strategy's legMask bit-width.",
     "kalshi_prob_shift": {
       "id": "kalshi_prob_shift",
       "abbr": "KAL-SHIFT",

@@ -208,7 +208,10 @@ def fetch_prob_bars(clob_token_id, lookback_days=90, fidelity=720, offline=False
         except Exception:
             blob = None
     today = datetime.now(timezone.utc).date().isoformat()
-    if blob and (offline or blob.get("fetched") == today):
+    # Coverage rule: a cached shorter window never silently serves a longer
+    # request (data_local period1 rule).
+    covers = blob and blob.get("lookback_days", 0) >= lookback_days
+    if blob and (offline or (covers and blob.get("fetched") == today)):
         return blob["bars"]
 
     interval = ("1d" if lookback_days <= 1 else
@@ -226,7 +229,8 @@ def fetch_prob_bars(clob_token_id, lookback_days=90, fidelity=720, offline=False
     os.makedirs(_CACHE_DIR, exist_ok=True)
     tmp = path + ".tmp"
     with gzip.open(tmp, "wt", encoding="utf-8") as f:
-        json.dump({"fetched": today, "bars": bars}, f, separators=(",", ":"))
+        json.dump({"fetched": today, "lookback_days": lookback_days,
+                   "bars": bars}, f, separators=(",", ":"))
     os.replace(tmp, path)
     return bars
 

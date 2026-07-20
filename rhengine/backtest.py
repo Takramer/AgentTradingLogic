@@ -168,12 +168,16 @@ def _cost_r(entry, stop, cost_bps):
 
 
 def run_backtest_on(cfg, bars_map, spy_bars, min_score=3, forced_strategy=None,
-                    date_lo=None, date_hi=None, regime_only=None, cost_bps=0.0):
+                    date_lo=None, date_hi=None, regime_only=None, cost_bps=0.0,
+                    gates=None):
     """Score + simulate over pre-fetched bars. Pure/in-memory so a sweep can call
     it many times without re-hitting the API. `date_lo`/`date_hi` (ISO strings)
     restrict signals to [date_lo, date_hi) for in-sample / out-of-sample splits.
     `regime_only` (e.g. 'uptrend') restricts to signals fired in that SPY regime —
-    used to evaluate which strategy a given regime slot should route to."""
+    used to evaluate which strategy a given regime slot should route to.
+    `gates` (gates.GateBook, optional) annotates each trade with external-gate
+    outcomes (sue/macro columns) and, for gates in filter mode, drops
+    non-passing trades — build one with GateBook.from_config."""
     mode = cfg["strategy"].get("mode", "auto")
     bear_only = set(cfg.get("bear_regime_only", []))
     regime_set = ({regime_only} if isinstance(regime_only, str)
@@ -229,7 +233,7 @@ def run_backtest_on(cfg, bars_map, spy_bars, min_score=3, forced_strategy=None,
                     continue
                 reason, exit_price, r, held = sim
                 r_net = r - _cost_r(bars[t + 1]["open"], s["stop"], cost_bps)
-                trades.append({
+                trade = {
                     "ticker": ticker,
                     # Leg pass-mask ("1101" = legs 1,2,4 passed) — lets ablate.py
                     # re-evaluate leg subsets over one backtest's trade list.
@@ -248,17 +252,28 @@ def run_backtest_on(cfg, bars_map, spy_bars, min_score=3, forced_strategy=None,
                     "exit_price": round(exit_price, 4),
                     "r_multiple": round(r_net, 4),
                     "sessions_held": held,
-                })
+                }
+                if gates is not None:
+                    gates.annotate(trade, ticker, bars[t]["time"])
+                    if not gates.keep(trade):
+                        continue
+                trades.append(trade)
 
     return trades
 
 
 def run_backtest(cfg, lookback_days=400, min_score=3, forced_strategy=None,
                  verbose=True, cost_bps=0.0):
-    """Convenience wrapper: fetch then run over the full window."""
+    """Convenience wrapper: fetch then run over the full window. Builds a
+    GateBook when config enables external_gates (None otherwise — no
+    behavior change for configs without the block)."""
     bars_map, spy_bars = load_bars(cfg, lookback_days=lookback_days, verbose=verbose)
+    from .gates import GateBook
+    gates = GateBook.from_config(cfg, list(bars_map.keys()),
+                                 lookback_days=lookback_days, verbose=verbose)
     return run_backtest_on(cfg, bars_map, spy_bars, min_score=min_score,
-                           forced_strategy=forced_strategy, cost_bps=cost_bps)
+                           forced_strategy=forced_strategy, cost_bps=cost_bps,
+                           gates=gates)
 
 
 def _iso_date(ms):

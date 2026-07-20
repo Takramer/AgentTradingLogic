@@ -148,6 +148,8 @@ def fetch_earnings_batch(symbols, max_requests=20, ttl_days=7, verbose=True):
             blob = _cache_read(sym)
             fresh = blob and time.time() - blob.get("fetched_ts", 0) < ttl_days * 86400
             if not fresh and not offline:
+                if spent:  # pace the free tier's per-minute limiter
+                    time.sleep(13)
                 spent += 1
             events_map[sym] = fetch_earnings(sym, ttl_days=ttl_days, offline=offline)
         except Exception as e:

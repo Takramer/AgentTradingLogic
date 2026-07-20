@@ -2,8 +2,22 @@
   "_note": "Standalone simulation config. watchlist \"all\" scans every ticker in the Massive whole-market cache (universe_filters sets tradeability floors; zero them to scan literally everything). Requires data_source massive + backfilled cache. Swap watchlist back to an explicit list for yahoo/alpaca.",
   "_note_data_source": "Enum: yahoo | alpaca | massive | kalshi | polymarket. kalshi/polymarket score IMPLIED-PROBABILITY bars ([0,1] daily closes) through the same engine — watchlist entries become \"SERIES/MARKET\" tickers (kalshi) or market slugs (polymarket), SPY regime anchor stays on Yahoo, and prediction_markets below configures the external gating legs. Polymarket bars have volume=0: cut VOL legs via legMask.",
   "data_source": "massive",
-  "prediction_markets": {
-    "_note": "External-leg gates (strategies.json external_legs) applied at scan level, never inside indicators.py. enabled=false means the adapters are dormant — flipping data_source is what routes bars.",
+  "external_gates": {
+    "_note": "External-leg gates (strategies.json external_legs) applied by gates.GateBook in the backtest loop, never inside indicators.py. mode 'annotate' adds sue/sue_pct/macro_risk_on columns to every trade (slice post-hoc in ablation/MC); 'filter' additionally drops non-passing trades (live-representative; sue 'na' and macro '' drop too). SUE backtests read av_cache/ only — backfill deliberately: py -m rhengine.gates backfill. kalshi/polymarket legs are scan-level and dormant until enabled.",
+    "av_earnings_sue": {
+      "enabled": true,
+      "mode": "annotate",
+      "driftMin": 1,
+      "driftMax": 10,
+      "minSurprisePct": 5.0
+    },
+    "macro_flags": {
+      "enabled": true,
+      "mode": "annotate",
+      "curveMin": 0.0,
+      "hyOasMax": 4.5,
+      "vixMax": 25.0
+    },
     "kalshi_prob_shift": {
       "enabled": false,
       "window": 5,
