@@ -13,6 +13,10 @@ those stay app-side.
 | `rhengine/market_data.py` | Data adapters: Alpaca IEX + Massive/Polygon grouped-daily (real SIP volume, disk-cached). Resolves `secrets.json` / `config.json` / `massive_cache` from the consuming app's cwd |
 | `rhengine/backtest.py` | Walk-forward backtest engine (`python3 -m rhengine.backtest` from the app dir) |
 | `rhengine/data_local.py` | **No-key data layer**: Yahoo daily bars (disk-cached in `yahoo_cache/`), OHLCV CSV loader, seeded synthetic universe for offline tests |
+| `rhengine/market_data_kalshi.py` | Kalshi adapter: public exchange-status gate (`kalshi_is_tradable`), market discovery, daily implied-probability bars from candlesticks (cached in `kalshi_cache/`), `score_prob_shift` external leg. `KalshiPerpsClient` wraps the separate `/margin/*` surface (order routing stubbed — no funding/liquidation model yet) |
+| `rhengine/market_data_polymarket.py` | Polymarket adapter, split per Polymarket's own APIs: Gamma (discovery), Data API (positions/trades/holders), CLOB prices-history → daily probability bars (cached in `polymarket_cache/`), `score_implied_prob` external leg. CLOB trading + perps are gated stubs |
+| `rhengine/market_data_fred.py` | FRED macro adapter: T10Y2Y / HY OAS / real VIX close, cached in `fred_cache/`; `macro_flags` portfolio-heat overlay (app-side, conventional thresholds) |
+| `rhengine/market_data_av.py` | AlphaVantage earnings-surprise adapter (real SUE feed — the PEAD upgrade path): cached in `av_cache/`, budget-aware batch (free tier = 25 req/day), `sue_gate` external leg |
 | `rhengine/portfolio.py` | Account-level equity simulation: replays backtest trades with fixed-fractional sizing, position caps, per-day entry limits → equity curve, CAGR, max DD, Sharpe |
 | `rhengine/montecarlo.py` | Bootstrap Monte Carlo over trade R-multiples → outcome/drawdown distributions, P(loss), P(ruin) |
 | `rhengine/optimize.py` | Threshold sweeps (OAT / grid) with in-sample/out-of-sample splits, plus expanding-window walk-forward fold evaluation |

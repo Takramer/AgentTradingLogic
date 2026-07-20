@@ -1,6 +1,22 @@
 {
   "_note": "Standalone simulation config. watchlist \"all\" scans every ticker in the Massive whole-market cache (universe_filters sets tradeability floors; zero them to scan literally everything). Requires data_source massive + backfilled cache. Swap watchlist back to an explicit list for yahoo/alpaca.",
+  "_note_data_source": "Enum: yahoo | alpaca | massive | kalshi | polymarket. kalshi/polymarket score IMPLIED-PROBABILITY bars ([0,1] daily closes) through the same engine — watchlist entries become \"SERIES/MARKET\" tickers (kalshi) or market slugs (polymarket), SPY regime anchor stays on Yahoo, and prediction_markets below configures the external gating legs. Polymarket bars have volume=0: cut VOL legs via legMask.",
   "data_source": "massive",
+  "prediction_markets": {
+    "_note": "External-leg gates (strategies.json external_legs) applied at scan level, never inside indicators.py. enabled=false means the adapters are dormant — flipping data_source is what routes bars.",
+    "kalshi_prob_shift": {
+      "enabled": false,
+      "window": 5,
+      "minShift": 0.05
+    },
+    "polymarket_implied_prob": {
+      "enabled": false,
+      "minProb": 0.1,
+      "maxProb": 0.9,
+      "window": 5,
+      "minShift": 0.0
+    }
+  },
   "spy_ticker": "SPY",
   "watchlist": "all",
   "strategy": {

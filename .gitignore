@@ -8,3 +8,7 @@ yahoo_cache/
 *.csv
 *.joblib
 *.egg-info/
+kalshi_cache/
+polymarket_cache/
+fred_cache/
+av_cache/

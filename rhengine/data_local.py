@@ -318,6 +318,16 @@ def load_bars_any(cfg, lookback_days=400, verbose=True):
     if source in ("alpaca", "massive"):
         from .backtest import load_bars
         return load_bars(cfg, lookback_days=lookback_days, verbose=verbose)
+    if source == "kalshi":
+        # Watchlist entries are "SERIES_TICKER/MARKET_TICKER"; bars are daily
+        # implied probabilities [0,1]. SPY regime anchor still comes from Yahoo.
+        from .market_data_kalshi import load_bars_kalshi
+        return load_bars_kalshi(cfg, lookback_days=lookback_days, verbose=verbose)
+    if source == "polymarket":
+        # Watchlist entries are market slugs; volume=0 on these bars, so cut
+        # VOL legs via legMask (see market_data_polymarket module note).
+        from .market_data_polymarket import load_bars_polymarket
+        return load_bars_polymarket(cfg, lookback_days=lookback_days, verbose=verbose)
 
     if cfg.get("watchlist") == "all":
         raise ValueError('watchlist "all" requires data_source "massive" — '

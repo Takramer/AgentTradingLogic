@@ -15,6 +15,96 @@
     "max_hold_sessions": 10,
     "leveraged_max_hold_sessions": 3
   },
+  "external_legs": {
+    "_note": "Adapter-derived gating legs evaluated OUTSIDE score_ticker — indicators.py stays a pure OHLCV scorer and the golden vectors never move. Apps apply these as scan-level filters alongside any strategy (config.json prediction_markets toggles + thresholds). Scorers: market_data_kalshi.score_prob_shift, market_data_polymarket.score_implied_prob. Additive to the spec — not part of any strategy's legMask bit-width.",
+    "kalshi_prob_shift": {
+      "id": "kalshi_prob_shift",
+      "abbr": "KAL-SHIFT",
+      "full": "Kalshi Implied-Probability Shift",
+      "desc": "The matching Kalshi market repriced by >= minShift over the last `window` daily bars — event-market information flow the equity tape may not have digested. Direction of the shift must agree with the setup's direction.",
+      "thresholds": {
+        "window": {
+          "default": 5,
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "label": "Shift Window (bars)"
+        },
+        "minShift": {
+          "default": 0.05,
+          "min": 0.01,
+          "max": 0.3,
+          "step": 0.01,
+          "label": "Min Probability Shift"
+        }
+      }
+    },
+    "av_earnings_sue": {
+      "id": "av_earnings_sue",
+      "abbr": "SUE",
+      "full": "Real Earnings Surprise (AlphaVantage)",
+      "desc": "A REAL earnings report (AlphaVantage EARNINGS feed) inside the PEAD drift window with |surprisePercentage| >= minSurprisePct, direction matching the setup. Confirms the price-proxy EVENT leg with actual SUE data — the upgrade path the PEAD spec names. Scorer: market_data_av.sue_gate.",
+      "thresholds": {
+        "driftMin": {
+          "default": 1,
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Drift Min (days)"
+        },
+        "driftMax": {
+          "default": 10,
+          "min": 5,
+          "max": 20,
+          "step": 1,
+          "label": "Drift Max (days)"
+        },
+        "minSurprisePct": {
+          "default": 5.0,
+          "min": 0.0,
+          "max": 25.0,
+          "step": 0.5,
+          "label": "Min |Surprise| %"
+        }
+      }
+    },
+    "polymarket_implied_prob": {
+      "id": "polymarket_implied_prob",
+      "abbr": "PM-PROB",
+      "full": "Polymarket Implied Probability Band",
+      "desc": "The matching Polymarket market's implied probability sits in the tradable band (minProb..maxProb — near 0/1 there is no repricing left) and, when minShift > 0, has moved by at least minShift over `window` bars in the setup's direction.",
+      "thresholds": {
+        "minProb": {
+          "default": 0.1,
+          "min": 0.0,
+          "max": 0.5,
+          "step": 0.05,
+          "label": "Min Implied Probability"
+        },
+        "maxProb": {
+          "default": 0.9,
+          "min": 0.5,
+          "max": 1.0,
+          "step": 0.05,
+          "label": "Max Implied Probability"
+        },
+        "window": {
+          "default": 5,
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "label": "Shift Window (bars)"
+        },
+        "minShift": {
+          "default": 0.0,
+          "min": 0.0,
+          "max": 0.3,
+          "step": 0.01,
+          "label": "Min Probability Shift (0=off)"
+        }
+      }
+    }
+  },
   "strategies": {
     "vwap": {
       "id": "vwap",
