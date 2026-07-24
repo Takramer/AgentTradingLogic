@@ -589,12 +589,12 @@
       "change": 5.682951146560322,
       "score": 2,
       "weighted_score": 2,
-      "strength": -0.3706,
+      "strength": -0.2965,
       "legs": [
        {
         "name": "Residual Momentum (2-bar)",
         "pass": false,
-        "val": "RA-Res: -0.371 prev: -0.415 (\u03b2=0.09)"
+        "val": "RA-Res: -0.297 prev: -0.340 (\u03b2=-0.13)"
        },
        {
         "name": "Above EMA21",
@@ -637,12 +637,12 @@
       "change": 0.4901145657797485,
       "score": 3,
       "weighted_score": 4,
-      "strength": 0.3355,
+      "strength": 0.334,
       "legs": [
        {
         "name": "Residual Momentum (2-bar)",
         "pass": true,
-        "val": "RA-Res: 0.335 prev: 0.320 (\u03b2=0.02)"
+        "val": "RA-Res: 0.334 prev: 0.318 (\u03b2=0.08)"
        },
        {
         "name": "Above EMA21",
