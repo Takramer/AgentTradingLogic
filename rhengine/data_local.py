@@ -244,7 +244,10 @@ def synthetic_universe(n_tickers=8, n_bars=300, seed=42):
 # ------------------------------------------------------- full universe ----
 
 def massive_universe(lookback_sessions=20, min_price=1.0, min_dollar_vol=500_000.0,
-                     plain_symbols_only=True, verbose=True):
+                     plain_symbols_only=True, exclude_etfs=False,
+                     exclude_adr=False, exclude_biotech=False,
+                     biotech_smallcap_max_mktcap=10000.0,
+                     adr_smallcap_max_mktcap=10000.0, verbose=True):
     """Every ticker in the Massive cache's most recent `lookback_sessions`
     cached days, filtered only for basic tradeability:
 
@@ -253,11 +256,36 @@ def massive_universe(lookback_sessions=20, min_price=1.0, min_dollar_vol=500_000
       min_dollar_vol — median close*volume floor (default $500k/day: a signal
                        you can't fill isn't a signal)
       plain_symbols_only — drop warrants/units/preferreds (symbols with . or /)
+      exclude_etfs   — drop US-listed ETFs (universe_hygiene blocklist). These
+                       are ~a third of the raw universe and lose heavily: an
+                       equity engine sets pennies-wide stops on tiny-ATR bond/
+                       credit ETFs and gets stopped out for -1R repeatedly.
+                       `plain_symbols_only` can't catch them (LQD/AGG are plain
+                       alphabetic tickers). Needs the blocklist cache — run
+                       `py -m rhengine.universe_hygiene refresh` first.
+      exclude_adr    — drop ADRs / foreign-domiciled names (country != US).
+      exclude_biotech— drop Biotechnology (any cap) and small-cap clinical
+                       Pharma/Health names (< biotech_smallcap_max_mktcap, $M):
+                       binary trial/FDA events = unpredictable gap risk. Both use
+                       the Finnhub sector_map cache — run
+                       `py -m rhengine.universe_hygiene sectors` first (unknown
+                       names pass through until classified).
 
     Set the floors to 0 in config to truly scan everything. Requires cached
     Massive data (run `py -m rhengine.market_data backfill` first)."""
     from .market_data import _MASSIVE_CACHE
     import statistics
+    etf_block = set()
+    if exclude_etfs:
+        from .universe_hygiene import etf_blocklist
+        etf_block = etf_blocklist(verbose=verbose)
+    sector_block = set()
+    if exclude_adr or exclude_biotech:
+        from .universe_hygiene import biotech_adr_blocklist
+        sector_block = biotech_adr_blocklist(
+            exclude_adr=exclude_adr, exclude_biotech=exclude_biotech,
+            biotech_smallcap_max_mktcap=biotech_smallcap_max_mktcap,
+            adr_smallcap_max_mktcap=adr_smallcap_max_mktcap, verbose=verbose)
     days = sorted(f for f in os.listdir(_MASSIVE_CACHE) if f.endswith(".json.gz"))
     if not days:
         raise RuntimeError("massive_cache is empty — run "
@@ -277,8 +305,21 @@ def massive_universe(lookback_sessions=20, min_price=1.0, min_dollar_vol=500_000
             closes.setdefault(t, []).append(c)
             dollars.setdefault(t, []).append(c * v)
     out = []
+    n_etf = 0
+    n_sector = 0
     for t, cs in closes.items():
-        if plain_symbols_only and not t.isalpha():
+        # plain_symbols_only drops non-common-stock share classes. Polygon/Massive
+        # encodes preferreds/warrants/units with LOWERCASE suffixes (BACpB, XYZw,
+        # XYZu) and other classes with '.'/'/'; requiring pure-UPPERCASE-alpha drops
+        # them all. Preferreds especially are bond-like (near-zero ATR) and, like the
+        # bond ETFs, get noise-stopped for -1R — 121 of them lost -1,035 R in the book.
+        if plain_symbols_only and not (t.isalpha() and t.isupper()):
+            continue
+        if exclude_etfs and t in etf_block:
+            n_etf += 1
+            continue
+        if sector_block and t in sector_block:
+            n_sector += 1
             continue
         if statistics.median(cs) < min_price:
             continue
@@ -287,9 +328,14 @@ def massive_universe(lookback_sessions=20, min_price=1.0, min_dollar_vol=500_000
         out.append(t)
     out.sort()
     if verbose:
+        extra = ""
+        if exclude_etfs:
+            extra += ", excluded {} ETFs".format(n_etf)
+        if sector_block:
+            extra += ", excluded {} ADR/biotech".format(n_sector)
         print("  Universe: {} of {} cached tickers pass filters "
-              "(min_price={}, min_dollar_vol={:,.0f})".format(
-                  len(out), len(closes), min_price, min_dollar_vol))
+              "(min_price={}, min_dollar_vol={:,.0f}{})".format(
+                  len(out), len(closes), min_price, min_dollar_vol, extra))
     return out
 
 
@@ -305,6 +351,11 @@ def resolve_watchlist(cfg, verbose=True):
         min_price=float(uf.get("min_price", 1.0)),
         min_dollar_vol=float(uf.get("min_dollar_volume", 500_000.0)),
         plain_symbols_only=bool(uf.get("plain_symbols_only", True)),
+        exclude_etfs=bool(uf.get("exclude_etfs", False)),
+        exclude_adr=bool(uf.get("exclude_adr", False)),
+        exclude_biotech=bool(uf.get("exclude_biotech", False)),
+        biotech_smallcap_max_mktcap=float(uf.get("biotech_smallcap_max_mktcap", 10000.0)),
+        adr_smallcap_max_mktcap=float(uf.get("adr_smallcap_max_mktcap", 10000.0)),
         verbose=verbose)
 
 

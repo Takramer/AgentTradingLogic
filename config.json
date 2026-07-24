@@ -38,11 +38,16 @@
   "strategy": {
     "mode": "auto",
     "interval": "1d",
+    "pead_always_on": false,
+    "_pead_note": "PEAD earnings-drift sleeve, pooled alongside the regime strategy (backtest.py, regime-precedence per bar; legMask=3=EVENT+DRIFT). DISABLED 2026-07-21: it tested +0.15R OOS on a universe INCLUDING biotech, but on the biotech-EXCLUDED universe (the hard rule) it is -0.05R/PF 0.89/-186 R — its edge lived in the banned names. Re-enable only if biotech is allowed back. Pooling code retained.",
     "thresholds": {
       "residualmomentum": {
         "legMask": 1
       },
       "macd": {
+        "legMask": 3
+      },
+      "pead": {
         "legMask": 3
       }
     },
@@ -54,7 +59,11 @@
     "trail_trigger_mult": 1.5,
     "chandelier_atr_mult": 3.0,
     "max_hold_sessions": 10,
-    "leveraged_max_hold_sessions": 3
+    "leveraged_max_hold_sessions": 3,
+    "min_stop_pct": 0.0075,
+    "_min_stop_pct_note": "Skip setups whose ATR stop is under this fraction of entry. Raised 0.003->0.0075 2026-07-20: near-zero-ATR names (low-vol equities, closed-end funds like CEE) produced degenerate R (0.3% stop -> a normal move = +27R) that failed the sanity degenerate_r check. 0.75% is still tight but noise-survivable.",
+    "winsor_r_cap": 10.0,
+    "_winsor_r_cap_note": "Cap the recorded UPSIDE r_multiple of a trade at this value (downside left uncapped so the loss tail stays honest). A gap-through-target that fills far above target can book +20-36R once, but that windfall isn't repeatable/bankable for expectancy or Monte Carlo — capping it keeps rare gaps from flattering the book. Set 0/remove to disable. 2026-07-21."
   },
   "leveraged_tickers": [],
   "bear_regime_only": [],
@@ -62,6 +71,13 @@
     "lookback_sessions": 20,
     "min_price": 1.0,
     "min_dollar_volume": 500000,
-    "plain_symbols_only": true
+    "plain_symbols_only": true,
+    "exclude_etfs": true,
+    "_exclude_etfs_note": "Drop US-listed ETFs from the equity scan (universe_hygiene blocklist; refresh via `py -m rhengine.universe_hygiene refresh`). Whole-market backtest: ETFs were ~33% of trades and -6,551 R (bond/credit/covered-call ETFs have near-zero ATR, so pennies-wide stops get noise-stopped for -1R). Clean-equity book is +6,178 R vs -1,712 R with ETFs mixed in. Set false to revert.",
+    "exclude_adr": true,
+    "exclude_biotech": true,
+    "biotech_smallcap_max_mktcap": 10000.0,
+    "adr_smallcap_max_mktcap": 10000.0,
+    "_exclude_adr_biotech_note": "Hard rule: no small ADRs and no biotech. exclude_adr drops foreign-domiciled (country != US) names UNDER adr_smallcap_max_mktcap ($M) so liquid large-cap foreign (ACN/ACGL/AEM/ALC) survive — the narrow 'no ADR' reading chosen 2026-07-21. exclude_biotech drops Biotechnology (any cap) + small-cap clinical Pharma/Health under biotech_smallcap_max_mktcap. Binary trial/FDA/earnings events = unpredictable two-sided gap risk. Note these names were net +profit in this window (fat right tails) so the rule COSTS ~3,700 backtested R for lower tail risk. Uses sector_map cache (`py -m rhengine.universe_hygiene sectors tests/results/current_full.csv`); unknown names pass through. Set false to revert."
   }
 }
