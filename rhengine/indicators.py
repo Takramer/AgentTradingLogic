@@ -709,25 +709,66 @@ def score_consolidation(ticker, bars, thresholds):
 # ─────────────────────────────────────────────
 
 def score_residual_momentum(ticker, bars, thresholds, spy_bars=None):
-    if not spy_bars or len(spy_bars) < 40 or len(bars) < 40:
+    # HORIZON — parameterized 2026-07-24 (docs/AUDIT-2026-07-24.md FC-8).
+    #
+    # The defaults below (36 / 12 / 1) are TRADING DAYS. The literature this
+    # sleeve cites — Blitz, Huij & Martens, "Residual Momentum", J. Empirical
+    # Finance 18(3) 2011 — specifies 36 MONTHS of regression and a 12-MONTH
+    # formation window skipping the most recent month. The original
+    # implementation transposed months to days, so it trades a ~12-day horizon
+    # while claiming a ~12-month effect. At 12 days the documented US equity
+    # anomaly is short-term REVERSAL (Jegadeesh 1990; Lehmann 1990), not
+    # momentum. Defaults are unchanged here so golden fixtures stay pinned;
+    # the literature horizon is selected via config thresholds:
+    #     regBars 756, formBars 252, skipBars 21
+    #
+    # The estimation window and the formation window are ADJACENT, not
+    # overlapping: beta/alpha come from the OLDEST `regBars` returns, residuals
+    # are measured on the `formBars` returns that follow, ending `skipBars`
+    # before now. That is a cleaner construction than BHM (which regresses and
+    # forms on the same window) and is preserved at every horizon.
+    reg_bars  = int(thresholds.get("regBars", 36))
+    form_bars = int(thresholds.get("formBars", 12))
+    skip_bars = int(thresholds.get("skipBars", 1))
+    # window = reg + form + skip + 1 reproduces the original hardcoded 50.
+    window = reg_bars + form_bars + skip_bars + 1
+    min_bars = 40 if window <= 50 else window
+    if not spy_bars or len(spy_bars) < min_bars or len(bars) < min_bars:
         return None
 
-    N           = min(len(bars), len(spy_bars), 50)
-    stock_slice = bars[-N:]
-    spy_slice   = spy_bars[-N:]
+    # DATE ALIGNMENT (FC-9). The original sliced bars[-N:] and spy_bars[-N:] and
+    # paired them BY POSITION. 18.3% of cached tickers have at least one missing
+    # session, so for those the regression correlated returns from different
+    # dates — corrupting beta exactly for the thin names that dominate the
+    # universe by count. Pair on the bar timestamp instead. `alignByDate` 0
+    # restores the legacy behavior for A/B comparison.
+    if int(thresholds.get("alignByDate", 1)):
+        spy_close = {b["time"]: b["close"] for b in spy_bars}
+        matched = [(b["time"], b["close"], spy_close[b["time"]])
+                   for b in bars if b["time"] in spy_close]
+        if len(matched) < min_bars:
+            return None
+        matched = matched[-window:]
+        N = len(matched)
+        stock_rets = [math.log(matched[i][1] / matched[i - 1][1]) for i in range(1, N)]
+        spy_rets   = [math.log(matched[i][2] / matched[i - 1][2]) for i in range(1, N)]
+    else:
+        N           = min(len(bars), len(spy_bars), window)
+        stock_slice = bars[-N:]
+        spy_slice   = spy_bars[-N:]
+        stock_rets = [math.log(stock_slice[i]["close"] / stock_slice[i-1]["close"]) for i in range(1, N)]
+        spy_rets   = [math.log(spy_slice[i]["close"]   / spy_slice[i-1]["close"])   for i in range(1, N)]
 
-    stock_rets = [math.log(stock_slice[i]["close"] / stock_slice[i-1]["close"]) for i in range(1, N)]
-    spy_rets   = [math.log(spy_slice[i]["close"]   / spy_slice[i-1]["close"])   for i in range(1, N)]
     L = min(len(stock_rets), len(spy_rets))
     if L < 20:
         return None
 
-    reg_n = min(L, 36)
+    reg_n = min(L, reg_bars)
     ols   = _calc_ols(spy_rets[:reg_n], stock_rets[:reg_n])
     beta  = ols["beta"]
     alpha = ols["alpha"]
 
-    SKIP, FORM = 1, 12
+    SKIP, FORM = skip_bars, form_bars
     form_end   = L - SKIP
     form_start = max(0, form_end - FORM)
     form_stock = stock_rets[form_start:form_end]
