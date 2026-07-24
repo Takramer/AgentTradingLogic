@@ -30,6 +30,8 @@ import argparse
 import itertools
 import json
 
+from .costs import resolve_cost_bps
+
 from .backtest import run_backtest_on, _stats, WARMUP_BARS, _iso_date
 from .indicators import load_spec, spec_defaults
 
@@ -223,7 +225,7 @@ def main():
                     help="comma list of thresholds to sweep (default: all in spec)")
     ap.add_argument("--lookback-days", type=int, default=400)
     ap.add_argument("--min-score", type=int, default=3)
-    ap.add_argument("--cost-bps", type=float, default=0.0)
+    ap.add_argument("--cost-bps", type=float, default=None)
     ap.add_argument("--split", type=float, default=0.7,
                     help="train fraction for IS/OOS split (default 0.7)")
     ap.add_argument("--min-trades", type=int, default=15,
@@ -235,6 +237,11 @@ def main():
     ap.add_argument("--walk-forward", type=int, default=0, metavar="FOLDS",
                     help="expanding-window fold evaluation (e.g. 4)")
     args = ap.parse_args()
+    # Single source of truth for the cost assumption (costs.py / config.json
+    # "costs.round_trip_bps"). Audit FC-2: these defaults used to be 0.0 or 5.0
+    # per-CLI and the headline artifact was generated at 0 bps.
+    args.cost_bps = resolve_cost_bps(args.cost_bps,
+                                     getattr(args, "config", None))
 
     with open(args.config) as f:
         cfg = json.load(f)

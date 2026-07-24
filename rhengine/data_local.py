@@ -24,6 +24,7 @@ import json
 import os
 import random
 import time as _time
+from bisect import bisect_right
 from datetime import datetime, timezone
 
 import requests
@@ -247,9 +248,23 @@ def massive_universe(lookback_sessions=20, min_price=1.0, min_dollar_vol=500_000
                      plain_symbols_only=True, exclude_etfs=False,
                      exclude_adr=False, exclude_biotech=False,
                      biotech_smallcap_max_mktcap=10000.0,
-                     adr_smallcap_max_mktcap=10000.0, verbose=True):
-    """Every ticker in the Massive cache's most recent `lookback_sessions`
-    cached days, filtered only for basic tradeability:
+                     adr_smallcap_max_mktcap=10000.0, as_of=None, verbose=True):
+    """Tickers passing tradeability floors over the `lookback_sessions` cached
+    days ending at `as_of` (ISO date; default = the newest cached session).
+
+    `as_of` is the point-in-time control. Leaving it None reproduces the legacy
+    behavior — a universe drawn from the newest sessions and applied to all of
+    history — which is survivorship-biased by construction (measured: 1,859 of
+    10,095 common stocks alive on 2024-07-18 are absent by 2026-07-20, of which
+    575 passed these very floors on day 1). Pass `as_of` per rebalance date, or
+    use `pit_membership()`, to screen with only the information available then.
+
+    NOT YET POINT-IN-TIME even with `as_of`: exclude_etfs / exclude_adr /
+    exclude_biotech consult present-day snapshots (etf_blocklist.json,
+    sector_map.json with *current* market cap). Those need dated vintages to be
+    honest; until then they remain a look-ahead channel. See AUDIT FC-4.
+
+    Filters:
 
       min_price      — median close floor (default $1: drops sub-dollar names
                        whose spreads/halts make fills fictional)
@@ -287,6 +302,13 @@ def massive_universe(lookback_sessions=20, min_price=1.0, min_dollar_vol=500_000
             biotech_smallcap_max_mktcap=biotech_smallcap_max_mktcap,
             adr_smallcap_max_mktcap=adr_smallcap_max_mktcap, verbose=verbose)
     days = sorted(f for f in os.listdir(_MASSIVE_CACHE) if f.endswith(".json.gz"))
+    if as_of is not None:
+        # POINT-IN-TIME: consider only sessions at or before as_of. Without this
+        # the universe is always drawn from the most recent cached sessions and
+        # applied retroactively to the whole backtest, which (a) silently drops
+        # every name that delisted before today and (b) screens history on
+        # today's price/liquidity. See docs/AUDIT-2026-07-24.md FC-4.
+        days = [f for f in days if f[:-8] <= as_of]
     if not days:
         raise RuntimeError("massive_cache is empty — run "
                            "`py -m rhengine.market_data backfill` first")
@@ -337,6 +359,130 @@ def massive_universe(lookback_sessions=20, min_price=1.0, min_dollar_vol=500_000
               "(min_price={}, min_dollar_vol={:,.0f}{})".format(
                   len(out), len(closes), min_price, min_dollar_vol, extra))
     return out
+
+
+class PitMembership:
+    """Point-in-time universe membership: which tickers were investable when.
+
+    Built by `pit_membership()`. Holds a schedule of (rebalance_date, frozenset)
+    snapshots; membership on any date is the most recent snapshot at or before
+    it — exactly what a live system would have known.
+    """
+
+    def __init__(self, grid, rebalance_sessions):
+        self._dates = [d for d, _ in grid]
+        self._sets = [s for _, s in grid]
+        self.rebalance_sessions = rebalance_sessions
+
+    def contains(self, ticker, iso_date):
+        i = bisect_right(self._dates, iso_date) - 1
+        if i < 0:
+            return False          # before the first snapshot: not yet screened
+        return ticker in self._sets[i]
+
+    def at(self, iso_date):
+        i = bisect_right(self._dates, iso_date) - 1
+        return self._sets[i] if i >= 0 else frozenset()
+
+    def union(self):
+        """Every ticker that was ever a member — the set of bars to fetch."""
+        out = set()
+        for s in self._sets:
+            out |= s
+        return sorted(out)
+
+    def sizes(self):
+        return [(d, len(s)) for d, s in zip(self._dates, self._sets)]
+
+    def __len__(self):
+        return len(self._dates)
+
+
+def pit_membership(cfg, rebalance_sessions=21, verbose=True):
+    """Build a PitMembership over the whole Massive cache in ONE pass.
+
+    At every `rebalance_sessions`-th cached session, snapshot the set of tickers
+    that pass the config's universe_filters using only the trailing
+    `lookback_sessions` of data available at that date. Defaults to a ~monthly
+    grid (21 trading sessions).
+
+    This is the survivorship fix (AUDIT FC-4): a name that was liquid in 2024
+    and delisted in 2025 is a member of the 2024 snapshots and absent from the
+    2025 ones, instead of being erased from all of history.
+
+    Cost: one read of every cached day. ~500 files for a 2-year cache.
+    """
+    from .market_data import _MASSIVE_CACHE
+    import statistics
+    from collections import deque
+
+    uf = cfg.get("universe_filters", {}) or {}
+    lookback = int(uf.get("lookback_sessions", 20))
+    min_price = float(uf.get("min_price", 1.0))
+    min_dollar_vol = float(uf.get("min_dollar_volume", 500_000.0))
+    plain_only = bool(uf.get("plain_symbols_only", True))
+
+    block = set()
+    if bool(uf.get("exclude_etfs", False)):
+        from .universe_hygiene import etf_blocklist
+        block |= etf_blocklist(verbose=verbose)
+    if bool(uf.get("exclude_adr", False)) or bool(uf.get("exclude_biotech", False)):
+        from .universe_hygiene import biotech_adr_blocklist
+        block |= biotech_adr_blocklist(
+            exclude_adr=bool(uf.get("exclude_adr", False)),
+            exclude_biotech=bool(uf.get("exclude_biotech", False)),
+            biotech_smallcap_max_mktcap=float(uf.get("biotech_smallcap_max_mktcap", 10000.0)),
+            adr_smallcap_max_mktcap=float(uf.get("adr_smallcap_max_mktcap", 10000.0)),
+            verbose=verbose)
+
+    days = sorted(f for f in os.listdir(_MASSIVE_CACHE) if f.endswith(".json.gz"))
+    if not days:
+        raise RuntimeError("massive_cache is empty — run "
+                           "`py -m rhengine.market_data backfill` first")
+
+    window = deque(maxlen=lookback)   # each entry: {ticker: (close, dollar_vol)}
+    grid, used = [], 0
+    if verbose:
+        print("  Building point-in-time universe over {} cached sessions "
+              "(rebalance every {})...".format(len(days), rebalance_sessions))
+    for fname in days:
+        with gzip.open(os.path.join(_MASSIVE_CACHE, fname), "rt") as f:
+            day = json.load(f)
+        if not day:
+            continue  # holiday
+        window.append({t: (bar[3], bar[3] * bar[4]) for t, bar in day.items()})
+        used += 1
+        if used < lookback or used % rebalance_sessions:
+            continue
+        closes, dollars = {}, {}
+        for snap in window:
+            for t, (c, dv) in snap.items():
+                closes.setdefault(t, []).append(c)
+                dollars.setdefault(t, []).append(dv)
+        members = set()
+        for t, cs in closes.items():
+            if plain_only and not (t.isalpha() and t.isupper()):
+                continue
+            if t in block:
+                continue
+            if statistics.median(cs) < min_price:
+                continue
+            if statistics.median(dollars[t]) < min_dollar_vol:
+                continue
+            members.add(t)
+        grid.append((fname[:-8], frozenset(members)))
+
+    if not grid:
+        raise RuntimeError(
+            "no rebalance snapshots built — cache has {} sessions but "
+            "lookback_sessions={}".format(used, lookback))
+    m = PitMembership(grid, rebalance_sessions)
+    if verbose:
+        sizes = [n for _, n in m.sizes()]
+        print("  PIT universe: {} snapshots, {}..{} names each, "
+              "{} distinct names ever a member".format(
+                  len(m), min(sizes), max(sizes), len(m.union())))
+    return m
 
 
 def resolve_watchlist(cfg, verbose=True):

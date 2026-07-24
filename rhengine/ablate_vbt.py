@@ -45,6 +45,8 @@ import json
 import numpy as np
 import pandas as pd
 
+from .costs import resolve_cost_bps
+
 from .backtest import WARMUP_BARS
 from .indicators import load_spec, resolve_thresholds
 
@@ -452,7 +454,7 @@ def main():
     ap.add_argument("--strategy", default="all",
                     help="one of {} or 'all'".format("|".join(STRATEGIES)))
     ap.add_argument("--lookback-days", type=int, default=400)
-    ap.add_argument("--cost-bps", type=float, default=5.0,
+    ap.add_argument("--cost-bps", type=float, default=None,
                     help="cost per side in basis points (default 5)")
     ap.add_argument("--split", type=float, default=0.7,
                     help="IS/OOS date split fraction (default 0.7)")
@@ -462,6 +464,11 @@ def main():
                     help="flag rows under this many trades")
     ap.add_argument("--csv", default="ablation_vbt_results.csv")
     args = ap.parse_args()
+    # Single source of truth for the cost assumption (costs.py / config.json
+    # "costs.round_trip_bps"). Audit FC-2: these defaults used to be 0.0 or 5.0
+    # per-CLI and the headline artifact was generated at 0 bps.
+    args.cost_bps = resolve_cost_bps(args.cost_bps,
+                                     getattr(args, "config", None))
 
     strategies = STRATEGIES if args.strategy == "all" else (args.strategy,)
     for s in strategies:
