@@ -31,6 +31,8 @@ import json
 import math
 from collections import defaultdict
 
+from .costs import resolve_cost_bps
+
 
 def _avg(rs):
     return sum(rs) / len(rs) if rs else 0.0
@@ -267,13 +269,18 @@ def main():
     ap.add_argument("--lookback-days", type=int, default=400)
     ap.add_argument("--min-score", type=int, default=3)
     ap.add_argument("--strategy", default=None)
-    ap.add_argument("--cost-bps", type=float, default=5.0)
+    ap.add_argument("--cost-bps", type=float, default=None)
     ap.add_argument("--max-tickers", type=int, default=0)
     ap.add_argument("--json", action="store_true",
                     help="emit machine-readable results on stdout")
     ap.add_argument("--strict", action="store_true",
                     help="exit 1 on WARN as well as FAIL")
     args = ap.parse_args()
+    # Single source of truth for the cost assumption (costs.py / config.json
+    # "costs.round_trip_bps"). Audit FC-2: these defaults used to be 0.0 or 5.0
+    # per-CLI and the headline artifact was generated at 0 bps.
+    args.cost_bps = resolve_cost_bps(args.cost_bps,
+                                     getattr(args, "config", None))
 
     if args.trades_csv:
         trades = load_trades_csv(args.trades_csv)

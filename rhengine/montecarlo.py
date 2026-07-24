@@ -22,6 +22,8 @@ import json
 import random
 import statistics
 
+from .costs import resolve_cost_bps
+
 
 def run_monte_carlo(r_multiples, n_trades=None, paths=20000, risk_pct=1.0,
                     start_equity=10_000.0, seed=1337, ruin_dd_pct=50.0):
@@ -128,7 +130,7 @@ def main():
     ap.add_argument("--lookback-days", type=int, default=400)
     ap.add_argument("--min-score", type=int, default=3)
     ap.add_argument("--strategy", default=None)
-    ap.add_argument("--cost-bps", type=float, default=0.0)
+    ap.add_argument("--cost-bps", type=float, default=None)
     ap.add_argument("--paths", type=int, default=20000)  # sources: >= 20k runs
     ap.add_argument("--n-trades", type=int, default=None,
                     help="trades per path (default: as many as observed)")
@@ -141,6 +143,11 @@ def main():
                          "bootstrap max drawdown exceeds this — lets CI/agents "
                          "reject a config mechanically")
     args = ap.parse_args()
+    # Single source of truth for the cost assumption (costs.py / config.json
+    # "costs.round_trip_bps"). Audit FC-2: these defaults used to be 0.0 or 5.0
+    # per-CLI and the headline artifact was generated at 0 bps.
+    args.cost_bps = resolve_cost_bps(args.cost_bps,
+                                     getattr(args, "config", None))
 
     if args.trades_csv:
         rs = _rs_from_csv(args.trades_csv)

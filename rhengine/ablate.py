@@ -26,6 +26,8 @@ import argparse
 import itertools
 import json
 
+from .costs import resolve_cost_bps
+
 from .backtest import run_backtest_on, _stats, _iso_date, WARMUP_BARS
 from .indicators import load_spec
 
@@ -66,7 +68,7 @@ def main():
     ap.add_argument("--config", default="config.json")
     ap.add_argument("--strategy", required=True)
     ap.add_argument("--lookback-days", type=int, default=400)
-    ap.add_argument("--cost-bps", type=float, default=5.0)
+    ap.add_argument("--cost-bps", type=float, default=None)
     ap.add_argument("--split", type=float, default=0.7)
     ap.add_argument("--regime", default=None,
                     help="restrict to signals fired in this SPY regime (e.g. "
@@ -75,6 +77,11 @@ def main():
                     help="flag configs under this many total trades (sources: "
                          "~300 = minimum statistical confidence)")
     args = ap.parse_args()
+    # Single source of truth for the cost assumption (costs.py / config.json
+    # "costs.round_trip_bps"). Audit FC-2: these defaults used to be 0.0 or 5.0
+    # per-CLI and the headline artifact was generated at 0 bps.
+    args.cost_bps = resolve_cost_bps(args.cost_bps,
+                                     getattr(args, "config", None))
 
     with open(args.config) as f:
         cfg = json.load(f)

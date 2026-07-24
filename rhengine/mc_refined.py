@@ -30,6 +30,8 @@ import json
 import numpy as np
 import pandas as pd
 
+from .costs import resolve_cost_bps
+
 from .ablate_vbt import RULE_BUILDERS, Market
 from .indicators import classify_spy_regime, resolve_thresholds
 
@@ -164,10 +166,15 @@ def main():
                     "for Monte Carlo analysis.")
     ap.add_argument("--config", default="config.json")
     ap.add_argument("--lookback-days", type=int, default=730)
-    ap.add_argument("--cost-bps", type=float, default=5.0)
+    ap.add_argument("--cost-bps", type=float, default=None)
     ap.add_argument("--max-tickers", type=int, default=0)
     ap.add_argument("--csv", default="tests/results/refined_trades.csv")
     args = ap.parse_args()
+    # Single source of truth for the cost assumption (costs.py / config.json
+    # "costs.round_trip_bps"). Audit FC-2: these defaults used to be 0.0 or 5.0
+    # per-CLI and the headline artifact was generated at 0 bps.
+    args.cost_bps = resolve_cost_bps(args.cost_bps,
+                                     getattr(args, "config", None))
 
     with open(args.config) as f:
         cfg = json.load(f)

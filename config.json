@@ -33,6 +33,11 @@
       "minShift": 0.0
     }
   },
+  "costs": {
+    "_note": "SINGLE SOURCE OF TRUTH for transaction costs (rhengine/costs.py). Every CLI's --cost-bps now defaults to None and resolves here; passing --cost-bps still overrides. Set 2026-07-24 by audit FC-2: the eleven CLIs previously carried their own defaults (0.0 in backtest/portfolio/optimize/nulltest/montecarlo/ic, 5.0 elsewhere) and tests/results/current_full.csv was forensically confirmed generated at 0 bps.",
+    "_calibration_note": "30 bps, NOT 5. universe_filters.min_dollar_volume is 500,000, i.e. names trading $500k/day, where round-trip half-spread x2 + impact is routinely 30-100+ bps. 5 bps is a mega-cap number applied to a microcap universe. Measured breakeven on current_full.csv is 11.2 bps incremental: at +5 bps mean R falls +0.0572 -> +0.0316, at +10 bps -> +0.0061, at +20 bps -> -0.0450. Lower this only with executed-fill evidence.",
+    "round_trip_bps": 30.0
+  },
   "spy_ticker": "SPY",
   "watchlist": "all",
   "strategy": {
