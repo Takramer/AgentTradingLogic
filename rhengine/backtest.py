@@ -171,7 +171,7 @@ def _cost_r(entry, stop, cost_bps):
 
 def run_backtest_on(cfg, bars_map, spy_bars, min_score=3, forced_strategy=None,
                     date_lo=None, date_hi=None, regime_only=None, cost_bps=0.0,
-                    gates=None, universe=None):
+                    gates=None, universe=None, signal_dates=None):
     """Score + simulate over pre-fetched bars. Pure/in-memory so a sweep can call
     it many times without re-hitting the API. `date_lo`/`date_hi` (ISO strings)
     restrict signals to [date_lo, date_hi) for in-sample / out-of-sample splits.
@@ -270,6 +270,13 @@ def run_backtest_on(cfg, bars_map, spy_bars, min_score=3, forced_strategy=None,
             if date_lo is not None and sig_date < date_lo:
                 continue
             if date_hi is not None and sig_date >= date_hi:
+                continue
+            # Rebalance calendar: when supplied, signals may only fire on these
+            # dates. A daily-scored signal is a daily-turnover strategy no
+            # matter what horizon it measures; a 12-month formation window is
+            # only economically coherent if it is acted on monthly. Also cuts
+            # scoring cost by the stride. Default None = score every bar.
+            if signal_dates is not None and sig_date not in signal_dates:
                 continue
             # Point-in-time universe membership: was this name investable ON
             # sig_date, judged only on data available then? Without this the
