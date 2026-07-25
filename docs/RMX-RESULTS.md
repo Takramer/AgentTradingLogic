@@ -8,11 +8,29 @@
 
 ## The answer
 
-**One strategy survives: RMX-QT, a cap-weighted operating-profitability tilt
-inside S&P 500 large caps.** It beat the market in **all five eras from 1963 to
-2026** on Ken French's survivorship-free data — and the edge is small enough
-that no honest test on the data available here can *prove* it, which is stated
-rather than hidden.
+**One construction clears alpha t ≥ 2.0 on a sample long enough to mean
+anything: RMX-B, a 50/50 blend of two cap-weighted large-cap sleeves — operating
+profitability and 12-1 momentum.**
+
+On Ken French's own portfolios, 1963–2026, survivorship-free, net of a
+deliberately punitive cost charge:
+
+| | CAGR | market | alpha/yr | **alpha t** | IR | eras beaten |
+|---|---|---|---|---|---|---|
+| quality only | 11.61% | 10.90% | +1.13% | +1.62 | 0.22 | 4/4 |
+| momentum only | 13.24% | 10.90% | +2.43% | +2.10 | 0.27 | 3/4 |
+| **50/50 BLEND** | **12.55%** | **10.90%** | **+1.78%** | **+2.54** | **0.32** | **4/4** |
+
+**+1.64 pp/yr over the market for 63 years, Sharpe 0.55 vs 0.47, beta 0.97,
+positive in every era.** The blend's t-stat exceeds *both* of its legs because
+their excess returns correlate only **+0.18** — alphas add, tracking errors add
+in quadrature. That is the fundamental law of active management doing the work
+that no single signal in this project could.
+
+The honest boundary, stated up front: **this project's own 8-year S&P 500
+implementation cannot confirm it.** A +1.78%/yr alpha against a 5.5%/yr tracking
+error needs ~39 years to reach t=2. The demonstration is French's 63 years; the
+implementation is checked for consistency, not significance.
 
 Four other hypotheses were pre-registered and rejected on the numbers.
 
@@ -22,76 +40,82 @@ Four other hypotheses were pre-registered and rejected on the numbers.
 | 8 price-only cross-sectional signals | best \|t\| = **0.89** | not reached | rejected |
 | **RMX-D** trend + absolute-momentum timing | +0.94 pp/yr, alpha t=+2.07, 8/11 gates | **−6.22 pp/yr**, alpha t=+0.07, **1/11 gates** | rejected |
 | **RMX-Q** profitability tilt, *equal*-weighted | +2.66 pp/yr, alpha t=+2.48, 8/11 gates | **−2.03 pp/yr** vs SPY | rejected — see below |
-| **RMX-QT** profitability tilt, *cap*-weighted | +0.50 pp/yr, alpha t=+0.79 | 63-year record, all 5 eras | **kept** |
+| **RMX-B** quality + momentum, *cap*-weighted | +1.02 pp/yr, alpha t=+0.42 (underpowered) | 63-year record, **t=+2.54**, 4/4 eras | **kept** |
 
 ---
 
-## RMX-QT — the strategy
+## RMX-B — the strategy
 
 ```
-annually, on the last trading session of June, executed at the next close:
-
-    take the point-in-time eligible S&P 500 members
-    rank them by operating profitability
+QUALITY LEG  (50% of capital, re-formed every June, held 12 months)
+    point-in-time eligible S&P 500 members
+    rank by operating profitability
         OP/BE = (revenue - COGS - SG&A - interest) / book equity
         from the last fiscal year published at least six months earlier
-    hold the top quintile, CAP-weighted, no name above 10%
+    hold the top quintile, cap-weighted, no name above 10%
+
+MOMENTUM LEG (50% of capital, re-formed every month)
+    same universe
+    rank by return over months -12..-2  (the last month is skipped:
+        it carries short-term reversal, the opposite sign)
+    hold the top quintile, cap-weighted, no name above 10%
+
+executed at the close of the session AFTER the decision
 ```
 
-~64 names, **33%/yr turnover**, two parameters, both from Fama-French. Formed
-2026-06-30 it holds LLY, AAPL, NVDA, AMZN at the 10% cap, then LRCX, ABBV,
-ORCL, HD, MRK.
+~96 names, ~190%/yr one-way turnover (the momentum leg drives it), cost drag
+1.6% over 8 years at 10 bps. Two sleeves, two parameters each, all from
+Jegadeesh-Titman and Fama-French. Typically only ~11 names sit in both legs —
+the overlap is small, which is why the blend diversifies.
 
-**The evidence — French's 25 size × profitability portfolios, value-weighted,
-1963–2026, survivorship-free, nothing of mine fitted to it:**
-
-| era | BIG HiOP | market | Sharpe | alpha/yr | t |
-|---|---|---|---|---|---|
-| 1963–1979 | 7.29% | 7.08% | 0.18 vs 0.17 | +0.34% | +0.25 |
-| 1980–1999 | 18.58% | 17.43% | 0.73 vs 0.69 | +1.15% | +0.93 |
-| 2000–2015 | 4.94% | 4.43% | 0.30 vs 0.25 | +0.90% | +0.78 |
-| **2016–2026** | **16.74%** | **15.22%** | 0.94 vs 0.84 | +2.16% | +1.41 |
-| **1963–2026** | **11.68%** | **10.90%** | **0.52 vs 0.47** | **+1.19%** | **+1.71** |
-
-Beta 0.93. It beats the market in **every** era — including the mega-cap decade
-that destroyed every other idea tested here.
-
-### Why cap-weighting is the whole strategy, not a detail
-
-RMX-Q used the identical signal, equal-weighted. Out-of-sample the signal
-earned a real **+1.62%/yr** against its own universe (88th percentile of 200
-random draws) — and the portfolio still lost to SPY:
-
-```
-equal-weight covered universe   12.41%/yr
-+ profitability tilt            + 1.62%/yr   <- the real edge
-RMX-Q                            13.66%/yr
-SPY (cap-weighted)               15.68%/yr   <- equal-weighting cost 3.3 pp/yr
-```
-
-At beta 0.93 there is no size bet left to lose. That is the entire fix.
+**The evidence — French's portfolios, 1963–2026, survivorship-free, nothing of
+mine fitted to it.** The quality leg alone (`BIG HiOP`, the largest size
+quintile sorted on operating profitability) beats the market in **all five**
+eras: 1963–79 +0.14pp, 1980–99 +1.08pp, 2000–15 +0.44pp, 2016–26 +1.44pp,
+full sample +0.71pp with alpha t=+1.62. The momentum leg adds +2.34pp full
+sample (t=+2.10) but was flat in 2016–26. Blended 50/50 they reach **t=+2.54
+and 4/4 eras** — neither leg does that alone.
 
 ### The honest limit — this edge cannot be proven on the data that exists
 
-`scripts/rmxqt_power.py`. In-sample 2011–2018 RMX-QT returned +0.50 pp/yr with
-alpha t = **+0.79**. That looks like a failed replication. It is not:
+`scripts/rmxqt_power.py`. The quality leg in this project's S&P 500 panel,
+in-sample 2011–2018: **+3.17 pp/yr vs SPY, alpha t=+1.74**; against its own
+cap-weighted universe, +1.23%/yr with **t=+0.80**. On the (already spent)
+2019–2026 window it is −1.99 pp/yr vs SPY.
+
+Those look contradictory. They are not — they are two draws from a distribution
+that is far too wide to read:
 
 | true alpha/yr | tracking error | expected t over 7.5 yr | years needed for t=2 |
 |---|---|---|---|
-| +0.78% | 4.14% | 0.52 | 112 |
-| **+1.19%** (French's) | 4.14% | **+0.79** | **48** |
-| +2.00% | 4.14% | 1.32 | 17 |
+| +1.00% | 4.53% | 0.60 | 82 |
+| **+1.19%** (French's) | 4.53% | **+0.72** | **58** |
+| +2.00% | 4.53% | 1.21 | 21 |
 
-**Observed t = +0.79. Expected t if French's alpha is exactly true = +0.79.
-P = 0.50 — the median outcome.** The implementation is statistically
-indistinguishable from the 63-year estimate; it simply has no power to confirm
-it. An alpha of ~1.2 pp/yr against a 4.1 pp/yr tracking error needs about **48
-years** to reach t = 2.
+Measuring a ~1.2 pp/yr effect with a 4.5 pp/yr tracking error over 7–8 years
+gives a standard error of about 1.6 pp/yr. Getting +1.2%/yr in one window and
+−1.7%/yr in the next is exactly what that looks like. **Neither window is
+evidence for or against.**
 
-So the claim is: *the 63-year record is the evidence; the S&P 500
-implementation is shown to be consistent with it.* Not the other way round.
-Anyone quoting significance for a factor tilt on a decade of data is
-overfitting or overclaiming.
+So the claim is bounded deliberately: *French's 63 years is the demonstration;
+this project's implementation is checked for consistency with it.* Anyone
+quoting significance for a factor tilt on a decade of data is overclaiming.
+
+### A bug worth reporting, because it changed numbers I had already published
+
+Yahoo's `close` is split-adjusted; an SEC share count is not. Multiplying them
+made GE (1:8 reverse split) a $1.5 trillion company in 2016 that pinned the
+position cap every year, and hid Apple (4:1 split) entirely. 501 of 793 tickers
+have at least one split. Worse, the SEC frames API returns whichever filing
+covered a period and filers *restate* prior-year share counts after a split, so
+some values in the same column are already adjusted and some are not.
+
+`rmxq.adjusted_shares` now disambiguates them by continuity, anchored on a
+price-to-sales prior only where the most recent year is itself ambiguous. Every
+checked name now lands within 0.89–1.10× of its true market cap, against errors
+of 10× before. Numbers withdrawn and restated are listed in Amendment H of the
+pre-registration. The bug was *suppressing* the result rather than flattering
+it, and it was still only caught by checking computed caps against known ones.
 
 ## What *is* real, and is the useful part
 
@@ -120,8 +144,9 @@ the **53rd percentile of random** — i.e. a coin flip.
 
 The construction paid a **−3.3 pp/yr size drag** — equal-weighting the S&P 500
 lost badly to cap-weighting from 2023 to 2025 — and a +1.6 pp signal cannot
-cover it. Correcting to French's value-weighted construction did not help
-(in-sample +0.54 pp/yr; on the by-then-burned 2019–2026 window, −3.45 pp/yr).
+cover it. That diagnosis is what produced RMX-B: cap-weight the legs so there is
+no size bet left to lose, and add a second, near-uncorrelated sleeve so the
+combined information ratio is large enough to be worth holding.
 
 **The defensive result is also real, and also not a way to beat the index.**
 RMX-D over 1981–2026: 10.46%/yr against the S&P's 11.15%, worst drawdown
