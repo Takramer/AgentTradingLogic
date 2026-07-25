@@ -1,0 +1,81 @@
+{
+  "window": [
+    "2016-01-29",
+    "2026-07-23"
+  ],
+  "oos": true,
+  "cost_bps": 10.0,
+  "strategy": {
+    "cagr": 9.240384057484707,
+    "sharpe": 0.5824207037126222,
+    "max_dd": -26.79184090701472,
+    "total": 151.96970902518078
+  },
+  "benchmark": {
+    "cagr": 15.461702108320829,
+    "sharpe": 0.7649866683424504,
+    "max_dd": -33.82977532763789,
+    "total": 349.6484142605952
+  },
+  "alpha": {
+    "alpha_ann": 0.0022024130304910162,
+    "alpha_t": 0.07138507270442065,
+    "beta": 0.5284909540189807,
+    "beta_t": 4.343610671763041,
+    "n": 127
+  },
+  "dsr_excess": 6.458110043041439e-05,
+  "mc": {
+    "paths": 1000,
+    "mean_block": 21,
+    "terminal_pct": {
+      "p5": 35.336812136567566,
+      "p25": 91.05983118373169,
+      "p50": 150.89580697536917,
+      "p75": 227.23265451767185,
+      "p95": 352.72115624909304
+    },
+    "spy_terminal_pct": {
+      "p5": 94.16232720409106,
+      "p25": 220.86092270669275,
+      "p50": 340.31083614960977,
+      "p75": 523.493762654039,
+      "p95": 896.1435362365679
+    },
+    "max_dd_mag_pct": {
+      "p50": 21.363482996246773,
+      "p75": 26.02278902735754,
+      "p95": 34.830077315849636,
+      "p99": 42.155293292411514
+    },
+    "p_loss": 0.009,
+    "p_underperform_spy": 0.952,
+    "realised_max_dd_mag_pct": 26.79184090701472
+  },
+  "null": {
+    "paths": 200,
+    "actual_pct": 151.96970902518078,
+    "percentile": 4.5,
+    "random_pct": {
+      "p5": 158.04507747821296,
+      "p25": 207.7223622637235,
+      "p50": 245.25413656649823,
+      "p75": 301.8509075098632,
+      "p95": 427.1670867892497
+    }
+  },
+  "gates": {
+    "beats index on total return": false,
+    "beats index on CAGR": false,
+    "alpha t >= 2.0": false,
+    "max drawdown <= index": true,
+    "Sharpe > index": false,
+    "still beats index at 50 bps": false,
+    ">= 70% of folds beat index": false,
+    ">= 3 independent bear episodes": false,
+    "timing >= 80th pct of random": false,
+    "P(underperform index) <= 0.30": false,
+    "deflated Sharpe (excess) > 0.95": false
+  },
+  "gates_passed": 1
+}

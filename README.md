@@ -1,9 +1,50 @@
 # AgentTradingLogic — shared trading engine
 
+> ### Status, 2026-07-25 — read `docs/RMX-RESULTS.md` before trusting any number below
+>
+> An adversarial audit (`docs/AUDIT-2026-07-24.md`) found the legacy sleeve
+> engine's headline result to be an artifact of zero costs, an uncapitalised
+> R-sum, IID statistics on overlapping trades, and a survivorship-biased
+> universe chosen by looking at the metric being reported. **None of the numbers
+> in the "Simulation & backtesting" sections below have been re-established.**
+>
+> `rhengine/alpha/` is the rebuilt research stack: point-in-time universe,
+> mark-to-market book, real cost curves, Newey-West statistics, benchmark alpha,
+> block bootstrap, and pre-registered holdouts. Four hypotheses were tested
+> against it. **None beats the S&P 500 out-of-sample.** The one durable finding
+> is that operating profitability ranks S&P 500 returns — 100th and 88th
+> percentile of random selection in two disjoint windows — worth about
+> +1.6 to +2.6 pp/yr against its own universe, which is not enough to overcome
+> the construction's size drag against cap-weighted SPY.
+
 Single source of truth for the 6-strategy signal engine shared by
 **RobinhoodAgent** (autonomous Python app) and **Nydex** (client-side React app).
 Engine-only: no order planning, no autonomous orchestration, no meta-labeling ML —
 those stay app-side.
+
+## The post-audit research stack (`rhengine/alpha/`)
+
+| Path | What |
+|---|---|
+| `rhengine/alpha/panel.py` | **Point-in-time** panel: daily S&P 500 membership 1996→2026 reconstructed from component-change history, joined on date to Yahoo bars and Ken French factors. `eligible(D)` is provably invariant to appending future data (audit FC-4) |
+| `rhengine/alpha/book.py` | The **only** source of performance numbers: weight targets → daily mark-to-market equity, one-session execution lag, turnover-based cost, −30% delisting return, charged margin above 1.0× (fixes FC-1, FC-13) |
+| `rhengine/alpha/stats.py` | Newey-West alpha/beta on non-overlapping monthly returns, Deflated Sharpe at the true trial count (fixes FC-3, FC-6, FC-14) |
+| `rhengine/alpha/validation.py` | Stationary block bootstrap, random-selection and random-timing nulls, purged folds, bear-episode table, drop-best-months (fixes FC-5, FC-7, FC-10) |
+| `rhengine/alpha/signals.py` | Residual momentum at the horizon its citation actually uses — months, not days (fixes FC-8) |
+| `rhengine/alpha/timing.py` | RMX-D: 10-month trend gate + absolute-momentum risk-off leg |
+| `rhengine/alpha/rmxd.py` | RMX-D, frozen. **Rejected out-of-sample (1/11 gates)** |
+| `rhengine/alpha/fundamentals.py` | Point-in-time SEC XBRL accounting data with the Fama-French 6-month publication lag (audit O-4) |
+| `rhengine/alpha/rmxq.py` | RMX-Q: operating-profitability tilt. Signal real in both windows; **loses to SPY out-of-sample** |
+| `docs/RMX-PREREGISTRATION.md` | Every hypothesis, parameter and kill criterion, written before its run; the trial ledger the audit demanded |
+| `docs/RMX-RESULTS.md` | **The answer**, with the numbers that decided each verdict |
+
+```bash
+py scripts/fetch_history.py            # 1,213 ever-S&P500 tickers, full history
+py scripts/fetch_sec_fundamentals.py   # SEC XBRL fundamentals, point-in-time
+py -m rhengine.alpha.panel             # coverage by year + PIT universe check
+py scripts/rmx_bias.py                 # survivorship inflation, measured vs RSP
+py scripts/rmxq_report.py --lo 2010-07-01 --hi 2018-12-31   # full gate report
+```
 
 ## Contents
 
@@ -91,6 +132,7 @@ py -m rhengine.ic --strategy residualmomentum --max-tickers 300
 
 # Blocked cross-validation — edge everywhere, or one lucky quarter?
 py -m rhengine.crossval --strategy bollinger --folds 5
+py -m rhengine.crossval --strategy bollinger --by-regime   # macro-defense: which regime carries it?
 py -m rhengine.crossval --strategy bollinger --select --params volMult --folds 4
 
 # Sanity battery — ten mechanical lie-detectors (nonzero exit code gates CI)

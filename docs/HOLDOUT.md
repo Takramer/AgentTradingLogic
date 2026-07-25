@@ -90,3 +90,49 @@ on evidence that does not exist.
 | Date | Window | Config hash | Purpose | Result |
 |---|---|---|---|---|
 | 2026-07-24 | — | — | Holdout established. No W2/W3 look performed. | — |
+| 2026-07-24 | RMX-D OOS 2016-01-01 → 2026-07-24 | `docs/RMX-PREREGISTRATION.md` §9 (10-month SMA, 12-month absolute momentum, no leverage, no vol target, 10 bps) | The single pre-registered out-of-sample look for the RMX-D strategy. Runs on VFINX/VFITX for continuity with the in-sample record and on SPY/IEF as the deployable form. **Logged before execution.** | *see §Result below* |
+
+### RMX-D holdout note
+
+The old W1/W2/W3 windows above concern the *legacy* `rhengine` sleeve engine and
+the Massive whole-market cache. RMX-D is a different strategy on a different
+dataset (Yahoo long history, built 2026-07-24), so it carries its own split,
+declared in `docs/RMX-PREREGISTRATION.md` §3 before any RMX-D result existed:
+
+- **in-sample 1981-02 → 2015-12** — all development, all rejected hypotheses;
+- **out-of-sample 2016-01 → 2026-07** — this look, once.
+
+RMX-D's instruments are SPY and IEF only. That has one consequence worth
+stating plainly: **it inherits none of the survivorship bias** that made every
+previous number in this repository unusable, because an index ETF does not
+delist and there is no universe to select.
+
+The window contains 2022 — the worst calendar year for Treasuries in modern
+history — which is precisely the regime the defensive leg has never been tested
+in. A pass here is the first genuinely informative evidence this project has
+produced. A failure kills the bond leg.
+
+**Result (2026-07-24): FAILED, 1/11 gates.** CAGR 9.24% vs SPY 15.46%, alpha
+t = +0.07, and the trend rule landed at the **4th percentile** of 200 random
+permutations holding the same number of invested months. 2022 played out as
+feared: −21.4% against the index's −18.2%. No parameter of RMX-D was changed in
+response. See `docs/RMX-PREREGISTRATION.md` Amendment E.
+
+---
+
+## RMX-Q holdout entry — logged 2026-07-24, BEFORE execution
+
+| Field | Value |
+|---|---|
+| Window | **2019-07 → 2026-07** (first June rebalance after 2019-01-01) |
+| Spec | `docs/RMX-PREREGISTRATION.md` Amendment E §RMX-Q — top 30% by OP/BE, equal weight, annual June rebalance, 10 bps |
+| Data | Point-in-time S&P 500 membership + SEC XBRL annual fundamentals with the Fama-French 6-month publication lag |
+| In-sample already fixed | 2010-07 → 2018-12: CAGR 13.80% vs SPY 11.14%, alpha vs SPY +2.67%/yr t=+2.48, alpha vs equal-weight-covered-universe +2.58%/yr t=+2.76, 100th percentile of the random-selection null, 8/11 gates |
+| Declared kill criterion | If RMX-Q does not beat SPY out-of-sample after the 0.86 pp/yr survivorship haircut, it is reported as a failure and no parameter is adjusted |
+
+**Known contamination, stated up front:** by the time this window was opened I
+had already seen that 2016–2026 was an exceptional mega-cap bull, and had read
+Ken French's factor table showing profitability stayed positive through it. So
+this look is a *replication check on a tradeable universe*, not independent
+evidence. The independent evidence is French's 1963–2026 record (excess
+t = +2.88), which was gathered before the S&P 500 implementation existed.
