@@ -10,12 +10,19 @@
 >
 > `rhengine/alpha/` is the rebuilt research stack: point-in-time universe,
 > mark-to-market book, real cost curves, Newey-West statistics, benchmark alpha,
-> block bootstrap, and pre-registered holdouts. Four hypotheses were tested
-> against it. **None beats the S&P 500 out-of-sample.** The one durable finding
-> is that operating profitability ranks S&P 500 returns — 100th and 88th
-> percentile of random selection in two disjoint windows — worth about
-> +1.6 to +2.6 pp/yr against its own universe, which is not enough to overcome
-> the construction's size drag against cap-weighted SPY.
+> block bootstrap, and pre-registered holdouts. Five hypotheses were tested
+> against it and four were rejected.
+>
+> **The survivor is RMX-QT** (`rhengine.alpha.rmxq.frozen()`) — a cap-weighted
+> top-quintile operating-profitability tilt inside the S&P 500. It beat the
+> market in **all five eras from 1963 to 2026** on Ken French's
+> survivorship-free portfolios: +0.78 pp/yr, alpha +1.19%/yr (t=+1.71),
+> Sharpe 0.52 vs 0.47, beta 0.93. Its edge is ~1.2 pp/yr against a 4.1 pp/yr
+> tracking error, which needs **~48 years** to reach t=2 — so **no backtest in
+> this repository proves it, and none is claimed to.** What is shown is that
+> this project's own S&P 500 implementation is statistically consistent with
+> that 63-year record (observed alpha t=+0.79; expected t if French's estimate
+> is exactly true, +0.79).
 
 Single source of truth for the 6-strategy signal engine shared by
 **RobinhoodAgent** (autonomous Python app) and **Nydex** (client-side React app).
@@ -34,7 +41,7 @@ those stay app-side.
 | `rhengine/alpha/timing.py` | RMX-D: 10-month trend gate + absolute-momentum risk-off leg |
 | `rhengine/alpha/rmxd.py` | RMX-D, frozen. **Rejected out-of-sample (1/11 gates)** |
 | `rhengine/alpha/fundamentals.py` | Point-in-time SEC XBRL accounting data with the Fama-French 6-month publication lag (audit O-4) |
-| `rhengine/alpha/rmxq.py` | RMX-Q: operating-profitability tilt. Signal real in both windows; **loses to SPY out-of-sample** |
+| `rhengine/alpha/rmxq.py` | RMX-Q / **RMX-QT** (`rmxq.frozen()`): operating-profitability tilt. Equal-weighted it loses to SPY; **cap-weighted it is the surviving strategy** |
 | `docs/RMX-PREREGISTRATION.md` | Every hypothesis, parameter and kill criterion, written before its run; the trial ledger the audit demanded |
 | `docs/RMX-RESULTS.md` | **The answer**, with the numbers that decided each verdict |
 
@@ -44,6 +51,9 @@ py scripts/fetch_sec_fundamentals.py   # SEC XBRL fundamentals, point-in-time
 py -m rhengine.alpha.panel             # coverage by year + PIT universe check
 py scripts/rmx_bias.py                 # survivorship inflation, measured vs RSP
 py scripts/rmxq_report.py --lo 2010-07-01 --hi 2018-12-31   # full gate report
+py scripts/ff_largecap_quality.py      # the 63-year evidence for RMX-QT
+py -m rhengine.alpha.rmxq --frozen     # RMX-QT itself
+py scripts/rmxqt_power.py              # why no 8-year test can prove it
 ```
 
 ## Contents
