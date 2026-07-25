@@ -206,7 +206,11 @@ class BacktestUniverseFilterTest(unittest.TestCase):
                "exits": {"max_hold_sessions": 5},
                "universe_filters": {"min_price": 0.0}}
 
-        base = run_backtest_on(cfg, bars_map, spy_bars, min_score=3)
+        # forced_strategy = the manual path. Auto mode is deliberately inert
+        # while the autonomous set is empty (see test_strategy_status), so this
+        # test would otherwise be testing the routing guard, not the universe.
+        base = run_backtest_on(cfg, bars_map, spy_bars, min_score=3,
+                               forced_strategy="bollinger")
         self.assertTrue(base, "fixture produced no trades to filter")
 
         class DenyAll:
@@ -214,6 +218,7 @@ class BacktestUniverseFilterTest(unittest.TestCase):
                 return False
 
         filtered = run_backtest_on(cfg, bars_map, spy_bars, min_score=3,
+                                   forced_strategy="bollinger",
                                    universe=DenyAll())
         self.assertEqual(filtered, [],
                          "a membership that admits nothing must yield no trades")
@@ -225,6 +230,7 @@ class BacktestUniverseFilterTest(unittest.TestCase):
                 return ticker in kept
 
         one = run_backtest_on(cfg, bars_map, spy_bars, min_score=3,
+                              forced_strategy="bollinger",
                               universe=OnlyFirst())
         self.assertTrue(one)
         self.assertEqual({t["ticker"] for t in one}, set(kept))

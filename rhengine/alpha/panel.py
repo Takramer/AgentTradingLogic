@@ -48,6 +48,7 @@ class Panel:
     mkt: pd.Series             # Ken French daily Mkt-RF (decimal)
     coverage: pd.Series        # priced members / PIT members, per session
     n_members: pd.Series       # PIT member count, per session
+    splits: dict = field(default_factory=dict, repr=False)
     _liq_cache: dict = field(default_factory=dict, repr=False)
 
     # ---------------------------------------------------------------- loading
@@ -105,7 +106,46 @@ class Panel:
 
         return cls(adj=adj, close=close, dollar_vol=dollar_vol, member=member,
                    spy=spy, rf=rf, mkt=mkt, coverage=coverage,
-                   n_members=member_full.sum(axis=1))
+                   n_members=member_full.sum(axis=1),
+                   splits=cls._load_splits())
+
+    @staticmethod
+    def _load_splits() -> dict:
+        """Split history per Yahoo symbol, from scripts/fetch_splits.py."""
+        path = os.path.join(DATA, "splits.json.gz")
+        if not os.path.exists(path):
+            return {}
+        import gzip
+        with gzip.open(path, "rt") as f:
+            raw = json.load(f)
+        out = {}
+        for sym, events in raw.items():
+            if events:
+                out[sym] = [(pd.Timestamp(e["date"], unit="s").normalize(),
+                             float(e["ratio"])) for e in events]
+        return out
+
+    def split_factor_after(self, ticker: str, cutoff: pd.Timestamp) -> float:
+        """Product of split ratios occurring strictly after `cutoff`.
+
+        Yahoo's `close` is split-adjusted; an SEC share count is on the share
+        basis of its own fiscal year. Market cap is only correct when the two
+        are put on the same basis:
+
+            cap(t) = close_adj(t) x shares(fy) x split_factor_after(fy_end)
+
+        Without this, GE (1:8 reverse split in 2021) showed a $1.5 trillion cap
+        in 2016 and pinned the position cap in every year, while Apple (4:1 in
+        2020) showed $139B and never entered the book.
+        """
+        events = self.splits.get(yahoo_symbol(ticker))
+        if not events:
+            return 1.0
+        f = 1.0
+        for d, ratio in events:
+            if d > cutoff:
+                f *= ratio
+        return f
 
     @staticmethod
     def _membership_mask(members_raw: pd.DataFrame, cal: pd.DatetimeIndex,

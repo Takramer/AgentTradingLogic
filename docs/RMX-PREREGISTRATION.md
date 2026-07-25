@@ -542,6 +542,77 @@ came from decisions made by looking at the metric being reported. The holdout
 for both strategies is now spent; the next credible evaluation is forward, in
 real time, on a configuration frozen before the sessions occur.
 
+## 14. Amendment H — a market-cap bug, and every number it invalidated
+
+Found while diagnosing why the cap-weighted benchmark trailed SPY by 2.6 pp/yr:
+**Yahoo's `close` is split-adjusted, and an SEC share count is not.**
+Multiplying them made GE — after its 1:8 reverse split — a $1.5 trillion company
+in 2016 that pinned the 10% position cap in every year of the backtest, while
+Apple's 4:1 split hid the largest company in the index entirely. 501 of the 793
+tickers in the panel have at least one split, so this was the normal case.
+
+The fix needed two steps, because the first one alone was wrong: split events
+were fetched (`scripts/fetch_splits.py`), and then the share counts had to be
+disambiguated, since the SEC frames API returns whichever filing covered a
+period and filers **restate** prior-year share counts after a split. Some values
+in the same column are already split-adjusted and some are not. `adjusted_shares`
+now walks each ticker backwards using continuity, anchoring on a price-to-sales
+prior only where the most recent year is itself ambiguous. Validated against
+known caps on four dates: every checked name now lands within 0.89–1.10× of its
+actual market capitalisation, against errors of 10× before.
+
+**Numbers previously reported that are now withdrawn and restated:**
+
+| | was (buggy caps) | is (corrected) |
+|---|---|---|
+| RMX-QT in-sample vs SPY | +0.50 pp/yr, alpha t=+0.79 | **+3.17 pp/yr, alpha t=+1.74** |
+| RMX-QT in-sample vs its own cap-weighted universe | not reported | +1.23%/yr, t=+0.80 |
+| RMX-QT tracking error | 4.14%/yr | 4.53%/yr |
+| years to reach t=2 | 48 | **58** |
+| RMX-Q value-weighted on 2019-2026 | −3.45 pp/yr, 0/11 gates | **−1.99 pp/yr, 1/11 gates** |
+
+The conclusions do not change, and that is worth stating plainly rather than
+quietly: the corrected in-sample number is *better*, the corrected burned-window
+number is *less bad*, and the strategy still cannot be shown to beat SPY on any
+sample this project owns. A bug that flatters a result is the dangerous kind;
+this one was suppressing a result and it was still caught by a sanity check
+against known market caps, which is the only reason to run such checks.
+
+## 15. Amendment I — RMX-B, and the only t ≥ 2 in this project
+
+The single-sleeve problem is arithmetic: profitability is worth roughly
++1.2%/yr of alpha against a 4.5%/yr tracking error, an information ratio of
+0.26, which needs ~58 years to reach t=2. No amount of care fixes that for one
+sleeve. The fundamental law of active management says breadth does.
+
+**Hypothesis, fixed before running:** a 50/50 blend of two long-only,
+cap-weighted large-cap sleeves — operating profitability and 12-1 momentum —
+beats the market with alpha t ≥ 2.0 over 1963–2026 and in a majority of eras.
+Tested on French's 25 size × OP and 25 size × prior-return portfolios, net of a
+deliberately punitive 20 bps round trip charged against 33%/yr (quality) and
+200%/yr (momentum) one-way turnover.
+
+Correlation of the two sleeves' excess returns: **+0.18.**
+
+| | CAGR | market | alpha/yr | alpha t | IR | eras beaten |
+|---|---|---|---|---|---|---|
+| quality only | 11.61% | 10.90% | +1.13% | +1.62 | 0.22 | 4/4 |
+| momentum only | 13.24% | 10.90% | +2.43% | +2.10 | 0.27 | 3/4 |
+| **50/50 blend** | **12.55%** | **10.90%** | **+1.78%** | **+2.54** | **0.32** | **4/4** |
+
+The blend's t-stat exceeds both of its legs, which is the mechanism working
+rather than a lucky draw. Sharpe 0.55 vs 0.47, beta 0.97. **ACCEPTED** on the
+pre-declared criterion (t ≥ 2.0 and ≥4 of 5 eras).
+
+A secondary candidate, `BIG HiOP LoINV` (profitability × conservative
+investment), scored higher still — +2.03 pp/yr, alpha t=+2.69, 4/4 eras — but
+it was declared secondary and is *not* promoted, because choosing it after
+seeing the table is exactly the selection this project exists to avoid.
+
+**Implementation caveat, stated as loudly as the result:** RMX-B in this
+project's own S&P 500 panel returns +1.02 pp/yr in-sample with alpha t=+0.42.
+At a 39-year requirement for t=2, that is uninformative in both directions.
+
 ---
 
 ## Log

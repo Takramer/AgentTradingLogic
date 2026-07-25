@@ -13,16 +13,19 @@
 > block bootstrap, and pre-registered holdouts. Five hypotheses were tested
 > against it and four were rejected.
 >
-> **The survivor is RMX-QT** (`rhengine.alpha.rmxq.frozen()`) — a cap-weighted
-> top-quintile operating-profitability tilt inside the S&P 500. It beat the
-> market in **all five eras from 1963 to 2026** on Ken French's
-> survivorship-free portfolios: +0.78 pp/yr, alpha +1.19%/yr (t=+1.71),
-> Sharpe 0.52 vs 0.47, beta 0.93. Its edge is ~1.2 pp/yr against a 4.1 pp/yr
-> tracking error, which needs **~48 years** to reach t=2 — so **no backtest in
-> this repository proves it, and none is claimed to.** What is shown is that
-> this project's own S&P 500 implementation is statistically consistent with
-> that 63-year record (observed alpha t=+0.79; expected t if French's estimate
-> is exactly true, +0.79).
+> **The survivor is RMX-B** (`rhengine/alpha/rmxb.py`) — a 50/50 blend of two
+> cap-weighted large-cap sleeves: operating profitability and 12-1 momentum. On
+> Ken French's survivorship-free portfolios, 1963–2026, net of a punitive cost
+> charge, it returns **12.55%/yr against the market's 10.90%**, alpha
+> **+1.78%/yr with t=+2.54**, Sharpe 0.55 vs 0.47, beta 0.97, and beats the
+> market in **all four eras**. The blend's t-stat exceeds both of its legs
+> (+1.62 and +2.10) because their excess returns correlate only +0.18.
+>
+> **The boundary, stated up front:** a +1.78%/yr alpha against a 5.5%/yr
+> tracking error needs ~39 years to reach t=2, so this project's own 8-year S&P
+> 500 implementation can only be checked for consistency, never for
+> significance. The demonstration is French's 63 years. Expect to trail the
+> index in roughly 4 years out of 10.
 
 Single source of truth for the 6-strategy signal engine shared by
 **RobinhoodAgent** (autonomous Python app) and **Nydex** (client-side React app).
@@ -41,7 +44,8 @@ those stay app-side.
 | `rhengine/alpha/timing.py` | RMX-D: 10-month trend gate + absolute-momentum risk-off leg |
 | `rhengine/alpha/rmxd.py` | RMX-D, frozen. **Rejected out-of-sample (1/11 gates)** |
 | `rhengine/alpha/fundamentals.py` | Point-in-time SEC XBRL accounting data with the Fama-French 6-month publication lag (audit O-4) |
-| `rhengine/alpha/rmxq.py` | RMX-Q / **RMX-QT** (`rmxq.frozen()`): operating-profitability tilt. Equal-weighted it loses to SPY; **cap-weighted it is the surviving strategy** |
+| `rhengine/alpha/rmxq.py` | The **quality leg**: operating-profitability tilt, cap- or equal-weighted. Also `adjusted_shares`, which reconciles split-adjusted prices against un-adjusted SEC share counts |
+| `rhengine/alpha/rmxb.py` | **RMX-B** — the deliverable: 50/50 quality + 12-1 momentum, cap-weighted, alpha t=+2.54 over 1963-2026 |
 | `docs/RMX-PREREGISTRATION.md` | Every hypothesis, parameter and kill criterion, written before its run; the trial ledger the audit demanded |
 | `docs/RMX-RESULTS.md` | **The answer**, with the numbers that decided each verdict |
 
@@ -51,8 +55,10 @@ py scripts/fetch_sec_fundamentals.py   # SEC XBRL fundamentals, point-in-time
 py -m rhengine.alpha.panel             # coverage by year + PIT universe check
 py scripts/rmx_bias.py                 # survivorship inflation, measured vs RSP
 py scripts/rmxq_report.py --lo 2010-07-01 --hi 2018-12-31   # full gate report
-py scripts/ff_largecap_quality.py      # the 63-year evidence for RMX-QT
-py -m rhengine.alpha.rmxq --frozen     # RMX-QT itself
+py scripts/ff_largecap_quality.py      # the 63-year quality-leg evidence
+py scripts/ff_blend.py                 # the blend: alpha t=+2.54, 4/4 eras
+py -m rhengine.alpha.rmxb              # RMX-B backtest
+py -m rhengine.alpha.rmxb --holdings   # the book as of today
 py scripts/rmxqt_power.py              # why no 8-year test can prove it
 ```
 

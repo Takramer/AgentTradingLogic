@@ -24,6 +24,10 @@ in every era with a full-sample excess t of +2.88, while value and investment
 went flat after 2000.
 
     py -m rhengine.alpha.rmxq --lo 2010-07-01 --hi 2018-12-31
+
+Superseded as the deliverable by `rmxb.py`: this sleeve alone carries an
+information ratio of ~0.26, which needs ~58 years to reach t=2. RMX-B blends it
+with momentum to get there in ~39. This module remains the quality leg.
 """
 from __future__ import annotations
 
@@ -63,10 +67,13 @@ def frozen() -> "RMXQConfig":
     from 2023-2025. At beta 0.93 there is no size bet left to lose.
 
     Expect a small edge slowly. `scripts/rmxqt_power.py` shows that an alpha of
-    this size against a 4.1%/yr tracking error needs ~48 years to reach t=2;
-    the 2011-2018 implementation returned exactly the t-stat a correct estimate
-    would produce (+0.79 observed, +0.79 expected). Anyone promising
-    significance here on a decade of data is selling something.
+    this size against a 4.5%/yr tracking error needs ~58 years to reach t=2. In
+    this project's panel the sleeve returns +3.17 pp/yr vs SPY in-sample
+    (alpha t=+1.74) and -1.99 pp/yr on the already-spent 2019-2026 window: two
+    draws from a distribution with a ~1.6 pp/yr standard error, which is to say
+    neither is evidence. Anyone promising significance here on a decade of data
+    is selling something. `rmxb.py` blends this sleeve with momentum, which is
+    what actually gets the combined t-stat above 2.
     """
     return RMXQConfig(signal=SIGNAL, top_fraction=0.20, rebalance_month=6,
                       weighting="value", max_weight=0.10)
@@ -100,16 +107,112 @@ def rebalance_dates(panel: Panel, cfg: RMXQConfig, lo: str, hi: str) -> pd.Datet
     return pd.DatetimeIndex([d for d in me if d.month == cfg.rebalance_month])
 
 
+_SHARES_CACHE: dict = {}
+
+
+def adjusted_shares(panel: Panel, fund: Fundamentals) -> pd.DataFrame:
+    """Share counts restated onto the price series' split basis, per fiscal year.
+
+    Two things had to be reconciled and neither is optional:
+
+    1. Yahoo's `close` is **split-adjusted**. An SEC share count is on the share
+       basis of whatever filing reported it. Multiplying the two directly made
+       GE a $1.5 trillion company in 2016 (1:8 reverse split) and hid Apple
+       (4:1 split) entirely. 501 of 793 tickers here have at least one split.
+    2. The SEC frames API returns the value from *whichever* filing covered that
+       period, and filers **restate** prior-period share counts after a split.
+       So some values are already split-adjusted and some are not, in the same
+       column, with nothing to distinguish them.
+
+    Neither rule alone is enough, so both are used:
+
+    * **Continuity** decides most years. Share counts move a few percent a year
+      through buybacks and issuance; a split-basis error moves them by an
+      integer multiple, so walking backwards from a known-good year makes the
+      choice unambiguous.
+    * **Price-to-sales** decides the anchor when the most recent year is itself
+      ambiguous - which happens (Mastercard's only share figures here are
+      2009-2011, and the 2011 one is already post-split while 2009 and 2010 are
+      not, so there is no clean year to walk back from).
+
+    P/S is used only as the anchor and never on its own, because it misfires on
+    genuinely expensive companies: NVIDIA really did trade at 39x sales in 2023,
+    and a valuation prior would have thrown its share count out by 10x.
+    """
+    key = id(panel), id(fund)
+    if key in _SHARES_CACHE:
+        return _SHARES_CACHE[key]
+
+    sh = fund.table["shares"].unstack("year")           # tickers x years
+    rev = fund.table["revenue"].unstack("year")
+    eq = fund.table["equity"].unstack("year")
+    years = sorted(int(y) for y in sh.columns)
+    out = pd.DataFrame(np.nan, index=sh.index, columns=years, dtype=float)
+
+    # Typical large-cap multiples. The decision is between values an integer
+    # factor apart, so it is insensitive to the exact prior.
+    PS_PRIOR, PB_PRIOR = 2.5, 2.5
+
+    # price at which each fiscal year's shares first get used (1 July of y+1)
+    px_at = {}
+    for y in years:
+        idx = panel.close.index[panel.close.index >= pd.Timestamp(y + 1, 7, 1)]
+        px_at[y] = panel.close.loc[idx[0] if len(idx) else panel.close.index[-1]]
+
+    def factor(tk: str, y: int) -> float:
+        return panel.split_factor_after(tk, pd.Timestamp(year=y, month=12, day=31))
+
+    for tk in sh.index:
+        row = sh.loc[tk]
+        have = [y for y in years if np.isfinite(row.get(y, np.nan)) and row[y] > 0]
+        if not have:
+            continue
+
+        nxt = None
+        for y in reversed(have):
+            raw = float(row[y])
+            f = factor(tk, y)
+            if f == 1.0:
+                pick = raw
+            elif nxt is not None:
+                # continuity with the year already decided
+                pick = min((raw, raw * f),
+                           key=lambda v: abs(np.log(v / nxt)))
+            else:
+                # anchor year, and it is ambiguous: fall back to a valuation prior
+                px = px_at[y].get(tk, np.nan)
+                r = rev.at[tk, y] if y in rev.columns else np.nan
+                b = eq.at[tk, y] if y in eq.columns else np.nan
+                ref, prior = (r, PS_PRIOR) if (np.isfinite(r) and r > 0) else \
+                             ((b, PB_PRIOR) if (np.isfinite(b) and b > 0) else (np.nan, np.nan))
+                if not np.isfinite(px) or px <= 0 or not np.isfinite(ref):
+                    pick = raw
+                else:
+                    pick = min((raw, raw * f),
+                               key=lambda s: abs(np.log((s * px / ref) / prior)))
+            out.loc[tk, y] = pick
+            nxt = pick
+
+    _SHARES_CACHE[key] = out
+    return out
+
+
 def market_cap(panel: Panel, fund: Fundamentals, date: pd.Timestamp,
                names: pd.Index) -> pd.Series:
-    """Shares outstanding (point-in-time, lagged) x the price on `date`.
+    """Split-consistent shares (point-in-time, lagged) x the price on `date`.
 
     The share count carries the same six-month publication lag as every other
     accounting item, so a buyback or issuance is only reflected once it was
-    public. Prices are current, which is correct: a weight is set from today's
-    price and yesterday's share count, exactly as an index provider does it.
+    public. The price is current, which is correct: an index provider sets a
+    weight from today's price and the last published share count.
     """
-    sh = fund.as_of(date, "shares", names)
+    fy = fund.latest_year_for(pd.Timestamp(date))
+    if fy is None:
+        return pd.Series(dtype=float)
+    adj_sh = adjusted_shares(panel, fund)
+    if fy not in adj_sh.columns:
+        return pd.Series(dtype=float)
+    sh = adj_sh[fy].reindex(names).dropna()
     px = panel.close.loc[date].reindex(sh.index)
     cap = (sh * px).dropna()
     return cap[cap > 0]
