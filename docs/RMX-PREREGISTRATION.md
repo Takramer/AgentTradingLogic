@@ -565,7 +565,39 @@ real time, on a configuration frozen before the sessions occur.
 | 12 | 2026-07-25 | RMX-Q value weight (correction to French's construction) | IS 2010-2018 | +0.54 pp/yr vs SPY, alpha t=+1.06 |
 | 13 | 2026-07-25 | RMX-Q value weight on the (now burned) 2019-2026 window | contaminated | **0/11 gates** — reported, not admissible |
 
-**Trial count for the Deflated Sharpe Ratio: 50** (8 IC signals + 1 portfolio
-baseline + 36 sweep cells + 5 timing configs). The sweep cells are counted in
-full even though they explore one family, because counting them generously is
-the conservative direction.
+| 14 | 2026-07-25 | **French 25 ME × OP — cap-weighted quality tilt inside large caps** | 1963-2026, never previously viewed | **PASS** — beats the market in all 5 eras, +0.78 pp/yr, alpha t=+1.71 |
+| 15 | 2026-07-25 | **RMX-QT frozen** (cap-weight, top quintile, 10% cap) | IS 2011-2018 | +0.50 pp/yr, alpha t=+0.79 — **exactly** the t a correct estimate yields (P=0.50) |
+| 16 | 2026-07-25 | Power analysis of the RMX-QT edge | — | ~48 years needed for t=2; no sample here can prove or disprove it |
+
+**Trial count for the Deflated Sharpe Ratio: 70** (8 IC signals + 5 fundamental
+signals + 1 portfolio baseline + 36 sweep cells + 5 timing configs + the RMX-Q
+and RMX-QT variants). The sweep cells are counted in full even though they
+explore one family, because counting them generously is the conservative
+direction.
+
+## 13. Amendment G — RMX-QT, and why it is not a fifth bite at the apple
+
+Trial 14 is the only test in this project run on data that had **never** been
+opened for any purpose: French's 25 size × operating-profitability portfolios.
+The construction it tests was not chosen by trying variants until one worked —
+it follows mechanically from RMX-Q's failure decomposition, which showed the
+signal earning +1.62%/yr while the equal-weight construction underneath it lost
+3.3 pp/yr. The question "does the same signal work on cap weights?" was written
+down, with its kill criterion, before the file was parsed.
+
+It passed: **BIG HiOP beat the market in all five eras**, 1963–2026, +0.78 pp/yr,
+alpha t=+1.71, beta 0.93, Sharpe 0.52 vs 0.47.
+
+Trial 15 then implemented it in this project's own point-in-time S&P 500 panel
+and got +0.50 pp/yr, alpha t=+0.79 — which trial 16 shows is *precisely* the
+t-statistic a correct +1.19%/yr alpha produces over 7.5 years at a 4.14%/yr
+tracking error (P = 0.50, the median outcome). The implementation neither
+confirms nor contradicts the 63-year record; at this sample size it cannot.
+
+**What is claimed:** RMX-QT rests on 63 years of independent, survivorship-free
+evidence, and this project's implementation of it is statistically consistent
+with that evidence.
+
+**What is not claimed:** that any backtest here demonstrates RMX-QT beats the
+S&P. It does not, it cannot, and a strategy of this alpha-to-tracking-error
+ratio would need roughly half a century of data before any backtest could.

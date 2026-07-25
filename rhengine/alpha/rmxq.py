@@ -45,6 +45,33 @@ REBALANCE_MONTH = 6          # French forms portfolios at the end of June
 DEFAULT_COST_BPS = 10.0
 
 
+def frozen() -> "RMXQConfig":
+    """RMX-QT — the deliverable configuration, frozen 2026-07-25.
+
+    Cap-weighted top **quintile** by operating profitability inside the
+    point-in-time eligible S&P 500, rebalanced annually at the end of June,
+    executed at the next session's close, no single name above 10%.
+
+    This is the direct analogue of French's `BIG HiOP` portfolio - the largest
+    size quintile sorted on operating profitability, value-weighted - which
+    beat the market in **all five** eras from 1963 to 2026 (+0.78 pp/yr,
+    alpha +1.19%/yr t=+1.71, Sharpe 0.52 vs 0.47, beta 0.93).
+
+    Cap weighting is the whole point and is not a detail: RMX-Q's equal-weight
+    predecessor earned a genuine +1.62%/yr from the same signal out-of-sample
+    and still lost to SPY, because equal-weighting the S&P 500 cost 3.3 pp/yr
+    from 2023-2025. At beta 0.93 there is no size bet left to lose.
+
+    Expect a small edge slowly. `scripts/rmxqt_power.py` shows that an alpha of
+    this size against a 4.1%/yr tracking error needs ~48 years to reach t=2;
+    the 2011-2018 implementation returned exactly the t-stat a correct estimate
+    would produce (+0.79 observed, +0.79 expected). Anyone promising
+    significance here on a decade of data is selling something.
+    """
+    return RMXQConfig(signal=SIGNAL, top_fraction=0.20, rebalance_month=6,
+                      weighting="value", max_weight=0.10)
+
+
 @dataclass
 class RMXQConfig:
     signal: str = SIGNAL
@@ -222,11 +249,16 @@ def main() -> None:
     ap.add_argument("--signal", default=SIGNAL)
     ap.add_argument("--monthly", action="store_true",
                     help="rebalance every month instead of annually in June")
+    ap.add_argument("--weighting", default="equal", choices=["value", "equal"])
+    ap.add_argument("--frozen", action="store_true",
+                    help="use the frozen RMX-QT configuration (see rmxq.frozen)")
     ap.add_argument("--trials", type=int, default=60)
     args = ap.parse_args()
 
-    cfg = RMXQConfig(signal=args.signal, top_fraction=args.top_fraction,
-                     rebalance_month=None if args.monthly else REBALANCE_MONTH)
+    cfg = frozen() if args.frozen else RMXQConfig(
+        signal=args.signal, top_fraction=args.top_fraction,
+        weighting=args.weighting,
+        rebalance_month=None if args.monthly else REBALANCE_MONTH)
     report(args.lo, args.hi, args.cost_bps, args.trials, cfg)
 
 
