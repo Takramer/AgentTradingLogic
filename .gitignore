@@ -25,3 +25,11 @@ research_data/sec/
 research_data/_panel_cache.pkl
 research_data/sp500_pit_raw.csv
 research_data/ff_daily.csv
+
+# Harvested published factor records (scripts/fetch_external_factors.py).
+# 134 MB and freely re-downloadable; the manifests record which vintage a
+# result came from, so they ARE tracked.
+research_data/external/*/*.csv
+research_data/external/*/*.zip
+research_data/external/*/*.xlsx
+!research_data/external/*/_manifest.json

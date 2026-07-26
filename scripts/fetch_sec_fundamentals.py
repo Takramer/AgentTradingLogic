@@ -60,6 +60,30 @@ CONCEPTS = [
     ("OperatingExpenses", "d"),
     ("CostsAndExpenses", "d"),
     ("InterestExpenseDebt", "d"),
+    # third pass: the balance-sheet items EBM needs (Penman, Richardson & Tuna
+    # 2007 enterprise book-to-market — see sleeves.value_ebm). Compustat's `che`
+    # and `dltt + dlc` have no single XBRL equivalent, so each is coalesced from
+    # several tags; a firm that tags only `DebtCurrent` and one that splits it
+    # into `LongTermDebtCurrent` + `ShortTermBorrowings` must both resolve or
+    # the signal is computed on a non-random subset of the universe.
+    ("CashAndCashEquivalentsAtCarryingValue", "i"),
+    ("ShortTermInvestments", "i"),
+    ("MarketableSecuritiesCurrent", "i"),
+    ("AvailableForSaleSecuritiesDebtSecuritiesCurrent", "i"),
+    ("LongTermDebtNoncurrent", "i"),
+    ("LongTermDebt", "i"),
+    ("DebtCurrent", "i"),
+    ("LongTermDebtCurrent", "i"),
+    ("ShortTermBorrowings", "i"),
+    ("CommercialPaper", "i"),
+    ("PreferredStockValue", "i"),
+    # fourth pass: cash returned to shareholders, for the payout sleeve
+    # (Boudoukh et al. 2007 `PayoutYield` — see sleeves.payout_yield).
+    ("PaymentsForRepurchaseOfCommonStock", "d"),
+    ("PaymentsForRepurchaseOfEquity", "d"),
+    ("PaymentsForRepurchaseOfPreferredStockAndPreferenceStock", "d"),
+    ("PaymentsOfDividendsCommonStock", "d"),
+    ("PaymentsOfDividends", "d"),
 ]
 
 
@@ -83,9 +107,20 @@ def main() -> None:
     ap.add_argument("--from-year", type=int, default=2009)
     ap.add_argument("--to-year", type=int, default=2025)
     ap.add_argument("--sleep", type=float, default=0.12)   # SEC asks for <= 10 req/s
+    ap.add_argument("--only", nargs="*", default=None,
+                    help="fetch just these concepts (adding tags without "
+                         "re-downloading the 26 already on disk)")
     args = ap.parse_args()
 
     os.makedirs(OUT, exist_ok=True)
+
+    concepts = CONCEPTS
+    if args.only:
+        want = {c.lower() for c in args.only}
+        concepts = [(c, k) for c, k in CONCEPTS if c.lower() in want]
+        unknown = want - {c.lower() for c, _ in CONCEPTS}
+        if unknown:
+            raise SystemExit(f"not in CONCEPTS: {sorted(unknown)}")
 
     tk = get("https://www.sec.gov/files/company_tickers.json")
     cik2tick = {}
@@ -95,7 +130,7 @@ def main() -> None:
     print(f"cik->ticker map: {len(cik2tick)} entries")
 
     got = miss = 0
-    for concept, kind in CONCEPTS:
+    for concept, kind in concepts:
         store = {}
         for year in range(args.from_year, args.to_year + 1):
             frame = f"CY{year}" + ("Q4I" if kind == "i" else "")
