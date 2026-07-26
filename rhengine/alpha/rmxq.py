@@ -109,6 +109,73 @@ def rebalance_dates(panel: Panel, cfg: RMXQConfig, lo: str, hi: str) -> pd.Datet
 
 _SHARES_CACHE: dict = {}
 
+# A one-year share count this far from BOTH its neighbours is a filing units
+# error, not a corporate action. Buybacks and issuance move share counts by tens
+# of percent; nothing legitimate moves them 50x for one year and back.
+UNITS_MIN_FACTOR = 50.0
+
+
+def _repair_share_units(sh: pd.DataFrame) -> pd.DataFrame:
+    """Repair filing units errors in the raw share counts. Ticker x year in/out.
+
+    A separate failure from the split-basis problem `adjusted_shares` solves,
+    and invisible to it: that function only ever chooses between `raw` and
+    `raw * split_factor`, and a units error is a factor of 1,000. So these pass
+    straight through into market cap.
+
+    Measured damage before this fix, on the eligible S&P 500 universe:
+
+        CLX  fy2012   130,962,056,000,000 shares  ->  $10.9 QUADRILLION cap
+        CCL  fy2020       932,485,510,000 shares  ->  $24.6 trillion
+        HBAN fy2010       863,338,744,000 shares  ->  $5.7 trillion
+        WAT  fy2023                59,176 shares  ->  $17 million
+        PEG, FTI, SPG, LEN, AIV, GRMN, KLAC, ANF, TER, DLR, BBBY  similar
+
+    27 corrupted cap-years in all, 20 of them inside the 2010-2018 window used
+    for every RMX-B / RMX-C implementation check. One $10.9-quadrillion name
+    pins the position cap and squeezes every other weight in that year's book —
+    the same class of error as the $1.5-trillion GE in `Panel.split_factor_after`,
+    which is why the guard is explicit rather than a filter on the output.
+
+    **The discriminator is a one-year SPIKE, not a level shift.** A reverse split
+    changes every reported count from that year on, permanently, and is a real
+    corporate action the split logic below handles. A units error affects one
+    filing and its neighbours disagree in the same direction. So each year is
+    compared against the geometric mean of its nearest populated neighbours on
+    either side, never against the ticker's own average, and a year with only one
+    neighbour is left alone rather than guessed at.
+
+    A detected error is snapped to the nearest power of 1,000 when that lands
+    within 50% of the neighbours, and dropped to NaN when it does not — a name
+    with no usable share count is excluded from cap weighting that year, which
+    is correct. Inventing a plausible-looking number would not be.
+    """
+    out = sh.copy()
+    years = list(sh.columns)
+    for tk in sh.index:
+        row = sh.loc[tk]
+        pos = [y for y in years if np.isfinite(row.get(y, np.nan)) and row[y] > 0]
+        if len(pos) < 3:
+            continue
+        for i, y in enumerate(pos):
+            if i == 0 or i == len(pos) - 1:
+                continue                      # no neighbour on one side
+            v = float(row[y])
+            a, b = float(row[pos[i - 1]]), float(row[pos[i + 1]])
+            ref = np.sqrt(a * b)
+            if not np.isfinite(ref) or ref <= 0:
+                continue
+            # both neighbours must disagree in the SAME direction, or this is a
+            # level shift (a real corporate action) and not a units error
+            if not ((v / a > UNITS_MIN_FACTOR and v / b > UNITS_MIN_FACTOR)
+                    or (a / v > UNITS_MIN_FACTOR and b / v > UNITS_MIN_FACTOR)):
+                continue
+            k = round(np.log(v / ref) / np.log(1000.0))
+            fixed = v / (1000.0 ** k) if k != 0 else v
+            out.loc[tk, y] = fixed if (k != 0 and 0.5 <= fixed / ref <= 2.0) \
+                else np.nan
+    return out
+
 
 def adjusted_shares(panel: Panel, fund: Fundamentals) -> pd.DataFrame:
     """Share counts restated onto the price series' split basis, per fiscal year.
@@ -143,7 +210,7 @@ def adjusted_shares(panel: Panel, fund: Fundamentals) -> pd.DataFrame:
     if key in _SHARES_CACHE:
         return _SHARES_CACHE[key]
 
-    sh = fund.table["shares"].unstack("year")           # tickers x years
+    sh = _repair_share_units(fund.table["shares"].unstack("year"))
     rev = fund.table["revenue"].unstack("year")
     eq = fund.table["equity"].unstack("year")
     years = sorted(int(y) for y in sh.columns)
