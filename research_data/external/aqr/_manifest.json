@@ -1,0 +1,47 @@
+{
+  "source": "aqr.com/library/data-sets",
+  "note": "QMJ (Asness, Frazzini & Pedersen), BAB (Frazzini & Pedersen), TSMOM (Moskowitz, Ooi & Pedersen), HML Devil. US series start 1926-1957 depending on factor.",
+  "fetched_utc": "2026-07-25T15:05:44Z",
+  "files": [
+    {
+      "file": "quality-minus-junk-factors-monthly.xlsx",
+      "url": "https://www.aqr.com/-/media/AQR/Documents/Insights/Data-Sets/Quality-Minus-Junk-Factors-Monthly.xlsx",
+      "bytes": 2255724,
+      "cached": false,
+      "seconds": 0.9,
+      "sha256_16": "bddfe3a235ada05e"
+    },
+    {
+      "file": "quality-minus-junk-10-portfolios-monthly.xlsx",
+      "url": "https://www.aqr.com/-/media/AQR/Documents/Insights/Data-Sets/Quality-Minus-Junk-Ten-Quality-Sorted-Portfolios-Monthly.xlsx",
+      "bytes": 49445,
+      "cached": false,
+      "seconds": 0.2,
+      "sha256_16": "d40d8af5434ab7e7"
+    },
+    {
+      "file": "betting-against-beta-equity-factors-monthly.xlsx",
+      "url": "https://www.aqr.com/-/media/AQR/Documents/Insights/Data-Sets/Betting-Against-Beta-Equity-Factors-Monthly.xlsx",
+      "bytes": 2495385,
+      "cached": false,
+      "seconds": 0.5,
+      "sha256_16": "f65a40851a8799d6"
+    },
+    {
+      "file": "time-series-momentum-factors-monthly.xlsx",
+      "url": "https://www.aqr.com/-/media/AQR/Documents/Insights/Data-Sets/Time-Series-Momentum-Factors-Monthly.xlsx",
+      "bytes": 139830,
+      "cached": false,
+      "seconds": 0.0,
+      "sha256_16": "33470930e2269c0d"
+    },
+    {
+      "file": "the-devil-in-hmls-details-factors-monthly.xlsx",
+      "url": "https://www.aqr.com/-/media/AQR/Documents/Insights/Data-Sets/The-Devil-in-HMLs-Details-Factors-Monthly.xlsx",
+      "bytes": 1939435,
+      "cached": false,
+      "seconds": 0.4,
+      "sha256_16": "b20c3604e3d4e9dc"
+    }
+  ]
+}

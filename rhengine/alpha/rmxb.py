@@ -72,6 +72,13 @@ class RMXBConfig:
     momentum_weight: float = 0.5
     min_names: int = 40
     weighting: str = "value"    # both legs are cap-weighted; `_weights` reads this
+    # Barroso & Santa-Clara vol scaling on the momentum leg (see `run`). OFF by
+    # default: the 50/50 blend is the specification with the 63-year record, and
+    # turning this on silently would mean the shipped strategy is no longer the
+    # one docs/RMX-RESULTS.md reports.
+    vol_scale_momentum: bool = False
+    vol_window: int = 126       # ~6 months, the paper's window
+    vol_cap: float = 1.5        # bound on the multiplier; retail, not the paper
 
 
 def momentum_12_1(panel: Panel, date: pd.Timestamp, names: pd.Index) -> pd.Series:
@@ -96,6 +103,8 @@ def build_targets(panel: Panel, fund: Fundamentals, cfg: RMXBConfig,
     """Blended weight targets, monthly, plus the covered universe per date."""
     targets: dict[pd.Timestamp, pd.Series] = {}
     covered: dict[pd.Timestamp, pd.Index] = {}
+    legs: dict[str, dict[pd.Timestamp, pd.Series]] = {"quality": {},
+                                                      "momentum": {}}
     diag = []
     quality_w: pd.Series | None = None
 
@@ -137,22 +146,85 @@ def build_targets(panel: Panel, fund: Fundamentals, cfg: RMXBConfig,
             cfg.momentum_weight * momentum_w, fill_value=0.0)
         targets[d] = blended / blended.sum()
         covered[d] = cap_all.index
+        legs["quality"][d] = qw
+        legs["momentum"][d] = momentum_w
         diag.append({"date": str(d.date()), "eligible": len(names),
                      "covered": len(cap_all), "quality_names": len(qw),
                      "momentum_names": len(mpick),
                      "held": int((targets[d] > 1e-6).sum()),
                      "overlap": len(set(qw.index) & set(mpick)),
                      "max_weight": float(targets[d].max())})
-    return targets, covered, pd.DataFrame(diag)
+    return targets, covered, pd.DataFrame(diag), legs
+
+
+def _vol_scaled_blend(panel: Panel, cfg: RMXBConfig,
+                      legs: dict[str, dict[pd.Timestamp, pd.Series]],
+                      cost_bps: float, hi: pd.Timestamp
+                      ) -> tuple[dict[pd.Timestamp, pd.Series], pd.Series]:
+    """Re-blend with the momentum leg scaled by its own realised volatility.
+
+    Barroso & Santa-Clara, "Momentum has its moments" (JFE 2015): weight
+    momentum by the inverse of its trailing 6-month realised volatility.
+    Momentum's volatility is far more forecastable than its return (their
+    out-of-sample R^2 for the specific component is 47%), which is why this
+    replicates where market-level volatility timing does not — see Cederburg et
+    al. on the Moreira-Muir critique.
+
+    On the raw momentum factor 1927-2011 the paper reports Sharpe 0.53 -> 0.97,
+    excess kurtosis 18.24 -> 2.68, worst month -78.96% -> -28.40%.
+
+    Two deviations from the paper, both deliberate:
+
+    * The scale is normalised to mean one over the sample and capped at
+      `vol_cap`, so this shifts the quality/momentum MIX rather than levering the
+      book. A backtest that levers at the T-bill rate describes an account
+      nobody has (see `book.run_book`'s borrow charge).
+    * `realised_vol` shifts by one session, so the multiplier applied on a
+      rebalance date uses returns strictly before it.
+    """
+    from .sleeves import realised_vol
+
+    mom_targets = legs["momentum"]
+    if not mom_targets:
+        raise ValueError("no momentum-leg targets to scale")
+    mom_book = run_book(panel.adj, mom_targets, panel.rf, cost_bps,
+                        start=min(mom_targets), end=hi)
+    vol = realised_vol(mom_book.daily_return, cfg.vol_window)
+    target_vol = float(mom_book.daily_return.std() * np.sqrt(252.0))
+    k = (target_vol / vol).clip(upper=cfg.vol_cap).ffill()
+
+    out: dict[pd.Timestamp, pd.Series] = {}
+    applied = {}
+    for d, mw in mom_targets.items():
+        qw = legs["quality"].get(d)
+        if qw is None:
+            continue
+        kd = float(k.reindex([d], method="pad").iloc[0]) if len(k) else 1.0
+        if not np.isfinite(kd):
+            kd = 1.0
+        applied[d] = kd
+        blended = (cfg.quality_weight * qw).add(
+            cfg.momentum_weight * kd * mw, fill_value=0.0)
+        if blended.sum() <= 0:
+            continue
+        out[d] = blended / blended.sum()
+    return out, pd.Series(applied, name="mom_vol_scale")
 
 
 def run(panel: Panel, fund: Fundamentals, cfg: RMXBConfig, lo: str, hi: str,
         cost_bps: float = DEFAULT_COST_BPS):
-    targets, covered, diag = build_targets(panel, fund, cfg, lo, hi)
+    targets, covered, diag, legs = build_targets(panel, fund, cfg, lo, hi)
     if not targets:
         raise ValueError("no rebalances produced")
     dates = sorted(targets)
     start, end = dates[0], pd.Timestamp(hi)
+
+    scale = None
+    if cfg.vol_scale_momentum:
+        targets, scale = _vol_scaled_blend(panel, cfg, legs, cost_bps,
+                                           pd.Timestamp(hi))
+        if not targets:
+            raise ValueError("vol scaling produced no rebalances")
 
     bk = run_book(panel.adj, targets, panel.rf, cost_bps, start=start, end=end)
 
@@ -164,6 +236,7 @@ def run(panel: Panel, fund: Fundamentals, cfg: RMXBConfig, lo: str, hi: str,
     spy = buy_and_hold(panel.spy, start, end).reindex(
         bk.daily_return.index).fillna(0.0)
     return {"book": bk, "targets": targets, "covered": covered, "diag": diag,
+            "legs": legs, "mom_vol_scale": scale,
             "benchmarks": {"SPY (cap-weight)": spy,
                            "CW covered universe": nb.daily_return}}
 
@@ -176,13 +249,19 @@ def main() -> None:
     ap.add_argument("--top-fraction", type=float, default=TOP_FRACTION)
     ap.add_argument("--holdings", action="store_true",
                     help="print the current book instead of the backtest")
+    ap.add_argument("--vol-scale-momentum", action="store_true",
+                    help="Barroso & Santa-Clara: weight the momentum leg by the "
+                         "inverse of its own 6-month realised volatility")
+    ap.add_argument("--vol-cap", type=float, default=1.5)
     args = ap.parse_args()
 
     panel, fund = load_panel(), Fundamentals.load()
-    cfg = RMXBConfig(top_fraction=args.top_fraction)
+    cfg = RMXBConfig(top_fraction=args.top_fraction,
+                     vol_scale_momentum=args.vol_scale_momentum,
+                     vol_cap=args.vol_cap)
 
     if args.holdings:
-        t, _, d = build_targets(panel, fund, cfg, "2024-01-01", args.hi)
+        t, _, d, _ = build_targets(panel, fund, cfg, "2024-01-01", args.hi)
         last = sorted(t)[-1]
         w = t[last].sort_values(ascending=False)
         w = w[w > 1e-6]
@@ -197,8 +276,13 @@ def main() -> None:
     spy = res["benchmarks"]["SPY (cap-weight)"]
     cw = res["benchmarks"]["CW covered universe"]
 
-    print(f"RMX-B  {r.index[0].date()} .. {r.index[-1].date()}  @ "
+    tag = " [momentum vol-scaled]" if cfg.vol_scale_momentum else ""
+    print(f"RMX-B{tag}  {r.index[0].date()} .. {r.index[-1].date()}  @ "
           f"{args.cost_bps:.0f} bps")
+    if res["mom_vol_scale"] is not None:
+        k = res["mom_vol_scale"]
+        print(f"momentum scale: mean {k.mean():.2f}  min {k.min():.2f}  "
+              f"max {k.max():.2f}  (capped at {cfg.vol_cap})")
     print(f"{len(res['targets'])} monthly rebalances | "
           f"{res['diag']['held'].mean():.0f} names held | "
           f"quality/momentum overlap {res['diag']['overlap'].mean():.0f} names | "

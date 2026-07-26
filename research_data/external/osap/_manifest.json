@@ -1,0 +1,39 @@
+{
+  "source": "openassetpricing.com release 2.0.0 (2025-10)",
+  "note": "Chen & Zimmermann, Critical Finance Review 2022. 212 published predictors; PredictorPortsFull.csv is the monthly long-short record, QuintilesVW the value-weighted quintile portfolios. CC-BY: cite the paper.",
+  "fetched_utc": "2026-07-25T15:07:45Z",
+  "files": [
+    {
+      "file": "SignalDoc.csv",
+      "url": "https://drive.google.com/uc?id=1rdi0jTPSA6xtn6TpQAMT5WyEczQ1gK59&export=download",
+      "bytes": 181712,
+      "cached": false,
+      "seconds": 1.1,
+      "sha256_16": "f6c055120bad7afe"
+    },
+    {
+      "file": "PredictorPortsFull.csv",
+      "url": "https://drive.google.com/uc?id=1g7w-yQ6Cg2qbMEkER9Q3vgns4JszXQo6&export=download",
+      "bytes": 77651932,
+      "cached": false,
+      "seconds": 5.7,
+      "sha256_16": "d7e5ceb0790f2597"
+    },
+    {
+      "file": "PredictorAltPorts_QuintilesVW.zip",
+      "url": "https://drive.google.com/uc?id=1ef905SSlCDyh1KU9W1tJs5sfBFz0HPUt&export=download",
+      "bytes": 18947238,
+      "cached": false,
+      "seconds": 5.6,
+      "sha256_16": "e4d5f323829102ae"
+    },
+    {
+      "file": "PredictorAltPorts_ex_micro.zip",
+      "url": "https://drive.google.com/uc?id=1Q4YatQ3soRU_V7VeACwUn2bnCnmhDUI2&export=download",
+      "bytes": 24381719,
+      "cached": false,
+      "seconds": 4.9,
+      "sha256_16": "172567b992018f20"
+    }
+  ]
+}

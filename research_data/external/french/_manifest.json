@@ -1,0 +1,47 @@
+{
+  "source": "Ken French data library",
+  "note": "Monthly research factors, momentum, short- and long-term reversal, and the 25 OP x INV portfolios. The daily file used by rhengine.alpha.panel is fetched separately.",
+  "fetched_utc": "2026-07-25T15:05:44Z",
+  "files": [
+    {
+      "file": "F-F_Research_Data_5_Factors_2x3.zip",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_CSV.zip",
+      "bytes": 11888,
+      "cached": false,
+      "seconds": 0.4,
+      "sha256_16": "ddc0280b2bb8ca6c"
+    },
+    {
+      "file": "F-F_Momentum_Factor.zip",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Momentum_Factor_CSV.zip",
+      "bytes": 5605,
+      "cached": false,
+      "seconds": 0.0,
+      "sha256_16": "37baf72ae4eace97"
+    },
+    {
+      "file": "F-F_ST_Reversal_Factor.zip",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_ST_Reversal_Factor_CSV.zip",
+      "bytes": 5575,
+      "cached": false,
+      "seconds": 0.0,
+      "sha256_16": "e0fc1859c8b7e56a"
+    },
+    {
+      "file": "F-F_LT_Reversal_Factor.zip",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_LT_Reversal_Factor_CSV.zip",
+      "bytes": 5320,
+      "cached": false,
+      "seconds": 0.0,
+      "sha256_16": "e2d061587e14eb24"
+    },
+    {
+      "file": "25_Portfolios_OP_INV_5x5.zip",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/25_Portfolios_OP_INV_5x5_CSV.zip",
+      "bytes": 383128,
+      "cached": false,
+      "seconds": 0.2,
+      "sha256_16": "5811dcc7fe92b0cc"
+    }
+  ]
+}
