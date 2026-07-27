@@ -48,12 +48,17 @@ def _t_stat(rs):
 
 
 def _extra_cost_r(trade, extra_bps):
-    """Additional cost in R for extra_bps more round-trip cost, from the
-    trade's own entry/stop geometry."""
+    """Additional cost in R for extra_bps more ROUND-TRIP cost, from the
+    trade's own entry/stop geometry.
+
+    Must stay identical to costs.cost_in_r / backtest._cost_r — this had the
+    same 2x double-count they did and was fixed with them on 2026-07-27. It
+    made the battery's cost-stress check twice as punitive as advertised.
+    """
     entry, stop = trade.get("entry"), trade.get("stop")
     if entry is None or stop is None or entry <= 0 or entry <= stop:
         return None
-    return 2.0 * (extra_bps / 10000.0) / ((entry - stop) / entry)
+    return (extra_bps / 10000.0) / ((entry - stop) / entry)
 
 
 # ----------------------------------------------------------------- checks --

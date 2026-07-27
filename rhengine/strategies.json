@@ -1,19 +1,18 @@
 {
   "_spec_version": 1,
-  "_notes": "Canonical strategy spec \u2014 single source of truth shared by RobinhoodAgent (Python) and Nydex (JS). Threshold defaults are RobinhoodAgent's walk-forward-tuned values (they win over Nydex UI defaults where they differ, e.g. bollinger adxMax 35). legs/slider metadata come from Nydex for its UI. exits = global exit engine params (RobinhoodAgent order_plan/backtest).",
-  "regime_routing": {
-    "uptrend": "residualmomentum",
-    "downtrend": "residualmomentum",
-    "choppy": "bollinger",
-    "_note": "MACD retired from auto-routing: no OOS edge in uptrends (optimize.py walk-forward). Still available manually."
+  "_notes": "Canonical strategy spec \u2014 single source of truth shared by RobinhoodAgent (Python) and Nydex (JS). Threshold defaults are RobinhoodAgent's walk-forward-tuned values (they win over Nydex UI defaults where they differ, e.g. bollinger adxMax 35). legs/slider metadata come from Nydex for its UI. Exit-engine params live in config.json exits (the duplicate block here was dead \u2014 no reader \u2014 and was removed 2026-07-24). Each strategy carries a `status`: autonomous | user_configurable | manual | retired \u2014 see indicators.strategy_status.",
+  "_deployment_tiers": {
+    "autonomous": "Cleared for UNATTENDED auto-routing by the RobinhoodAgent. Must appear in regime_routing to actually trade. Earning this requires passing the gates in docs/AUDIT-2026-07-24.md section 10 (G1).",
+    "user_configurable": "Shipped in Nydex for a USER to configure and run on their own account, including unattended. NEVER auto-routed by the RobinhoodAgent \u2014 that requires 'autonomous'. This tier is a product decision, not a validation result: a sleeve here has NOT passed G1. Every entry must carry a cost_profile so the UI can show measured breakeven against modelled cost.",
+    "manual": "Selectable by hand in the research CLIs via --strategy, for attended experimentation only. NEVER auto-routed, and NOT shipped as a Nydex user-runnable strategy \u2014 that is 'user_configurable'. This is the default for anything without an explicit status: autonomy is earned, not inherited.",
+    "retired": "Kept only so historical results stay reproducible. Hidden from `scan --all`.",
+    "_enforcement": "indicators.select_strategy_for_regime returns None unless the routed strategy's status is 'autonomous'. None means STAND FLAT \u2014 the agent trades nothing rather than falling back to an arbitrary sleeve. Demoting a strategy out of 'autonomous' is sufficient to pull it from unattended agent trading; the routing entry need not be edited. Note this governs the AGENT only: a 'user_configurable' sleeve can still run unattended if a Nydex user configures it that way, which is why that tier requires a published cost_profile."
   },
-  "exits": {
-    "stop_atr_mult": 1.5,
-    "target_atr_mult": 2.0,
-    "trail_trigger_mult": 1.5,
-    "chandelier_atr_mult": 3.0,
-    "max_hold_sessions": 10,
-    "leveraged_max_hold_sessions": 3
+  "regime_routing": {
+    "uptrend": null,
+    "downtrend": null,
+    "choppy": null,
+    "_note": "LIVE as of 2026-07-24 \u2014 previously this block was unread and indicators.py carried a hardcoded duplicate that could silently disagree (audit FC-20). Targets must have status 'autonomous' or they are refused at routing time. All three regimes are currently unrouted; see the determination in docs/AUDIT-2026-07-24.md section 12f."
   },
   "external_legs": {
     "_note": "Adapter-derived gating legs evaluated OUTSIDE score_ticker — indicators.py stays a pure OHLCV scorer and the golden vectors never move. GateBook today wires only av_earnings_sue + macro_flags (annotate/filter via config.json external_gates). kalshi_prob_shift / polymarket_implied_prob are defined here and scoreable via their adapters / data_source paths, but are NOT yet applied by GateBook — treat as experimental until wired. Scorers: market_data_av.sue_gate, market_data_kalshi.score_prob_shift, market_data_polymarket.score_implied_prob. Additive to the spec — not part of any strategy's legMask bit-width.",
@@ -21,7 +20,7 @@
       "id": "kalshi_prob_shift",
       "abbr": "KAL-SHIFT",
       "full": "Kalshi Implied-Probability Shift",
-      "desc": "The matching Kalshi market repriced by >= minShift over the last `window` daily bars — event-market information flow the equity tape may not have digested. Direction of the shift must agree with the setup's direction.",
+      "desc": "The matching Kalshi market repriced by >= minShift over the last `window` daily bars \u2014 event-market information flow the equity tape may not have digested. Direction of the shift must agree with the setup's direction.",
       "thresholds": {
         "window": {
           "default": 5,
@@ -43,7 +42,7 @@
       "id": "av_earnings_sue",
       "abbr": "SUE",
       "full": "Real Earnings Surprise (AlphaVantage)",
-      "desc": "A REAL earnings report (AlphaVantage EARNINGS feed) inside the PEAD drift window with |surprisePercentage| >= minSurprisePct, direction matching the setup. Confirms the price-proxy EVENT leg with actual SUE data — the upgrade path the PEAD spec names. Scorer: market_data_av.sue_gate.",
+      "desc": "A REAL earnings report (AlphaVantage EARNINGS feed) inside the PEAD drift window with |surprisePercentage| >= minSurprisePct, direction matching the setup. Confirms the price-proxy EVENT leg with actual SUE data \u2014 the upgrade path the PEAD spec names. Scorer: market_data_av.sue_gate.",
       "thresholds": {
         "driftMin": {
           "default": 1,
@@ -72,7 +71,7 @@
       "id": "polymarket_implied_prob",
       "abbr": "PM-PROB",
       "full": "Polymarket Implied Probability Band",
-      "desc": "The matching Polymarket market's implied probability sits in the tradable band (minProb..maxProb — near 0/1 there is no repricing left) and, when minShift > 0, has moved by at least minShift over `window` bars in the setup's direction.",
+      "desc": "The matching Polymarket market's implied probability sits in the tradable band (minProb..maxProb \u2014 near 0/1 there is no repricing left) and, when minShift > 0, has moved by at least minShift over `window` bars in the setup's direction.",
       "thresholds": {
         "minProb": {
           "default": 0.1,
@@ -110,6 +109,8 @@
       "id": "vwap",
       "name": "VWAP Confluence",
       "description": "Anchored-VWAP reclaim/rejection, EMA trend stack, volume confirmation, RSI momentum reset. Best in trending conditions.",
+      "status": "user_configurable",
+      "_status_note": "Never validated. It was the fallback target of the old hardcoded routing dict for any unrecognised regime, so it could auto-trade without ever having been tested; that fallback is removed. Zero trades in the 2025-09..2026-07 book.",
       "regime": null,
       "legs": [
         {
@@ -183,12 +184,29 @@
           "step": 1,
           "label": "Stage Filter (150d SMA)"
         }
+      },
+      "_tier_note": "Tier set 2026-07-25: user_configurable \u2014 offered to Nydex users to configure and run themselves, never auto-routed by the RobinhoodAgent. Cost MEASURED 2026-07-27 (not assumed): 29.1 bps round trip trade-weighted from 296 live Robinhood quotes stratified across ADV deciles and reweighted to the real book. Engine arithmetic corrected the same day \u2014 a 2x double-count in backtest._cost_r and a second in the vectorbt fee rate meant every prior result was charged twice the cost it reported. This sleeve breaks even at 34.1 bps round trip, so net mean R is +0.0122 (+0.0841 gross). THAT IS STILL NOT AN EDGE: day-clustered t = -0.99 (per-trade t +0.86; the gap is audit FC-3). Indistinguishable from zero either way. G1: 0 of 10.",
+      "cost_profile": {
+        "basis": "MEASURED round-trip from live quotes; engine arithmetic corrected 2026-07-27",
+        "measured_cost_bps_round_trip": 29.1,
+        "breakeven_bps_round_trip": 34.1,
+        "mean_r_gross": 0.0841,
+        "mean_r_at_measured_cost": 0.0122,
+        "t_day_clustered": -0.99,
+        "t_per_trade_do_not_use": 0.86,
+        "verdict": "no measurable edge (|day-clustered t| < 1.5)",
+        "measured": "2026-07-27T13:45 ET, mid-session",
+        "caveat": "mid-session quoted spread; the engine fills at the OPEN, which is wider - this is the optimistic bound. Excludes market impact; excludes PFOF price improvement, which cuts the other way.",
+        "universe": "3,309 names, min_dollar_vol $500k/day, ETF+ADR excluded; 119,875 trades, 730d",
+        "source": "tests/results/rh_quotes_midsession_2026-07-27.json"
       }
     },
     "bollinger": {
       "id": "bollinger",
       "name": "Bollinger Band Mean Reversion",
       "description": "Band tag + RSI exhaustion + close back inside with volume. Hard-gated by ADX; choppy/range markets only.",
+      "status": "user_configurable",
+      "_status_note": "Best of a bad set: the only sleeve with day-clustered t > 2 on the massive window (+3.38), but on just 52 signal sessions. Deep-history scorecard is the deciding evidence; see docs/AUDIT-2026-07-24.md 12f.",
       "regime": "choppy",
       "legs": [
         {
@@ -262,12 +280,29 @@
           "step": 1,
           "label": "Stage Filter (150d SMA)"
         }
+      },
+      "_tier_note": "Tier set 2026-07-25: user_configurable \u2014 offered to Nydex users to configure and run themselves, never auto-routed by the RobinhoodAgent. Cost MEASURED 2026-07-27 (not assumed): 29.1 bps round trip trade-weighted from 296 live Robinhood quotes stratified across ADV deciles and reweighted to the real book. Engine arithmetic corrected the same day \u2014 a 2x double-count in backtest._cost_r and a second in the vectorbt fee rate meant every prior result was charged twice the cost it reported. This sleeve breaks even at 23.5 bps round trip, so net mean R is -0.0128 (+0.0535 gross). THAT IS STILL NOT AN EDGE: day-clustered t = +1.34 (per-trade t -0.57; the gap is audit FC-3). Indistinguishable from zero either way. G1: 0 of 10.",
+      "cost_profile": {
+        "basis": "MEASURED round-trip from live quotes; engine arithmetic corrected 2026-07-27",
+        "measured_cost_bps_round_trip": 29.1,
+        "breakeven_bps_round_trip": 23.5,
+        "mean_r_gross": 0.0535,
+        "mean_r_at_measured_cost": -0.0128,
+        "t_day_clustered": 1.34,
+        "t_per_trade_do_not_use": -0.57,
+        "verdict": "no measurable edge (|day-clustered t| < 1.5)",
+        "measured": "2026-07-27T13:45 ET, mid-session",
+        "caveat": "mid-session quoted spread; the engine fills at the OPEN, which is wider - this is the optimistic bound. Excludes market impact; excludes PFOF price improvement, which cuts the other way.",
+        "universe": "3,309 names, min_dollar_vol $500k/day, ETF+ADR excluded; 119,875 trades, 730d",
+        "source": "tests/results/rh_quotes_midsession_2026-07-27.json"
       }
     },
     "macd": {
       "id": "macd",
       "name": "MACD Trend Continuation",
       "description": "Early-stage MACD/signal cross with EMA50 trend confirmation and RSI band. Retired from auto-routing (no OOS edge); manual use only. Ablation 2026-07-18: CROSS+SUB-0 (legMask=3) is the OOS-strongest form (PF 1.37); EMA50/RSI legs are dead weight.",
+      "status": "user_configurable",
+      "_status_note": "Not auto-routed since before this audit and produced ZERO trades in the 2025-09..2026-07 book, yet config carried a tuned legMask=3 and docs claimed 'OOS PF 1.37' \u2014 a claim about a sleeve the system never traded.",
       "regime": null,
       "legs": [
         {
@@ -341,6 +376,21 @@
           "step": 1,
           "label": "Active Leg Bitmask (0=all)"
         }
+      },
+      "_tier_note": "Tier set 2026-07-25: user_configurable \u2014 offered to Nydex users to configure and run themselves, never auto-routed by the RobinhoodAgent. Cost MEASURED 2026-07-27 (not assumed): 29.1 bps round trip trade-weighted from 296 live Robinhood quotes stratified across ADV deciles and reweighted to the real book. Engine arithmetic corrected the same day \u2014 a 2x double-count in backtest._cost_r and a second in the vectorbt fee rate meant every prior result was charged twice the cost it reported. This sleeve breaks even at 57.7 bps round trip, so net mean R is +0.0687 (+0.1388 gross). THAT IS STILL NOT AN EDGE: day-clustered t = +0.46 (per-trade t +1.47; the gap is audit FC-3). Indistinguishable from zero either way. G1: 0 of 10.",
+      "cost_profile": {
+        "basis": "MEASURED round-trip from live quotes; engine arithmetic corrected 2026-07-27",
+        "measured_cost_bps_round_trip": 29.1,
+        "breakeven_bps_round_trip": 57.7,
+        "mean_r_gross": 0.1388,
+        "mean_r_at_measured_cost": 0.0687,
+        "t_day_clustered": 0.46,
+        "t_per_trade_do_not_use": 1.47,
+        "verdict": "no measurable edge (|day-clustered t| < 1.5)",
+        "measured": "2026-07-27T13:45 ET, mid-session",
+        "caveat": "mid-session quoted spread; the engine fills at the OPEN, which is wider - this is the optimistic bound. Excludes market impact; excludes PFOF price improvement, which cuts the other way.",
+        "universe": "3,309 names, min_dollar_vol $500k/day, ETF+ADR excluded; 119,875 trades, 730d",
+        "source": "tests/results/rh_quotes_midsession_2026-07-27.json"
       }
     },
     "consolidation": {
@@ -348,6 +398,8 @@
       "name": "Consolidation Breakout",
       "retired": true,
       "description": "RETIRED 2026-07-18 per full-matrix ablation: the COMP compression leg is toxic (median PF 0.69 on vs 1.01 off; every COMP combination PF<1 over 730d full market). Kept for manual/research use only; excluded from scan --all. Original: BB + range compression with low ADX, then a confirmed breakout bar with volume; 'held' leg filters single-bar fakeouts.",
+      "status": "retired",
+      "_status_note": "RETIRED 2026-07-18 per full-matrix ablation: the COMP compression leg is toxic (median PF 0.69 on vs 1.01 off).",
       "regime": null,
       "legs": [
         {
@@ -434,6 +486,8 @@
       "id": "residualmomentum",
       "name": "Residual Momentum",
       "description": "OLS-strips SPY beta to isolate idiosyncratic alpha momentum; 2-bar hold plus EMA and RSI confirmation. Auto-routed in uptrend and downtrend regimes.",
+      "status": "user_configurable",
+      "_status_note": "DEMOTED 2026-07-24. Carried 94% of the book. Day-clustered t +1.32 on the massive window; at 30 bps -3.69. O-1 rebuilt it at its cited Blitz/Huij/Martens horizon (756/252/21, monthly) over 7.7 years: t at 30 bps was -0.44 (ATR exits) and -0.02 (wide stops). Failed its predeclared kill criterion at every horizon.",
       "regime": "uptrend|downtrend",
       "legs": [
         {
@@ -528,12 +582,29 @@
           "step": 1,
           "label": "RRG Rotation Mode"
         }
+      },
+      "_tier_note": "Tier set 2026-07-25: user_configurable \u2014 offered to Nydex users to configure and run themselves, never auto-routed by the RobinhoodAgent. Cost MEASURED 2026-07-27 (not assumed): 29.1 bps round trip trade-weighted from 296 live Robinhood quotes stratified across ADV deciles and reweighted to the real book. Engine arithmetic corrected the same day \u2014 a 2x double-count in backtest._cost_r and a second in the vectorbt fee rate meant every prior result was charged twice the cost it reported. This sleeve breaks even at 26.8 bps round trip, so net mean R is -0.0059 (+0.0676 gross). THAT IS STILL NOT AN EDGE: day-clustered t = -1.18 (per-trade t -1.08; the gap is audit FC-3). Indistinguishable from zero either way. G1: 0 of 10.",
+      "cost_profile": {
+        "basis": "MEASURED round-trip from live quotes; engine arithmetic corrected 2026-07-27",
+        "measured_cost_bps_round_trip": 29.1,
+        "breakeven_bps_round_trip": 26.8,
+        "mean_r_gross": 0.0676,
+        "mean_r_at_measured_cost": -0.0059,
+        "t_day_clustered": -1.18,
+        "t_per_trade_do_not_use": -1.08,
+        "verdict": "no measurable edge (|day-clustered t| < 1.5)",
+        "measured": "2026-07-27T13:45 ET, mid-session",
+        "caveat": "mid-session quoted spread; the engine fills at the OPEN, which is wider - this is the optimistic bound. Excludes market impact; excludes PFOF price improvement, which cuts the other way.",
+        "universe": "3,309 names, min_dollar_vol $500k/day, ETF+ADR excluded; 119,875 trades, 730d",
+        "source": "tests/results/rh_quotes_midsession_2026-07-27.json"
       }
     },
     "pead": {
       "id": "pead",
       "name": "Post-Earnings Announcement Drift",
       "description": "Event-driven, regime-agnostic sleeve: detects an earnings-like gap (price move + volume spike), then rides the drift 1-10 sessions with trend and momentum confirmation. Runs alongside the regime strategy; pools merged by (ticker, direction) keeping the stronger setup. Upgrade path: replace the price-proxy event detector with a real earnings/SUE feed (Nydex api/sue.js via FMP).",
+      "status": "user_configurable",
+      "_status_note": "Its edge lived in the excluded biotech names: on the biotech-excluded universe it is -0.05R / PF 0.89 / -186R. pead_always_on is false.",
       "regime": "always-on",
       "legs": [
         {
@@ -614,6 +685,21 @@
           "step": 1,
           "label": "Stage Filter (150d SMA)"
         }
+      },
+      "_tier_note": "Tier set 2026-07-25: user_configurable \u2014 offered to Nydex users to configure and run themselves, never auto-routed by the RobinhoodAgent. Cost MEASURED 2026-07-27 (not assumed): 29.1 bps round trip trade-weighted from 296 live Robinhood quotes stratified across ADV deciles and reweighted to the real book. Engine arithmetic corrected the same day \u2014 a 2x double-count in backtest._cost_r and a second in the vectorbt fee rate meant every prior result was charged twice the cost it reported. This sleeve breaks even at 41.9 bps round trip, so net mean R is +0.0236 (+0.0772 gross). THAT IS STILL NOT AN EDGE: day-clustered t = +0.28 (per-trade t +2.57; the gap is audit FC-3). Indistinguishable from zero either way. G1: 0 of 10.",
+      "cost_profile": {
+        "basis": "MEASURED round-trip from live quotes; engine arithmetic corrected 2026-07-27",
+        "measured_cost_bps_round_trip": 29.1,
+        "breakeven_bps_round_trip": 41.9,
+        "mean_r_gross": 0.0772,
+        "mean_r_at_measured_cost": 0.0236,
+        "t_day_clustered": 0.28,
+        "t_per_trade_do_not_use": 2.57,
+        "verdict": "no measurable edge (|day-clustered t| < 1.5)",
+        "measured": "2026-07-27T13:45 ET, mid-session",
+        "caveat": "mid-session quoted spread; the engine fills at the OPEN, which is wider - this is the optimistic bound. Excludes market impact; excludes PFOF price improvement, which cuts the other way.",
+        "universe": "3,309 names, min_dollar_vol $500k/day, ETF+ADR excluded; 119,875 trades, 730d",
+        "source": "tests/results/rh_quotes_midsession_2026-07-27.json"
       }
     }
   }

@@ -27,10 +27,13 @@ import unittest
 from rhengine.backtest import run_backtest_on
 from rhengine.data_local import synthetic_universe
 from rhengine.indicators import (
+    VALID_STATUSES,
     autonomous_strategies,
     load_spec,
     select_strategy_for_regime,
+    strategy_cost_profile,
     strategy_status,
+    user_configurable_strategies,
 )
 
 
@@ -157,6 +160,104 @@ class ShippedSpecTest(unittest.TestCase):
                 strategy_status(name, spec), "autonomous",
                 "regime_routing[{}] -> {} but its status is {}".format(
                     regime, name, strategy_status(name, spec)))
+
+    def test_every_status_is_a_known_tier(self):
+        """A typo'd status fails safe (never autonomous) but would silently
+        misrepresent the sleeve to Nydex, which renders by tier."""
+        spec = load_spec()
+        for name, s in spec["strategies"].items():
+            self.assertIn(strategy_status(name, spec), VALID_STATUSES,
+                          "{} carries unknown status {!r}".format(
+                              name, s.get("status")))
+
+
+class UserConfigurableTierTest(unittest.TestCase):
+    """`user_configurable` — shipped for a Nydex user to run themselves.
+
+    Added 2026-07-25. `manual` conflated two different risk surfaces: attended
+    research selection, and a user configuring a sleeve and leaving it running
+    unattended. Only the first was ever evaluated. The tier confers NO agent
+    permission — that separation is what these tests pin.
+    """
+
+    def test_never_auto_routes(self):
+        """THE guard for this tier. A user running it themselves is their
+        decision; the agent choosing it on their behalf is not."""
+        spec = _spec({"uptrend": "a"}, {"a": {"status": "user_configurable"}})
+        self.assertIsNone(select_strategy_for_regime("uptrend", spec))
+        self.assertEqual(autonomous_strategies(spec), [])
+
+    def test_listed_separately_from_autonomous(self):
+        spec = _spec({}, {"a": {"status": "autonomous"},
+                          "b": {"status": "user_configurable"},
+                          "c": {"status": "manual"},
+                          "d": {"retired": True, "status": "user_configurable"}})
+        self.assertEqual(user_configurable_strategies(spec), ["b"])
+        self.assertEqual(autonomous_strategies(spec), ["a"])
+
+    def test_tiers_are_disjoint_in_shipped_spec(self):
+        spec = load_spec()
+        self.assertEqual(
+            set(user_configurable_strategies(spec)) & set(autonomous_strategies(spec)),
+            set())
+
+    def test_shipped_sleeves_are_user_configurable(self):
+        spec = load_spec()
+        self.assertEqual(
+            user_configurable_strategies(spec),
+            ["bollinger", "macd", "pead", "residualmomentum", "vwap"])
+
+    def test_each_publishes_a_cost_profile(self):
+        """The tier's price of admission: a user cannot judge a strategy whose
+        measured breakeven is hidden from them.
+
+        Cost is MEASURED from live quotes (2026-07-27), not assumed — every
+        field here is in ROUND-TRIP bps, the unit the measurement is in. Do not
+        reintroduce a per-side field without renaming it; mixing the two units
+        is the bug that made the engine charge 2x (backtest._cost_r).
+        """
+        spec = load_spec()
+        required = ("basis", "measured_cost_bps_round_trip",
+                    "breakeven_bps_round_trip", "mean_r_at_measured_cost",
+                    "t_day_clustered", "verdict", "measured", "caveat", "source")
+        for name in user_configurable_strategies(spec):
+            profile = strategy_cost_profile(name, spec)
+            self.assertIsNotNone(profile, "{} publishes no cost_profile".format(name))
+            for key in required:
+                self.assertIn(key, profile, "{} cost_profile lacks {}".format(name, key))
+            for key in ("measured_cost_bps_round_trip", "breakeven_bps_round_trip",
+                        "mean_r_at_measured_cost", "t_day_clustered"):
+                self.assertIsInstance(profile[key], (int, float))
+
+    def test_cost_profile_is_self_consistent(self):
+        """Breakeven above the measured cost must mean positive net R, and below
+        it negative. Catches a profile edited in one field but not the other."""
+        spec = load_spec()
+        for name in user_configurable_strategies(spec):
+            p = strategy_cost_profile(name, spec)
+            if p["breakeven_bps_round_trip"] < p["measured_cost_bps_round_trip"]:
+                self.assertLess(p["mean_r_at_measured_cost"], 0, name)
+            else:
+                self.assertGreater(p["mean_r_at_measured_cost"], 0, name)
+
+    def test_no_sleeve_claims_a_statistically_real_edge(self):
+        """The sign of mean R is not the finding — the t-stat is.
+
+        At the measured cost every sleeve sits inside the noise (day-clustered
+        |t| < 1.5). If a future edit reports a real edge here it must come with
+        a t-stat that survives day clustering, because per-trade t is inflated
+        several-fold by same-day trades (audit FC-3): macd reads +1.44
+        per-trade and +0.45 day-clustered on the same data.
+        """
+        spec = load_spec()
+        for name in user_configurable_strategies(spec):
+            p = strategy_cost_profile(name, spec)
+            self.assertLess(
+                abs(p["t_day_clustered"]), 1.5,
+                "{} now claims a day-clustered t of {:+.2f}. If that is real, "
+                "re-run G1 and move the tier deliberately — do not let a "
+                "cost_profile edit silently promote a sleeve."
+                .format(name, p["t_day_clustered"]))
 
 
 if __name__ == "__main__":
