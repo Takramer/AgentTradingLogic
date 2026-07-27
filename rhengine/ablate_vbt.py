@@ -387,7 +387,11 @@ def sweep_strategy(strategy, m, th, exits_cfg, cost_bps, split_ts, verbose=True)
             price=m.open, open=m.open, high=m.high, low=m.low,
             sl_stop=sl_frac.values, tp_stop=tp_frac.values,
             stop_entry_price="fillprice", direction="longonly",
-            fees=cost_bps / 1e4, init_cash=10_000.0,
+            # vectorbt charges `fees` on EVERY order — entry and exit both — so
+            # a round-trip figure must be halved here or it is billed twice.
+            # (2026-07-27: it was not, mirroring the same units bug in
+            # backtest._cost_r. `cost_bps` is ROUND TRIP; see costs.py.)
+            fees=cost_bps / 2.0 / 1e4, init_cash=10_000.0,
             size=100.0, size_type="value", freq="1D")
 
         recs = pf.trades.records
