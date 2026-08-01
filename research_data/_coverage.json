@@ -1,0 +1,7637 @@
+{
+"A": {
+"symbol": "A",
+"status": "ok",
+"n": 6714,
+"first": "1999-11-18",
+"last": "2026-07-31"
+},
+"AABA": {
+"symbol": "AABA",
+"status": "missing",
+"n": 0
+},
+"AAL": {
+"symbol": "AAL",
+"status": "ok",
+"n": 5243,
+"first": "2005-09-27",
+"last": "2026-07-31"
+},
+"AAMRQ": {
+"symbol": "AAMRQ",
+"status": "missing",
+"n": 0
+},
+"AAP": {
+"symbol": "AAP",
+"status": "ok",
+"n": 6206,
+"first": "2001-11-29",
+"last": "2026-07-31"
+},
+"AAPL": {
+"symbol": "AAPL",
+"status": "ok",
+"n": 11500,
+"first": "1980-12-12",
+"last": "2026-07-31"
+},
+"ABBV": {
+"symbol": "ABBV",
+"status": "ok",
+"n": 3415,
+"first": "2013-01-02",
+"last": "2026-07-31"
+},
+"ABC": {
+"symbol": "ABC",
+"status": "missing",
+"n": 0
+},
+"ABI": {
+"symbol": "ABI",
+"status": "ok",
+"n": 276,
+"first": "2025-06-26",
+"last": "2026-07-31"
+},
+"ABKFQ": {
+"symbol": "ABKFQ",
+"status": "missing",
+"n": 0
+},
+"ABMD": {
+"symbol": "ABMD",
+"status": "missing",
+"n": 0
+},
+"ABNB": {
+"symbol": "ABNB",
+"status": "ok",
+"n": 1415,
+"first": "2020-12-10",
+"last": "2026-07-31"
+},
+"ABS": {
+"symbol": "ABS",
+"status": "missing",
+"n": 0
+},
+"ABT": {
+"symbol": "ABT",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"ABX": {
+"symbol": "ABX",
+"status": "ok",
+"n": 1477,
+"first": "2020-09-14",
+"last": "2026-07-31"
+},
+"ACAS": {
+"symbol": "ACAS",
+"status": "missing",
+"n": 0
+},
+"ACGL": {
+"symbol": "ACGL",
+"status": "ok",
+"n": 7770,
+"first": "1995-09-14",
+"last": "2026-07-31"
+},
+"ACKH": {
+"symbol": "ACKH",
+"status": "missing",
+"n": 0
+},
+"ACN": {
+"symbol": "ACN",
+"status": "ok",
+"n": 6295,
+"first": "2001-07-19",
+"last": "2026-07-31"
+},
+"ACS": {
+"symbol": "ACS",
+"status": "missing",
+"n": 0
+},
+"ACV": {
+"symbol": "ACV",
+"status": "ok",
+"n": 2815,
+"first": "2015-05-21",
+"last": "2026-07-31"
+},
+"ADBE": {
+"symbol": "ADBE",
+"status": "ok",
+"n": 10068,
+"first": "1986-08-13",
+"last": "2026-07-31"
+},
+"ADCT": {
+"symbol": "ADCT",
+"status": "ok",
+"n": 1559,
+"first": "2020-05-18",
+"last": "2026-07-31"
+},
+"ADI": {
+"symbol": "ADI",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"ADM": {
+"symbol": "ADM",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"ADP": {
+"symbol": "ADP",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"ADS": {
+"symbol": "ADS",
+"status": "missing",
+"n": 0
+},
+"ADSK": {
+"symbol": "ADSK",
+"status": "ok",
+"n": 10351,
+"first": "1985-06-28",
+"last": "2026-07-31"
+},
+"ADT": {
+"symbol": "ADT",
+"status": "ok",
+"n": 2144,
+"first": "2018-01-19",
+"last": "2026-07-31"
+},
+"AEE": {
+"symbol": "AEE",
+"status": "ok",
+"n": 7188,
+"first": "1998-01-02",
+"last": "2026-07-31"
+},
+"AEP": {
+"symbol": "AEP",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"AES": {
+"symbol": "AES",
+"status": "ok",
+"n": 8837,
+"first": "1991-06-26",
+"last": "2026-07-31"
+},
+"AET": {
+"symbol": "AET",
+"status": "ok",
+"n": 5781,
+"first": "1995-12-14",
+"last": "2018-11-29"
+},
+"AFL": {
+"symbol": "AFL",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"AFS.A": {
+"symbol": "AFS-A",
+"status": "missing",
+"n": 0
+},
+"AGC": {
+"symbol": "AGC",
+"status": "missing",
+"n": 0
+},
+"AGN": {
+"symbol": "AGN",
+"status": "missing",
+"n": 0
+},
+"AHM": {
+"symbol": "AHM",
+"status": "missing",
+"n": 0
+},
+"AIG": {
+"symbol": "AIG",
+"status": "ok",
+"n": 13508,
+"first": "1973-01-02",
+"last": "2026-07-31"
+},
+"AIT": {
+"symbol": "AIT",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"AIV": {
+"symbol": "AIV",
+"status": "ok",
+"n": 8060,
+"first": "1994-07-22",
+"last": "2026-07-31"
+},
+"AIZ": {
+"symbol": "AIZ",
+"status": "ok",
+"n": 5657,
+"first": "2004-02-05",
+"last": "2026-07-31"
+},
+"AJG": {
+"symbol": "AJG",
+"status": "ok",
+"n": 10610,
+"first": "1984-06-20",
+"last": "2026-07-31"
+},
+"AKAM": {
+"symbol": "AKAM",
+"status": "ok",
+"n": 6728,
+"first": "1999-10-29",
+"last": "2026-07-31"
+},
+"AKS": {
+"symbol": "AKS",
+"status": "missing",
+"n": 0
+},
+"AL": {
+"symbol": "AL",
+"status": "missing",
+"n": 0
+},
+"ALB": {
+"symbol": "ALB",
+"status": "ok",
+"n": 8164,
+"first": "1994-02-22",
+"last": "2026-07-31"
+},
+"ALGN": {
+"symbol": "ALGN",
+"status": "ok",
+"n": 6413,
+"first": "2001-01-30",
+"last": "2026-07-31"
+},
+"ALK": {
+"symbol": "ALK",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"ALL": {
+"symbol": "ALL",
+"status": "ok",
+"n": 8347,
+"first": "1993-06-03",
+"last": "2026-07-31"
+},
+"ALLE": {
+"symbol": "ALLE",
+"status": "ok",
+"n": 3193,
+"first": "2013-11-18",
+"last": "2026-07-31"
+},
+"ALTR": {
+"symbol": "ALTR",
+"status": "missing",
+"n": 0
+},
+"ALXN": {
+"symbol": "ALXN",
+"status": "missing",
+"n": 0
+},
+"AM": {
+"symbol": "AM",
+"status": "ok",
+"n": 2323,
+"first": "2017-05-04",
+"last": "2026-07-31"
+},
+"AMAT": {
+"symbol": "AMAT",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"AMCC": {
+"symbol": "AMCC",
+"status": "missing",
+"n": 0
+},
+"AMCR": {
+"symbol": "AMCR",
+"status": "ok",
+"n": 3573,
+"first": "2012-05-15",
+"last": "2026-07-31"
+},
+"AMD": {
+"symbol": "AMD",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"AME": {
+"symbol": "AME",
+"status": "ok",
+"n": 10590,
+"first": "1984-07-19",
+"last": "2026-07-31"
+},
+"AMG": {
+"symbol": "AMG",
+"status": "ok",
+"n": 7215,
+"first": "1997-11-21",
+"last": "2026-07-31"
+},
+"AMGN": {
+"symbol": "AMGN",
+"status": "ok",
+"n": 10865,
+"first": "1983-06-17",
+"last": "2026-07-31"
+},
+"AMH": {
+"symbol": "AMH",
+"status": "ok",
+"n": 3269,
+"first": "2013-08-01",
+"last": "2026-07-31"
+},
+"AMP": {
+"symbol": "AMP",
+"status": "ok",
+"n": 5251,
+"first": "2005-09-15",
+"last": "2026-07-31"
+},
+"AMT": {
+"symbol": "AMT",
+"status": "ok",
+"n": 7150,
+"first": "1998-02-27",
+"last": "2026-07-31"
+},
+"AMTM": {
+"symbol": "AMTM",
+"status": "ok",
+"n": 464,
+"first": "2024-09-24",
+"last": "2026-07-31"
+},
+"AMZN": {
+"symbol": "AMZN",
+"status": "ok",
+"n": 7348,
+"first": "1997-05-15",
+"last": "2026-07-31"
+},
+"AN": {
+"symbol": "AN",
+"status": "ok",
+"n": 9121,
+"first": "1990-05-11",
+"last": "2026-07-31"
+},
+"ANDV": {
+"symbol": "ANDV",
+"status": "ok",
+"n": 11503,
+"first": "1972-07-13",
+"last": "2018-10-01"
+},
+"ANDW": {
+"symbol": "ANDW",
+"status": "missing",
+"n": 0
+},
+"ANET": {
+"symbol": "ANET",
+"status": "ok",
+"n": 3056,
+"first": "2014-06-06",
+"last": "2026-07-31"
+},
+"ANF": {
+"symbol": "ANF",
+"status": "ok",
+"n": 7508,
+"first": "1996-09-26",
+"last": "2026-07-31"
+},
+"ANRZQ": {
+"symbol": "ANRZQ",
+"status": "missing",
+"n": 0
+},
+"ANSS": {
+"symbol": "ANSS",
+"status": "missing",
+"n": 0
+},
+"ANTM": {
+"symbol": "ANTM",
+"status": "missing",
+"n": 0
+},
+"ANV": {
+"symbol": "ANV",
+"status": "ok",
+"n": 123,
+"first": "2026-02-04",
+"last": "2026-07-31"
+},
+"AON": {
+"symbol": "AON",
+"status": "ok",
+"n": 11635,
+"first": "1980-06-02",
+"last": "2026-07-31"
+},
+"AOS": {
+"symbol": "AOS",
+"status": "ok",
+"n": 10792,
+"first": "1983-09-30",
+"last": "2026-07-31"
+},
+"APA": {
+"symbol": "APA",
+"status": "ok",
+"n": 11900,
+"first": "1979-05-15",
+"last": "2026-07-31"
+},
+"APC": {
+"symbol": "APC",
+"status": "ok",
+"n": 117,
+"first": "2026-02-12",
+"last": "2026-07-31"
+},
+"APCC": {
+"symbol": "APCC",
+"status": "missing",
+"n": 0
+},
+"APD": {
+"symbol": "APD",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"APH": {
+"symbol": "APH",
+"status": "ok",
+"n": 8742,
+"first": "1991-11-08",
+"last": "2026-07-31"
+},
+"APO": {
+"symbol": "APO",
+"status": "ok",
+"n": 3857,
+"first": "2011-03-30",
+"last": "2026-07-31"
+},
+"APOL": {
+"symbol": "APOL",
+"status": "missing",
+"n": 0
+},
+"APP": {
+"symbol": "APP",
+"status": "ok",
+"n": 1330,
+"first": "2021-04-15",
+"last": "2026-07-31"
+},
+"APTV": {
+"symbol": "APTV",
+"status": "ok",
+"n": 3695,
+"first": "2011-11-17",
+"last": "2026-07-31"
+},
+"AR": {
+"symbol": "AR",
+"status": "ok",
+"n": 3220,
+"first": "2013-10-10",
+"last": "2026-07-31"
+},
+"ARC": {
+"symbol": "ARC",
+"status": "missing",
+"n": 0
+},
+"ARE": {
+"symbol": "ARE",
+"status": "ok",
+"n": 7340,
+"first": "1997-05-28",
+"last": "2026-07-31"
+},
+"ARES": {
+"symbol": "ARES",
+"status": "ok",
+"n": 3080,
+"first": "2014-05-02",
+"last": "2026-07-31"
+},
+"ARG": {
+"symbol": "ARG",
+"status": "missing",
+"n": 0
+},
+"ARNC": {
+"symbol": "ARNC",
+"status": "missing",
+"n": 0
+},
+"AS": {
+"symbol": "AS",
+"status": "ok",
+"n": 626,
+"first": "2024-02-01",
+"last": "2026-07-31"
+},
+"ASC": {
+"symbol": "ASC",
+"status": "ok",
+"n": 3269,
+"first": "2013-08-01",
+"last": "2026-07-31"
+},
+"ASH": {
+"symbol": "ASH",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"ASN": {
+"symbol": "ASN",
+"status": "missing",
+"n": 0
+},
+"ASND": {
+"symbol": "ASND",
+"status": "ok",
+"n": 2894,
+"first": "2015-01-28",
+"last": "2026-07-31"
+},
+"ASO": {
+"symbol": "ASO",
+"status": "ok",
+"n": 1463,
+"first": "2020-10-02",
+"last": "2026-07-31"
+},
+"AT": {
+"symbol": "AT",
+"status": "missing",
+"n": 0
+},
+"ATGE": {
+"symbol": "ATGE",
+"status": "missing",
+"n": 0
+},
+"ATI": {
+"symbol": "ATI",
+"status": "ok",
+"n": 6708,
+"first": "1999-11-29",
+"last": "2026-07-31"
+},
+"ATO": {
+"symbol": "ATO",
+"status": "ok",
+"n": 10731,
+"first": "1983-12-28",
+"last": "2026-07-31"
+},
+"ATVI": {
+"symbol": "ATVI",
+"status": "missing",
+"n": 0
+},
+"AV": {
+"symbol": "AV",
+"status": "ok",
+"n": 60,
+"first": "2026-05-06",
+"last": "2026-07-31"
+},
+"AVB": {
+"symbol": "AVB",
+"status": "ok",
+"n": 8151,
+"first": "1994-03-11",
+"last": "2026-07-31"
+},
+"AVGO": {
+"symbol": "AVGO",
+"status": "ok",
+"n": 4272,
+"first": "2009-08-06",
+"last": "2026-07-31"
+},
+"AVP": {
+"symbol": "AVP",
+"status": "missing",
+"n": 0
+},
+"AVY": {
+"symbol": "AVY",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"AW": {
+"symbol": "AW",
+"status": "missing",
+"n": 0
+},
+"AWE": {
+"symbol": "AWE",
+"status": "missing",
+"n": 0
+},
+"AWK": {
+"symbol": "AWK",
+"status": "ok",
+"n": 4597,
+"first": "2008-04-23",
+"last": "2026-07-31"
+},
+"AXON": {
+"symbol": "AXON",
+"status": "ok",
+"n": 6316,
+"first": "2001-06-19",
+"last": "2026-07-31"
+},
+"AXP": {
+"symbol": "AXP",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"AYE": {
+"symbol": "AYE",
+"status": "missing",
+"n": 0
+},
+"AYI": {
+"symbol": "AYI",
+"status": "ok",
+"n": 6204,
+"first": "2001-12-03",
+"last": "2026-07-31"
+},
+"AZA.A": {
+"symbol": "AZA-A",
+"status": "missing",
+"n": 0
+},
+"AZO": {
+"symbol": "AZO",
+"status": "ok",
+"n": 8897,
+"first": "1991-04-02",
+"last": "2026-07-31"
+},
+"BA": {
+"symbol": "BA",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"BAC": {
+"symbol": "BAC",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"BALL": {
+"symbol": "BALL",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"BAX": {
+"symbol": "BAX",
+"status": "ok",
+"n": 11280,
+"first": "1981-10-27",
+"last": "2026-07-31"
+},
+"BAY": {
+"symbol": "BAY",
+"status": "ok",
+"n": 60,
+"first": "2026-05-06",
+"last": "2026-07-31"
+},
+"BBBY": {
+"symbol": "BBBY",
+"status": "ok",
+"n": 6082,
+"first": "2002-05-30",
+"last": "2026-07-31"
+},
+"BBI": {
+"symbol": "BBI",
+"status": "missing",
+"n": 0
+},
+"BBT": {
+"symbol": "BBT",
+"status": "ok",
+"n": 6561,
+"first": "2000-06-28",
+"last": "2026-07-31"
+},
+"BBWI": {
+"symbol": "BBWI",
+"status": "ok",
+"n": 11172,
+"first": "1982-04-01",
+"last": "2026-07-31"
+},
+"BBY": {
+"symbol": "BBY",
+"status": "ok",
+"n": 10401,
+"first": "1985-04-18",
+"last": "2026-07-31"
+},
+"BC": {
+"symbol": "BC",
+"status": "ok",
+"n": 11235,
+"first": "1981-12-31",
+"last": "2026-07-31"
+},
+"BCO": {
+"symbol": "BCO",
+"status": "ok",
+"n": 7694,
+"first": "1996-01-03",
+"last": "2026-07-31"
+},
+"BCR": {
+"symbol": "BCR",
+"status": "missing",
+"n": 0
+},
+"BDK": {
+"symbol": "BDK",
+"status": "missing",
+"n": 0
+},
+"BDX": {
+"symbol": "BDX",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"BEAM": {
+"symbol": "BEAM",
+"status": "ok",
+"n": 1629,
+"first": "2020-02-06",
+"last": "2026-07-31"
+},
+"BEN": {
+"symbol": "BEN",
+"status": "ok",
+"n": 10797,
+"first": "1983-09-23",
+"last": "2026-07-31"
+},
+"BEV": {
+"symbol": "BEV",
+"status": "missing",
+"n": 0
+},
+"BF.B": {
+"symbol": "BF-B",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"BFI": {
+"symbol": "BFI",
+"status": "missing",
+"n": 0
+},
+"BFO": {
+"symbol": "BFO",
+"status": "missing",
+"n": 0
+},
+"BG": {
+"symbol": "BG",
+"status": "ok",
+"n": 6285,
+"first": "2001-08-02",
+"last": "2026-07-31"
+},
+"BGEN": {
+"symbol": "BGEN",
+"status": "missing",
+"n": 0
+},
+"BGG": {
+"symbol": "BGG",
+"status": "missing",
+"n": 0
+},
+"BHF": {
+"symbol": "BHF",
+"status": "ok",
+"n": 2273,
+"first": "2017-07-17",
+"last": "2026-07-31"
+},
+"BHGE": {
+"symbol": "BHGE",
+"status": "missing",
+"n": 0
+},
+"BHMSQ": {
+"symbol": "BHMSQ",
+"status": "missing",
+"n": 0
+},
+"BIG": {
+"symbol": "BIG",
+"status": "missing",
+"n": 0
+},
+"BIIB": {
+"symbol": "BIIB",
+"status": "ok",
+"n": 8780,
+"first": "1991-09-17",
+"last": "2026-07-31"
+},
+"BIO": {
+"symbol": "BIO",
+"status": "ok",
+"n": 11701,
+"first": "1980-02-27",
+"last": "2026-07-31"
+},
+"BJS": {
+"symbol": "BJS",
+"status": "missing",
+"n": 0
+},
+"BK": {
+"symbol": "BK",
+"status": "missing",
+"n": 0
+},
+"BKB": {
+"symbol": "BKB",
+"status": "missing",
+"n": 0
+},
+"BKNG": {
+"symbol": "BKNG",
+"status": "ok",
+"n": 6876,
+"first": "1999-03-31",
+"last": "2026-07-31"
+},
+"BKR": {
+"symbol": "BKR",
+"status": "ok",
+"n": 9905,
+"first": "1987-04-06",
+"last": "2026-07-31"
+},
+"BLDR": {
+"symbol": "BLDR",
+"status": "ok",
+"n": 5306,
+"first": "2005-06-28",
+"last": "2026-07-31"
+},
+"BLK": {
+"symbol": "BLK",
+"status": "ok",
+"n": 6748,
+"first": "1999-10-01",
+"last": "2026-07-31"
+},
+"BLL": {
+"symbol": "BLL",
+"status": "missing",
+"n": 0
+},
+"BLS": {
+"symbol": "BLS",
+"status": "missing",
+"n": 0
+},
+"BLY": {
+"symbol": "BLY",
+"status": "missing",
+"n": 0
+},
+"BMC": {
+"symbol": "BMC",
+"status": "missing",
+"n": 0
+},
+"BMET": {
+"symbol": "BMET",
+"status": "missing",
+"n": 0
+},
+"BMGCA": {
+"symbol": "BMGCA",
+"status": "missing",
+"n": 0
+},
+"BMS": {
+"symbol": "BMS",
+"status": "ok",
+"n": 11723,
+"first": "1972-06-05",
+"last": "2019-06-10"
+},
+"BMY": {
+"symbol": "BMY",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"BNI": {
+"symbol": "BNI",
+"status": "missing",
+"n": 0
+},
+"BNL": {
+"symbol": "BNL",
+"status": "ok",
+"n": 1474,
+"first": "2020-09-17",
+"last": "2026-07-31"
+},
+"BNY": {
+"symbol": "BNY",
+"status": "ok",
+"n": 13424,
+"first": "1973-05-03",
+"last": "2026-07-31"
+},
+"BOAT": {
+"symbol": "BOAT",
+"status": "ok",
+"n": 1253,
+"first": "2021-08-04",
+"last": "2026-07-31"
+},
+"BOL": {
+"symbol": "BOL",
+"status": "missing",
+"n": 0
+},
+"BR": {
+"symbol": "BR",
+"status": "ok",
+"n": 4871,
+"first": "2007-03-22",
+"last": "2026-07-31"
+},
+"BRCM": {
+"symbol": "BRCM",
+"status": "missing",
+"n": 0
+},
+"BRK.B": {
+"symbol": "BRK-B",
+"status": "ok",
+"n": 7605,
+"first": "1996-05-09",
+"last": "2026-07-31"
+},
+"BRL": {
+"symbol": "BRL",
+"status": "missing",
+"n": 0
+},
+"BRO": {
+"symbol": "BRO",
+"status": "ok",
+"n": 11459,
+"first": "1981-02-11",
+"last": "2026-07-31"
+},
+"BSC": {
+"symbol": "BSC",
+"status": "missing",
+"n": 0
+},
+"BSX": {
+"symbol": "BSX",
+"status": "ok",
+"n": 8610,
+"first": "1992-05-19",
+"last": "2026-07-31"
+},
+"BT": {
+"symbol": "BT",
+"status": "missing",
+"n": 0
+},
+"BTUUQ": {
+"symbol": "BTUUQ",
+"status": "missing",
+"n": 0
+},
+"BUD": {
+"symbol": "BUD",
+"status": "ok",
+"n": 4297,
+"first": "2009-07-01",
+"last": "2026-07-31"
+},
+"BVSN": {
+"symbol": "BVSN",
+"status": "missing",
+"n": 0
+},
+"BWA": {
+"symbol": "BWA",
+"status": "ok",
+"n": 8297,
+"first": "1993-08-13",
+"last": "2026-07-31"
+},
+"BX": {
+"symbol": "BX",
+"status": "ok",
+"n": 4807,
+"first": "2007-06-22",
+"last": "2026-07-31"
+},
+"BXLT": {
+"symbol": "BXLT",
+"status": "missing",
+"n": 0
+},
+"BXP": {
+"symbol": "BXP",
+"status": "ok",
+"n": 7325,
+"first": "1997-06-18",
+"last": "2026-07-31"
+},
+"C": {
+"symbol": "C",
+"status": "ok",
+"n": 12497,
+"first": "1977-01-03",
+"last": "2026-07-31"
+},
+"CA": {
+"symbol": "CA",
+"status": "missing",
+"n": 0
+},
+"CAG": {
+"symbol": "CAG",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"CAH": {
+"symbol": "CAH",
+"status": "ok",
+"n": 10832,
+"first": "1983-08-04",
+"last": "2026-07-31"
+},
+"CAL": {
+"symbol": "CAL",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"CAM": {
+"symbol": "CAM",
+"status": "ok",
+"n": 206,
+"first": "2025-10-06",
+"last": "2026-07-31"
+},
+"CAR": {
+"symbol": "CAR",
+"status": "ok",
+"n": 10804,
+"first": "1983-09-14",
+"last": "2026-07-31"
+},
+"CARR": {
+"symbol": "CARR",
+"status": "ok",
+"n": 1600,
+"first": "2020-03-19",
+"last": "2026-07-31"
+},
+"CASY": {
+"symbol": "CASY",
+"status": "ok",
+"n": 10778,
+"first": "1983-10-20",
+"last": "2026-07-31"
+},
+"CAT": {
+"symbol": "CAT",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"CB": {
+"symbol": "CB",
+"status": "ok",
+"n": 8395,
+"first": "1993-03-25",
+"last": "2026-07-31"
+},
+"CBB": {
+"symbol": "CBB",
+"status": "missing",
+"n": 0
+},
+"CBE": {
+"symbol": "CBE",
+"status": "missing",
+"n": 0
+},
+"CBH": {
+"symbol": "CBH",
+"status": "missing",
+"n": 0
+},
+"CBOE": {
+"symbol": "CBOE",
+"status": "ok",
+"n": 4057,
+"first": "2010-06-15",
+"last": "2026-07-31"
+},
+"CBRE": {
+"symbol": "CBRE",
+"status": "ok",
+"n": 5570,
+"first": "2004-06-10",
+"last": "2026-07-31"
+},
+"CBS": {
+"symbol": "CBS",
+"status": "missing",
+"n": 0
+},
+"CBSS": {
+"symbol": "CBSS",
+"status": "missing",
+"n": 0
+},
+"CCB": {
+"symbol": "CCB",
+"status": "ok",
+"n": 2019,
+"first": "2018-07-19",
+"last": "2026-07-31"
+},
+"CCE": {
+"symbol": "CCE",
+"status": "missing",
+"n": 0
+},
+"CCEP": {
+"symbol": "CCEP",
+"status": "ok",
+"n": 9996,
+"first": "1986-11-24",
+"last": "2026-07-31"
+},
+"CCI": {
+"symbol": "CCI",
+"status": "ok",
+"n": 7031,
+"first": "1998-08-18",
+"last": "2026-07-31"
+},
+"CCK": {
+"symbol": "CCK",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"CCL": {
+"symbol": "CCL",
+"status": "ok",
+"n": 9829,
+"first": "1987-07-24",
+"last": "2026-07-31"
+},
+"CCTYQ": {
+"symbol": "CCTYQ",
+"status": "missing",
+"n": 0
+},
+"CCU": {
+"symbol": "CCU",
+"status": "ok",
+"n": 8521,
+"first": "1992-09-24",
+"last": "2026-07-31"
+},
+"CDAY": {
+"symbol": "CDAY",
+"status": "missing",
+"n": 0
+},
+"CDNS": {
+"symbol": "CDNS",
+"status": "ok",
+"n": 9860,
+"first": "1987-06-10",
+"last": "2026-07-31"
+},
+"CDW": {
+"symbol": "CDW",
+"status": "ok",
+"n": 3293,
+"first": "2013-06-27",
+"last": "2026-07-31"
+},
+"CE": {
+"symbol": "CE",
+"status": "ok",
+"n": 5415,
+"first": "2005-01-21",
+"last": "2026-07-31"
+},
+"CEG": {
+"symbol": "CEG",
+"status": "ok",
+"n": 1137,
+"first": "2022-01-19",
+"last": "2026-07-31"
+},
+"CELG": {
+"symbol": "CELG",
+"status": "missing",
+"n": 0
+},
+"CEN": {
+"symbol": "CEN",
+"status": "missing",
+"n": 0
+},
+"CEPH": {
+"symbol": "CEPH",
+"status": "missing",
+"n": 0
+},
+"CERN": {
+"symbol": "CERN",
+"status": "missing",
+"n": 0
+},
+"CF": {
+"symbol": "CF",
+"status": "ok",
+"n": 5275,
+"first": "2005-08-11",
+"last": "2026-07-31"
+},
+"CFC": {
+"symbol": "CFC",
+"status": "missing",
+"n": 0
+},
+"CFG": {
+"symbol": "CFG",
+"status": "ok",
+"n": 2980,
+"first": "2014-09-24",
+"last": "2026-07-31"
+},
+"CFL": {
+"symbol": "CFL",
+"status": "missing",
+"n": 0
+},
+"CFN": {
+"symbol": "CFN",
+"status": "missing",
+"n": 0
+},
+"CG": {
+"symbol": "CG",
+"status": "ok",
+"n": 3581,
+"first": "2012-05-03",
+"last": "2026-07-31"
+},
+"CGP": {
+"symbol": "CGP",
+"status": "missing",
+"n": 0
+},
+"CHA": {
+"symbol": "CHA",
+"status": "ok",
+"n": 323,
+"first": "2025-04-17",
+"last": "2026-07-31"
+},
+"CHD": {
+"symbol": "CHD",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"CHIR": {
+"symbol": "CHIR",
+"status": "ok",
+"n": 1318,
+"first": "2018-12-07",
+"last": "2024-03-05"
+},
+"CHK": {
+"symbol": "CHK",
+"status": "missing",
+"n": 0
+},
+"CHRS": {
+"symbol": "CHRS",
+"status": "ok",
+"n": 2949,
+"first": "2014-11-06",
+"last": "2026-07-31"
+},
+"CHRW": {
+"symbol": "CHRW",
+"status": "ok",
+"n": 7241,
+"first": "1997-10-16",
+"last": "2026-07-31"
+},
+"CHTR": {
+"symbol": "CHTR",
+"status": "ok",
+"n": 4168,
+"first": "2010-01-05",
+"last": "2026-07-31"
+},
+"CI": {
+"symbol": "CI",
+"status": "ok",
+"n": 11173,
+"first": "1982-03-31",
+"last": "2026-07-31"
+},
+"CIEN": {
+"symbol": "CIEN",
+"status": "ok",
+"n": 7415,
+"first": "1997-02-07",
+"last": "2026-07-31"
+},
+"CIN": {
+"symbol": "CIN",
+"status": "missing",
+"n": 0
+},
+"CINF": {
+"symbol": "CINF",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"CIT.A": {
+"symbol": "CIT-A",
+"status": "missing",
+"n": 0
+},
+"CITGQ": {
+"symbol": "CITGQ",
+"status": "missing",
+"n": 0
+},
+"CL": {
+"symbol": "CL",
+"status": "ok",
+"n": 13425,
+"first": "1973-05-02",
+"last": "2026-07-31"
+},
+"CLF": {
+"symbol": "CLF",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"CLX": {
+"symbol": "CLX",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"CMA": {
+"symbol": "CMA",
+"status": "missing",
+"n": 0
+},
+"CMB": {
+"symbol": "CMB",
+"status": "missing",
+"n": 0
+},
+"CMCSA": {
+"symbol": "CMCSA",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"CMCSK": {
+"symbol": "CMCSK",
+"status": "missing",
+"n": 0
+},
+"CME": {
+"symbol": "CME",
+"status": "ok",
+"n": 5949,
+"first": "2002-12-06",
+"last": "2026-07-31"
+},
+"CMG": {
+"symbol": "CMG",
+"status": "ok",
+"n": 5160,
+"first": "2006-01-26",
+"last": "2026-07-31"
+},
+"CMI": {
+"symbol": "CMI",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"CMS": {
+"symbol": "CMS",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"CMVT": {
+"symbol": "CMVT",
+"status": "missing",
+"n": 0
+},
+"CMX": {
+"symbol": "CMX",
+"status": "missing",
+"n": 0
+},
+"CNC": {
+"symbol": "CNC",
+"status": "ok",
+"n": 6196,
+"first": "2001-12-13",
+"last": "2026-07-31"
+},
+"CNG": {
+"symbol": "CNG",
+"status": "missing",
+"n": 0
+},
+"CNP": {
+"symbol": "CNP",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"CNW": {
+"symbol": "CNW",
+"status": "missing",
+"n": 0
+},
+"CNX": {
+"symbol": "CNX",
+"status": "ok",
+"n": 6855,
+"first": "1999-04-30",
+"last": "2026-07-31"
+},
+"CNXT": {
+"symbol": "CNXT",
+"status": "ok",
+"n": 3023,
+"first": "2014-07-24",
+"last": "2026-07-31"
+},
+"COC.B": {
+"symbol": "COC-B",
+"status": "missing",
+"n": 0
+},
+"COF": {
+"symbol": "COF",
+"status": "ok",
+"n": 7978,
+"first": "1994-11-16",
+"last": "2026-07-31"
+},
+"COG": {
+"symbol": "COG",
+"status": "missing",
+"n": 0
+},
+"COHR": {
+"symbol": "COHR",
+"status": "ok",
+"n": 9780,
+"first": "1987-10-02",
+"last": "2026-07-31"
+},
+"COIN": {
+"symbol": "COIN",
+"status": "ok",
+"n": 1331,
+"first": "2021-04-14",
+"last": "2026-07-31"
+},
+"COL": {
+"symbol": "COL",
+"status": "ok",
+"n": 2055,
+"first": "2012-08-02",
+"last": "2020-11-30"
+},
+"COMS": {
+"symbol": "COMS",
+"status": "ok",
+"n": 4516,
+"first": "2008-08-15",
+"last": "2026-07-30"
+},
+"COO": {
+"symbol": "COO",
+"status": "ok",
+"n": 10967,
+"first": "1983-01-21",
+"last": "2026-07-31"
+},
+"COP": {
+"symbol": "COP",
+"status": "ok",
+"n": 11235,
+"first": "1981-12-31",
+"last": "2026-07-31"
+},
+"COR": {
+"symbol": "COR",
+"status": "ok",
+"n": 7883,
+"first": "1995-04-04",
+"last": "2026-07-31"
+},
+"COST": {
+"symbol": "COST",
+"status": "ok",
+"n": 10093,
+"first": "1986-07-09",
+"last": "2026-07-31"
+},
+"COTY": {
+"symbol": "COTY",
+"status": "ok",
+"n": 3303,
+"first": "2013-06-13",
+"last": "2026-07-31"
+},
+"COV": {
+"symbol": "COV",
+"status": "missing",
+"n": 0
+},
+"CPAY": {
+"symbol": "CPAY",
+"status": "ok",
+"n": 3929,
+"first": "2010-12-15",
+"last": "2026-07-31"
+},
+"CPB": {
+"symbol": "CPB",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"CPGX": {
+"symbol": "CPGX",
+"status": "missing",
+"n": 0
+},
+"CPNLQ": {
+"symbol": "CPNLQ",
+"status": "missing",
+"n": 0
+},
+"CPQ": {
+"symbol": "CPQ",
+"status": "missing",
+"n": 0
+},
+"CPRI": {
+"symbol": "CPRI",
+"status": "ok",
+"n": 3676,
+"first": "2011-12-15",
+"last": "2026-07-31"
+},
+"CPRT": {
+"symbol": "CPRT",
+"status": "ok",
+"n": 8147,
+"first": "1994-03-17",
+"last": "2026-07-31"
+},
+"CPT": {
+"symbol": "CPT",
+"status": "ok",
+"n": 8313,
+"first": "1993-07-22",
+"last": "2026-07-31"
+},
+"CPWR": {
+"symbol": "CPWR",
+"status": "ok",
+"n": 4943,
+"first": "2006-12-04",
+"last": "2026-07-30"
+},
+"CR": {
+"symbol": "CR",
+"status": "ok",
+"n": 838,
+"first": "2023-03-29",
+"last": "2026-07-31"
+},
+"CRH": {
+"symbol": "CRH",
+"status": "ok",
+"n": 9331,
+"first": "1989-07-13",
+"last": "2026-07-31"
+},
+"CRL": {
+"symbol": "CRL",
+"status": "ok",
+"n": 6564,
+"first": "2000-06-23",
+"last": "2026-07-31"
+},
+"CRM": {
+"symbol": "CRM",
+"status": "ok",
+"n": 5562,
+"first": "2004-06-23",
+"last": "2026-07-31"
+},
+"CRR": {
+"symbol": "CRR",
+"status": "missing",
+"n": 0
+},
+"CRWD": {
+"symbol": "CRWD",
+"status": "ok",
+"n": 1794,
+"first": "2019-06-12",
+"last": "2026-07-31"
+},
+"CSCO": {
+"symbol": "CSCO",
+"status": "ok",
+"n": 9179,
+"first": "1990-02-16",
+"last": "2026-07-31"
+},
+"CSE": {
+"symbol": "CSE",
+"status": "missing",
+"n": 0
+},
+"CSGP": {
+"symbol": "CSGP",
+"status": "ok",
+"n": 7064,
+"first": "1998-07-01",
+"last": "2026-07-31"
+},
+"CSR": {
+"symbol": "CSR",
+"status": "ok",
+"n": 7240,
+"first": "1997-10-17",
+"last": "2026-07-31"
+},
+"CSRA": {
+"symbol": "CSRA",
+"status": "ok",
+"n": 598,
+"first": "2015-11-16",
+"last": "2018-04-03"
+},
+"CSX": {
+"symbol": "CSX",
+"status": "ok",
+"n": 11527,
+"first": "1980-11-03",
+"last": "2026-07-31"
+},
+"CTAS": {
+"symbol": "CTAS",
+"status": "ok",
+"n": 10821,
+"first": "1983-08-19",
+"last": "2026-07-31"
+},
+"CTB": {
+"symbol": "CTB",
+"status": "missing",
+"n": 0
+},
+"CTL": {
+"symbol": "CTL",
+"status": "missing",
+"n": 0
+},
+"CTLT": {
+"symbol": "CTLT",
+"status": "missing",
+"n": 0
+},
+"CTRA": {
+"symbol": "CTRA",
+"status": "missing",
+"n": 0
+},
+"CTSH": {
+"symbol": "CTSH",
+"status": "ok",
+"n": 7072,
+"first": "1998-06-19",
+"last": "2026-07-31"
+},
+"CTVA": {
+"symbol": "CTVA",
+"status": "ok",
+"n": 1806,
+"first": "2019-05-24",
+"last": "2026-07-31"
+},
+"CTX": {
+"symbol": "CTX",
+"status": "missing",
+"n": 0
+},
+"CTXS": {
+"symbol": "CTXS",
+"status": "missing",
+"n": 0
+},
+"CVC": {
+"symbol": "CVC",
+"status": "missing",
+"n": 0
+},
+"CVG": {
+"symbol": "CVG",
+"status": "ok",
+"n": 6889,
+"first": "1998-08-13",
+"last": "2026-07-31"
+},
+"CVH": {
+"symbol": "CVH",
+"status": "missing",
+"n": 0
+},
+"CVNA": {
+"symbol": "CVNA",
+"status": "ok",
+"n": 2327,
+"first": "2017-04-28",
+"last": "2026-07-31"
+},
+"CVS": {
+"symbol": "CVS",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"CVX": {
+"symbol": "CVX",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"CXO": {
+"symbol": "CXO",
+"status": "missing",
+"n": 0
+},
+"CYM": {
+"symbol": "CYM",
+"status": "missing",
+"n": 0
+},
+"CYR": {
+"symbol": "CYR",
+"status": "missing",
+"n": 0
+},
+"CZR": {
+"symbol": "CZR",
+"status": "ok",
+"n": 2982,
+"first": "2014-09-22",
+"last": "2026-07-31"
+},
+"D": {
+"symbol": "D",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"DAL": {
+"symbol": "DAL",
+"status": "ok",
+"n": 4842,
+"first": "2007-05-03",
+"last": "2026-07-31"
+},
+"DALRQ": {
+"symbol": "DALRQ",
+"status": "missing",
+"n": 0
+},
+"DASH": {
+"symbol": "DASH",
+"status": "ok",
+"n": 1416,
+"first": "2020-12-09",
+"last": "2026-07-31"
+},
+"DAY": {
+"symbol": "DAY",
+"status": "missing",
+"n": 0
+},
+"DCNAQ": {
+"symbol": "DCNAQ",
+"status": "missing",
+"n": 0
+},
+"DD": {
+"symbol": "DD",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"DDOG": {
+"symbol": "DDOG",
+"status": "ok",
+"n": 1725,
+"first": "2019-09-19",
+"last": "2026-07-31"
+},
+"DDR": {
+"symbol": "DDR",
+"status": "missing",
+"n": 0
+},
+"DDS": {
+"symbol": "DDS",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"DE": {
+"symbol": "DE",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"DEC": {
+"symbol": "DEC",
+"status": "ok",
+"n": 1400,
+"first": "2021-01-04",
+"last": "2026-07-31"
+},
+"DECK": {
+"symbol": "DECK",
+"status": "ok",
+"n": 8253,
+"first": "1993-10-15",
+"last": "2026-07-31"
+},
+"DELL": {
+"symbol": "DELL",
+"status": "ok",
+"n": 2502,
+"first": "2016-08-17",
+"last": "2026-07-31"
+},
+"DF": {
+"symbol": "DF",
+"status": "missing",
+"n": 0
+},
+"DFS": {
+"symbol": "DFS",
+"status": "missing",
+"n": 0
+},
+"DG": {
+"symbol": "DG",
+"status": "ok",
+"n": 4202,
+"first": "2009-11-13",
+"last": "2026-07-31"
+},
+"DGN": {
+"symbol": "DGN",
+"status": "missing",
+"n": 0
+},
+"DGX": {
+"symbol": "DGX",
+"status": "ok",
+"n": 7451,
+"first": "1996-12-17",
+"last": "2026-07-31"
+},
+"DHI": {
+"symbol": "DHI",
+"status": "ok",
+"n": 8598,
+"first": "1992-06-05",
+"last": "2026-07-31"
+},
+"DHR": {
+"symbol": "DHR",
+"status": "ok",
+"n": 11994,
+"first": "1978-12-29",
+"last": "2026-07-31"
+},
+"DI": {
+"symbol": "DI",
+"status": "missing",
+"n": 0
+},
+"DIGI": {
+"symbol": "DIGI",
+"status": "ok",
+"n": 4078,
+"first": "2010-05-13",
+"last": "2026-07-30"
+},
+"DIS": {
+"symbol": "DIS",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"DISCA": {
+"symbol": "DISCA",
+"status": "missing",
+"n": 0
+},
+"DISCK": {
+"symbol": "DISCK",
+"status": "missing",
+"n": 0
+},
+"DISH": {
+"symbol": "DISH",
+"status": "missing",
+"n": 0
+},
+"DJ": {
+"symbol": "DJ",
+"status": "missing",
+"n": 0
+},
+"DLR": {
+"symbol": "DLR",
+"status": "ok",
+"n": 5472,
+"first": "2004-10-29",
+"last": "2026-07-31"
+},
+"DLTR": {
+"symbol": "DLTR",
+"status": "ok",
+"n": 7903,
+"first": "1995-03-07",
+"last": "2026-07-31"
+},
+"DLX": {
+"symbol": "DLX",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"DNB": {
+"symbol": "DNB",
+"status": "missing",
+"n": 0
+},
+"DNR": {
+"symbol": "DNR",
+"status": "missing",
+"n": 0
+},
+"DO": {
+"symbol": "DO",
+"status": "missing",
+"n": 0
+},
+"DOC": {
+"symbol": "DOC",
+"status": "ok",
+"n": 10376,
+"first": "1985-05-23",
+"last": "2026-07-31"
+},
+"DOV": {
+"symbol": "DOV",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"DOW": {
+"symbol": "DOW",
+"status": "ok",
+"n": 1852,
+"first": "2019-03-20",
+"last": "2026-07-31"
+},
+"DPHIQ": {
+"symbol": "DPHIQ",
+"status": "missing",
+"n": 0
+},
+"DPZ": {
+"symbol": "DPZ",
+"status": "ok",
+"n": 5549,
+"first": "2004-07-13",
+"last": "2026-07-31"
+},
+"DRE": {
+"symbol": "DRE",
+"status": "missing",
+"n": 0
+},
+"DRI": {
+"symbol": "DRI",
+"status": "ok",
+"n": 7859,
+"first": "1995-05-09",
+"last": "2026-07-31"
+},
+"DTE": {
+"symbol": "DTE",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"DTV": {
+"symbol": "DTV",
+"status": "missing",
+"n": 0
+},
+"DUK": {
+"symbol": "DUK",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"DVA": {
+"symbol": "DVA",
+"status": "ok",
+"n": 7737,
+"first": "1995-10-31",
+"last": "2026-07-31"
+},
+"DVN": {
+"symbol": "DVN",
+"status": "ok",
+"n": 10336,
+"first": "1985-07-22",
+"last": "2026-07-31"
+},
+"DWD": {
+"symbol": "DWD",
+"status": "missing",
+"n": 0
+},
+"DWDP": {
+"symbol": "DWDP",
+"status": "missing",
+"n": 0
+},
+"DXC": {
+"symbol": "DXC",
+"status": "ok",
+"n": 11235,
+"first": "1981-12-31",
+"last": "2026-07-31"
+},
+"DXCM": {
+"symbol": "DXCM",
+"status": "ok",
+"n": 5358,
+"first": "2005-04-14",
+"last": "2026-07-31"
+},
+"DYN": {
+"symbol": "DYN",
+"status": "ok",
+"n": 1474,
+"first": "2020-09-17",
+"last": "2026-07-31"
+},
+"EA": {
+"symbol": "EA",
+"status": "ok",
+"n": 9283,
+"first": "1989-09-20",
+"last": "2026-07-31"
+},
+"EBAY": {
+"symbol": "EBAY",
+"status": "ok",
+"n": 7005,
+"first": "1998-09-24",
+"last": "2026-07-31"
+},
+"EC": {
+"symbol": "EC",
+"status": "ok",
+"n": 4494,
+"first": "2008-09-18",
+"last": "2026-07-31"
+},
+"ECH": {
+"symbol": "ECH",
+"status": "ok",
+"n": 4702,
+"first": "2007-11-20",
+"last": "2026-07-31"
+},
+"ECHO": {
+"symbol": "ECHO",
+"status": "ok",
+"n": 4674,
+"first": "2008-01-02",
+"last": "2026-07-31"
+},
+"ECL": {
+"symbol": "ECL",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"ECO": {
+"symbol": "ECO",
+"status": "ok",
+"n": 744,
+"first": "2023-08-14",
+"last": "2026-07-31"
+},
+"ED": {
+"symbol": "ED",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"EDS": {
+"symbol": "EDS",
+"status": "missing",
+"n": 0
+},
+"EFU": {
+"symbol": "EFU",
+"status": "ok",
+"n": 4720,
+"first": "2007-10-25",
+"last": "2026-07-31"
+},
+"EFX": {
+"symbol": "EFX",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"EG": {
+"symbol": "EG",
+"status": "ok",
+"n": 7757,
+"first": "1995-10-03",
+"last": "2026-07-31"
+},
+"EHC": {
+"symbol": "EHC",
+"status": "ok",
+"n": 10039,
+"first": "1986-09-24",
+"last": "2026-07-31"
+},
+"EIX": {
+"symbol": "EIX",
+"status": "ok",
+"n": 13424,
+"first": "1973-05-03",
+"last": "2026-07-31"
+},
+"EKDKQ": {
+"symbol": "EKDKQ",
+"status": "missing",
+"n": 0
+},
+"EL": {
+"symbol": "EL",
+"status": "ok",
+"n": 7724,
+"first": "1995-11-17",
+"last": "2026-07-31"
+},
+"ELV": {
+"symbol": "ELV",
+"status": "ok",
+"n": 6227,
+"first": "2001-10-30",
+"last": "2026-07-31"
+},
+"EMC": {
+"symbol": "EMC",
+"status": "ok",
+"n": 806,
+"first": "2023-05-15",
+"last": "2026-07-31"
+},
+"EME": {
+"symbol": "EME",
+"status": "ok",
+"n": 7942,
+"first": "1995-01-10",
+"last": "2026-07-31"
+},
+"EMN": {
+"symbol": "EMN",
+"status": "ok",
+"n": 8212,
+"first": "1993-12-14",
+"last": "2026-07-31"
+},
+"EMR": {
+"symbol": "EMR",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"ENDP": {
+"symbol": "ENDP",
+"status": "missing",
+"n": 0
+},
+"ENPH": {
+"symbol": "ENPH",
+"status": "ok",
+"n": 3604,
+"first": "2012-03-30",
+"last": "2026-07-31"
+},
+"ENRNQ": {
+"symbol": "ENRNQ",
+"status": "missing",
+"n": 0
+},
+"ENS": {
+"symbol": "ENS",
+"status": "ok",
+"n": 5535,
+"first": "2004-08-02",
+"last": "2026-07-31"
+},
+"EOG": {
+"symbol": "EOG",
+"status": "ok",
+"n": 9273,
+"first": "1989-10-04",
+"last": "2026-07-31"
+},
+"EOP": {
+"symbol": "EOP",
+"status": "missing",
+"n": 0
+},
+"EP": {
+"symbol": "EP",
+"status": "ok",
+"n": 6730,
+"first": "1999-10-27",
+"last": "2026-07-31"
+},
+"EPAM": {
+"symbol": "EPAM",
+"status": "ok",
+"n": 3640,
+"first": "2012-02-08",
+"last": "2026-07-31"
+},
+"EQ": {
+"symbol": "EQ",
+"status": "ok",
+"n": 1959,
+"first": "2018-10-12",
+"last": "2026-07-31"
+},
+"EQIX": {
+"symbol": "EQIX",
+"status": "ok",
+"n": 6530,
+"first": "2000-08-11",
+"last": "2026-07-31"
+},
+"EQR": {
+"symbol": "EQR",
+"status": "ok",
+"n": 8298,
+"first": "1993-08-12",
+"last": "2026-07-31"
+},
+"EQT": {
+"symbol": "EQT",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"ERIE": {
+"symbol": "ERIE",
+"status": "ok",
+"n": 7758,
+"first": "1995-10-02",
+"last": "2026-07-31"
+},
+"ES": {
+"symbol": "ES",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"ESRX": {
+"symbol": "ESRX",
+"status": "ok",
+"n": 6676,
+"first": "1992-06-09",
+"last": "2018-12-21"
+},
+"ESS": {
+"symbol": "ESS",
+"status": "ok",
+"n": 8092,
+"first": "1994-06-07",
+"last": "2026-07-31"
+},
+"ESV": {
+"symbol": "ESV",
+"status": "missing",
+"n": 0
+},
+"ETFC": {
+"symbol": "ETFC",
+"status": "missing",
+"n": 0
+},
+"ETN": {
+"symbol": "ETN",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"ETR": {
+"symbol": "ETR",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"ETS": {
+"symbol": "ETS",
+"status": "ok",
+"n": 237,
+"first": "2025-08-21",
+"last": "2026-07-31"
+},
+"ETSY": {
+"symbol": "ETSY",
+"status": "ok",
+"n": 2840,
+"first": "2015-04-16",
+"last": "2026-07-31"
+},
+"EVHC": {
+"symbol": "EVHC",
+"status": "ok",
+"n": 1299,
+"first": "2013-08-14",
+"last": "2018-10-10"
+},
+"EVRG": {
+"symbol": "EVRG",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"EW": {
+"symbol": "EW",
+"status": "ok",
+"n": 6626,
+"first": "2000-03-27",
+"last": "2026-07-31"
+},
+"EXC": {
+"symbol": "EXC",
+"status": "ok",
+"n": 13425,
+"first": "1973-05-02",
+"last": "2026-07-31"
+},
+"EXE": {
+"symbol": "EXE",
+"status": "ok",
+"n": 1374,
+"first": "2021-02-10",
+"last": "2026-07-31"
+},
+"EXPD": {
+"symbol": "EXPD",
+"status": "ok",
+"n": 10542,
+"first": "1984-09-26",
+"last": "2026-07-31"
+},
+"EXPE": {
+"symbol": "EXPE",
+"status": "ok",
+"n": 5290,
+"first": "2005-07-21",
+"last": "2026-07-31"
+},
+"EXR": {
+"symbol": "EXR",
+"status": "ok",
+"n": 5525,
+"first": "2004-08-16",
+"last": "2026-07-31"
+},
+"F": {
+"symbol": "F",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"FANG": {
+"symbol": "FANG",
+"status": "ok",
+"n": 3468,
+"first": "2012-10-12",
+"last": "2026-07-31"
+},
+"FAST": {
+"symbol": "FAST",
+"status": "ok",
+"n": 9810,
+"first": "1987-08-20",
+"last": "2026-07-31"
+},
+"FB": {
+"symbol": "FB",
+"status": "ok",
+"n": 276,
+"first": "2025-06-26",
+"last": "2026-07-31"
+},
+"FBF": {
+"symbol": "FBF",
+"status": "missing",
+"n": 0
+},
+"FBHS": {
+"symbol": "FBHS",
+"status": "missing",
+"n": 0
+},
+"FBO": {
+"symbol": "FBO",
+"status": "missing",
+"n": 0
+},
+"FCN": {
+"symbol": "FCN",
+"status": "ok",
+"n": 7605,
+"first": "1996-05-09",
+"last": "2026-07-31"
+},
+"FCPT": {
+"symbol": "FCPT",
+"status": "ok",
+"n": 2695,
+"first": "2015-11-10",
+"last": "2026-07-31"
+},
+"FCX": {
+"symbol": "FCX",
+"status": "ok",
+"n": 7817,
+"first": "1995-07-10",
+"last": "2026-07-31"
+},
+"FDC": {
+"symbol": "FDC",
+"status": "missing",
+"n": 0
+},
+"FDO": {
+"symbol": "FDO",
+"status": "missing",
+"n": 0
+},
+"FDS": {
+"symbol": "FDS",
+"status": "ok",
+"n": 7570,
+"first": "1996-06-28",
+"last": "2026-07-31"
+},
+"FDX": {
+"symbol": "FDX",
+"status": "ok",
+"n": 12176,
+"first": "1978-04-12",
+"last": "2026-07-31"
+},
+"FDXF": {
+"symbol": "FDXF",
+"status": "ok",
+"n": 46,
+"first": "2026-05-27",
+"last": "2026-07-31"
+},
+"FE": {
+"symbol": "FE",
+"status": "ok",
+"n": 7224,
+"first": "1997-11-10",
+"last": "2026-07-31"
+},
+"FFIV": {
+"symbol": "FFIV",
+"status": "ok",
+"n": 6831,
+"first": "1999-06-04",
+"last": "2026-07-31"
+},
+"FG": {
+"symbol": "FG",
+"status": "ok",
+"n": 924,
+"first": "2022-11-22",
+"last": "2026-07-31"
+},
+"FHN": {
+"symbol": "FHN",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"FI": {
+"symbol": "FI",
+"status": "missing",
+"n": 0
+},
+"FICO": {
+"symbol": "FICO",
+"status": "ok",
+"n": 9831,
+"first": "1987-07-22",
+"last": "2026-07-31"
+},
+"FII": {
+"symbol": "FII",
+"status": "missing",
+"n": 0
+},
+"FIS": {
+"symbol": "FIS",
+"status": "ok",
+"n": 6315,
+"first": "2001-06-20",
+"last": "2026-07-31"
+},
+"FISV": {
+"symbol": "FISV",
+"status": "ok",
+"n": 10037,
+"first": "1986-09-25",
+"last": "2026-07-31"
+},
+"FITB": {
+"symbol": "FITB",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"FIX": {
+"symbol": "FIX",
+"status": "ok",
+"n": 7318,
+"first": "1997-06-27",
+"last": "2026-07-31"
+},
+"FJ": {
+"symbol": "FJ",
+"status": "missing",
+"n": 0
+},
+"FL": {
+"symbol": "FL",
+"status": "missing",
+"n": 0
+},
+"FLEX": {
+"symbol": "FLEX",
+"status": "ok",
+"n": 8146,
+"first": "1994-03-18",
+"last": "2026-07-31"
+},
+"FLIR": {
+"symbol": "FLIR",
+"status": "missing",
+"n": 0
+},
+"FLMIQ": {
+"symbol": "FLMIQ",
+"status": "missing",
+"n": 0
+},
+"FLR": {
+"symbol": "FLR",
+"status": "ok",
+"n": 6452,
+"first": "2000-12-01",
+"last": "2026-07-31"
+},
+"FLS": {
+"symbol": "FLS",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"FLT": {
+"symbol": "FLT",
+"status": "missing",
+"n": 0
+},
+"FLTWQ": {
+"symbol": "FLTWQ",
+"status": "missing",
+"n": 0
+},
+"FMC": {
+"symbol": "FMC",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"FMCC": {
+"symbol": "FMCC",
+"status": "ok",
+"n": 9484,
+"first": "1988-12-02",
+"last": "2026-07-31"
+},
+"FMY": {
+"symbol": "FMY",
+"status": "ok",
+"n": 5328,
+"first": "2005-05-26",
+"last": "2026-07-31"
+},
+"FNMA": {
+"symbol": "FNMA",
+"status": "ok",
+"n": 12497,
+"first": "1977-01-03",
+"last": "2026-07-31"
+},
+"FOSL": {
+"symbol": "FOSL",
+"status": "ok",
+"n": 8385,
+"first": "1993-04-08",
+"last": "2026-07-31"
+},
+"FOX": {
+"symbol": "FOX",
+"status": "ok",
+"n": 1857,
+"first": "2019-03-13",
+"last": "2026-07-31"
+},
+"FOXA": {
+"symbol": "FOXA",
+"status": "ok",
+"n": 1858,
+"first": "2019-03-12",
+"last": "2026-07-31"
+},
+"FPC": {
+"symbol": "FPC",
+"status": "missing",
+"n": 0
+},
+"FRC": {
+"symbol": "FRC",
+"status": "missing",
+"n": 0
+},
+"FRO": {
+"symbol": "FRO",
+"status": "ok",
+"n": 6283,
+"first": "2001-08-06",
+"last": "2026-07-31"
+},
+"FRT": {
+"symbol": "FRT",
+"status": "ok",
+"n": 13424,
+"first": "1973-05-03",
+"last": "2026-07-31"
+},
+"FRX": {
+"symbol": "FRX",
+"status": "missing",
+"n": 0
+},
+"FSH": {
+"symbol": "FSH",
+"status": "missing",
+"n": 0
+},
+"FSL": {
+"symbol": "FSL",
+"status": "missing",
+"n": 0
+},
+"FSLR": {
+"symbol": "FSLR",
+"status": "ok",
+"n": 4954,
+"first": "2006-11-17",
+"last": "2026-07-31"
+},
+"FTI": {
+"symbol": "FTI",
+"status": "ok",
+"n": 6318,
+"first": "2001-06-15",
+"last": "2026-07-31"
+},
+"FTL.A": {
+"symbol": "FTL-A",
+"status": "missing",
+"n": 0
+},
+"FTNT": {
+"symbol": "FTNT",
+"status": "ok",
+"n": 4199,
+"first": "2009-11-18",
+"last": "2026-07-31"
+},
+"FTR": {
+"symbol": "FTR",
+"status": "missing",
+"n": 0
+},
+"FTV": {
+"symbol": "FTV",
+"status": "ok",
+"n": 2533,
+"first": "2016-07-05",
+"last": "2026-07-31"
+},
+"FWLT": {
+"symbol": "FWLT",
+"status": "missing",
+"n": 0
+},
+"G": {
+"symbol": "G",
+"status": "ok",
+"n": 4779,
+"first": "2007-08-02",
+"last": "2026-07-31"
+},
+"GAPTQ": {
+"symbol": "GAPTQ",
+"status": "missing",
+"n": 0
+},
+"GAS": {
+"symbol": "GAS",
+"status": "missing",
+"n": 0
+},
+"GD": {
+"symbol": "GD",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"GDDY": {
+"symbol": "GDDY",
+"status": "ok",
+"n": 2851,
+"first": "2015-03-31",
+"last": "2026-07-31"
+},
+"GDT": {
+"symbol": "GDT",
+"status": "ok",
+"n": 132,
+"first": "2026-01-22",
+"last": "2026-07-31"
+},
+"GDW": {
+"symbol": "GDW",
+"status": "missing",
+"n": 0
+},
+"GE": {
+"symbol": "GE",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"GEHC": {
+"symbol": "GEHC",
+"status": "ok",
+"n": 908,
+"first": "2022-12-15",
+"last": "2026-07-31"
+},
+"GEN": {
+"symbol": "GEN",
+"status": "ok",
+"n": 9344,
+"first": "1989-06-23",
+"last": "2026-07-31"
+},
+"GENZ": {
+"symbol": "GENZ",
+"status": "ok",
+"n": 4659,
+"first": "2008-01-24",
+"last": "2026-07-31"
+},
+"GEV": {
+"symbol": "GEV",
+"status": "ok",
+"n": 588,
+"first": "2024-03-27",
+"last": "2026-07-31"
+},
+"GFS.A": {
+"symbol": "GFS-A",
+"status": "missing",
+"n": 0
+},
+"GGP": {
+"symbol": "GGP",
+"status": "missing",
+"n": 0
+},
+"GHC": {
+"symbol": "GHC",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"GIDL": {
+"symbol": "GIDL",
+"status": "missing",
+"n": 0
+},
+"GILD": {
+"symbol": "GILD",
+"status": "ok",
+"n": 8692,
+"first": "1992-01-22",
+"last": "2026-07-31"
+},
+"GIS": {
+"symbol": "GIS",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"GL": {
+"symbol": "GL",
+"status": "ok",
+"n": 11550,
+"first": "1980-10-01",
+"last": "2026-07-31"
+},
+"GLD": {
+"symbol": "GLD",
+"status": "ok",
+"n": 5458,
+"first": "2004-11-18",
+"last": "2026-07-31"
+},
+"GLK": {
+"symbol": "GLK",
+"status": "missing",
+"n": 0
+},
+"GLW": {
+"symbol": "GLW",
+"status": "ok",
+"n": 11235,
+"first": "1981-12-31",
+"last": "2026-07-31"
+},
+"GM": {
+"symbol": "GM",
+"status": "ok",
+"n": 3947,
+"first": "2010-11-18",
+"last": "2026-07-31"
+},
+"GMCR": {
+"symbol": "GMCR",
+"status": "missing",
+"n": 0
+},
+"GME": {
+"symbol": "GME",
+"status": "ok",
+"n": 6155,
+"first": "2002-02-13",
+"last": "2026-07-31"
+},
+"GNRC": {
+"symbol": "GNRC",
+"status": "ok",
+"n": 4142,
+"first": "2010-02-11",
+"last": "2026-07-31"
+},
+"GNT": {
+"symbol": "GNT",
+"status": "ok",
+"n": 3900,
+"first": "2011-01-27",
+"last": "2026-07-31"
+},
+"GNW": {
+"symbol": "GNW",
+"status": "ok",
+"n": 5581,
+"first": "2004-05-25",
+"last": "2026-07-31"
+},
+"GOOG": {
+"symbol": "GOOG",
+"status": "ok",
+"n": 5522,
+"first": "2004-08-19",
+"last": "2026-07-31"
+},
+"GOOGL": {
+"symbol": "GOOGL",
+"status": "ok",
+"n": 5522,
+"first": "2004-08-19",
+"last": "2026-07-31"
+},
+"GP": {
+"symbol": "GP",
+"status": "ok",
+"n": 1487,
+"first": "2020-08-28",
+"last": "2026-07-31"
+},
+"GPC": {
+"symbol": "GPC",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"GPN": {
+"symbol": "GPN",
+"status": "ok",
+"n": 6423,
+"first": "2001-01-16",
+"last": "2026-07-31"
+},
+"GPS": {
+"symbol": "GPS",
+"status": "missing",
+"n": 0
+},
+"GPU": {
+"symbol": "GPU",
+"status": "missing",
+"n": 0
+},
+"GR": {
+"symbol": "GR",
+"status": "missing",
+"n": 0
+},
+"GRA": {
+"symbol": "GRA",
+"status": "missing",
+"n": 0
+},
+"GRMN": {
+"symbol": "GRMN",
+"status": "ok",
+"n": 6447,
+"first": "2000-12-08",
+"last": "2026-07-31"
+},
+"GRN": {
+"symbol": "GRN",
+"status": "ok",
+"n": 1726,
+"first": "2019-09-18",
+"last": "2026-07-31"
+},
+"GS": {
+"symbol": "GS",
+"status": "ok",
+"n": 6853,
+"first": "1999-05-04",
+"last": "2026-07-31"
+},
+"GSX": {
+"symbol": "GSX",
+"status": "ok",
+"n": 1,
+"first": "2026-02-19",
+"last": "2026-02-19"
+},
+"GT": {
+"symbol": "GT",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"GTE": {
+"symbol": "GTE",
+"status": "ok",
+"n": 5183,
+"first": "2005-12-21",
+"last": "2026-07-31"
+},
+"GTW": {
+"symbol": "GTW",
+"status": "missing",
+"n": 0
+},
+"GWF": {
+"symbol": "GWF",
+"status": "missing",
+"n": 0
+},
+"GWW": {
+"symbol": "GWW",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"GX": {
+"symbol": "GX",
+"status": "missing",
+"n": 0
+},
+"H": {
+"symbol": "H",
+"status": "ok",
+"n": 4208,
+"first": "2009-11-05",
+"last": "2026-07-31"
+},
+"HAL": {
+"symbol": "HAL",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"HAR": {
+"symbol": "HAR",
+"status": "missing",
+"n": 0
+},
+"HAS": {
+"symbol": "HAS",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"HBAN": {
+"symbol": "HBAN",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"HBI": {
+"symbol": "HBI",
+"status": "missing",
+"n": 0
+},
+"HBOC": {
+"symbol": "HBOC",
+"status": "missing",
+"n": 0
+},
+"HCA": {
+"symbol": "HCA",
+"status": "ok",
+"n": 3871,
+"first": "2011-03-10",
+"last": "2026-07-31"
+},
+"HCBK": {
+"symbol": "HCBK",
+"status": "missing",
+"n": 0
+},
+"HCP": {
+"symbol": "HCP",
+"status": "missing",
+"n": 0
+},
+"HCR": {
+"symbol": "HCR",
+"status": "missing",
+"n": 0
+},
+"HD": {
+"symbol": "HD",
+"status": "ok",
+"n": 11305,
+"first": "1981-09-22",
+"last": "2026-07-31"
+},
+"HDLM": {
+"symbol": "HDLM",
+"status": "missing",
+"n": 0
+},
+"HES": {
+"symbol": "HES",
+"status": "missing",
+"n": 0
+},
+"HET": {
+"symbol": "HET",
+"status": "missing",
+"n": 0
+},
+"HFC": {
+"symbol": "HFC",
+"status": "missing",
+"n": 0
+},
+"HFS": {
+"symbol": "HFS",
+"status": "missing",
+"n": 0
+},
+"HI": {
+"symbol": "HI",
+"status": "missing",
+"n": 0
+},
+"HIG": {
+"symbol": "HIG",
+"status": "ok",
+"n": 7705,
+"first": "1995-12-15",
+"last": "2026-07-31"
+},
+"HII": {
+"symbol": "HII",
+"status": "ok",
+"n": 3863,
+"first": "2011-03-22",
+"last": "2026-07-31"
+},
+"HLT": {
+"symbol": "HLT",
+"status": "ok",
+"n": 3176,
+"first": "2013-12-12",
+"last": "2026-07-31"
+},
+"HM": {
+"symbol": "HM",
+"status": "missing",
+"n": 0
+},
+"HMA": {
+"symbol": "HMA",
+"status": "missing",
+"n": 0
+},
+"HNZ": {
+"symbol": "HNZ",
+"status": "missing",
+"n": 0
+},
+"HOG": {
+"symbol": "HOG",
+"status": "ok",
+"n": 10094,
+"first": "1986-07-08",
+"last": "2026-07-31"
+},
+"HOLX": {
+"symbol": "HOLX",
+"status": "missing",
+"n": 0
+},
+"HON": {
+"symbol": "HON",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"HONA": {
+"symbol": "HONA",
+"status": "ok",
+"n": 33,
+"first": "2026-06-15",
+"last": "2026-07-31"
+},
+"HOOD": {
+"symbol": "HOOD",
+"status": "ok",
+"n": 1257,
+"first": "2021-07-29",
+"last": "2026-07-31"
+},
+"HOT": {
+"symbol": "HOT",
+"status": "ok",
+"n": 502,
+"first": "2015-01-02",
+"last": "2017-03-20"
+},
+"HP": {
+"symbol": "HP",
+"status": "ok",
+"n": 11540,
+"first": "1980-10-15",
+"last": "2026-07-31"
+},
+"HPC": {
+"symbol": "HPC",
+"status": "missing",
+"n": 0
+},
+"HPE": {
+"symbol": "HPE",
+"status": "ok",
+"n": 2711,
+"first": "2015-10-19",
+"last": "2026-07-31"
+},
+"HPH": {
+"symbol": "HPH",
+"status": "missing",
+"n": 0
+},
+"HPQ": {
+"symbol": "HPQ",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"HRB": {
+"symbol": "HRB",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"HRL": {
+"symbol": "HRL",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"HRS": {
+"symbol": "HRS",
+"status": "missing",
+"n": 0
+},
+"HSH": {
+"symbol": "HSH",
+"status": "missing",
+"n": 0
+},
+"HSIC": {
+"symbol": "HSIC",
+"status": "ok",
+"n": 7734,
+"first": "1995-11-03",
+"last": "2026-07-31"
+},
+"HSP": {
+"symbol": "HSP",
+"status": "missing",
+"n": 0
+},
+"HST": {
+"symbol": "HST",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"HSY": {
+"symbol": "HSY",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"HUBB": {
+"symbol": "HUBB",
+"status": "ok",
+"n": 13531,
+"first": "1972-06-05",
+"last": "2026-07-31"
+},
+"HUM": {
+"symbol": "HUM",
+"status": "ok",
+"n": 11235,
+"first": "1981-12-31",
+"last": "2026-07-31"
+},
+"HWM": {
+"symbol": "HWM",
+"status": "ok",
+"n": 2449,
+"first": "2016-11-01",
+"last": "2026-07-31"
+},
+"I": {
+"symbol": "I",
+"status": "missing",
+"n": 0
+},
+"IAC": {
+"symbol": "IAC",
+"status": "ok",
+"n": 1,
+"first": "2026-07-17",
+"last": "2026-07-17"
+},
+"IBKR": {
+"symbol": "IBKR",
+"status": "ok",
+"n": 4841,
+"first": "2007-05-04",
+"last": "2026-07-31"
+},
+"IBM": {
+"symbol": "IBM",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"ICE": {
+"symbol": "ICE",
+"status": "ok",
+"n": 5207,
+"first": "2005-11-16",
+"last": "2026-07-31"
+},
+"IDXX": {
+"symbol": "IDXX",
+"status": "ok",
+"n": 8840,
+"first": "1991-06-21",
+"last": "2026-07-31"
+},
+"IEF": {
+"symbol": "IEF",
+"status": "ok",
+"n": 6040,
+"first": "2002-07-30",
+"last": "2026-07-31"
+},
+"IEX": {
+"symbol": "IEX",
+"status": "ok",
+"n": 9359,
+"first": "1989-06-02",
+"last": "2026-07-31"
+},
+"IFF": {
+"symbol": "IFF",
+"status": "ok",
+"n": 13013,
+"first": "1974-12-17",
+"last": "2026-07-31"
+},
+"IGT": {
+"symbol": "IGT",
+"status": "missing",
+"n": 0
+},
+"IKN": {
+"symbol": "IKN",
+"status": "missing",
+"n": 0
+},
+"ILMN": {
+"symbol": "ILMN",
+"status": "ok",
+"n": 6540,
+"first": "2000-07-28",
+"last": "2026-07-31"
+},
+"IMNX": {
+"symbol": "IMNX",
+"status": "missing",
+"n": 0
+},
+"INCLF": {
+"symbol": "INCLF",
+"status": "missing",
+"n": 0
+},
+"INCY": {
+"symbol": "INCY",
+"status": "ok",
+"n": 8239,
+"first": "1993-11-04",
+"last": "2026-07-31"
+},
+"INFO": {
+"symbol": "INFO",
+"status": "ok",
+"n": 452,
+"first": "2024-10-10",
+"last": "2026-07-31"
+},
+"INGR": {
+"symbol": "INGR",
+"status": "ok",
+"n": 7202,
+"first": "1997-12-11",
+"last": "2026-07-31"
+},
+"INTC": {
+"symbol": "INTC",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"INTU": {
+"symbol": "INTU",
+"status": "ok",
+"n": 8404,
+"first": "1993-03-12",
+"last": "2026-07-31"
+},
+"INVH": {
+"symbol": "INVH",
+"status": "ok",
+"n": 2387,
+"first": "2017-02-01",
+"last": "2026-07-31"
+},
+"IP": {
+"symbol": "IP",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"IPG": {
+"symbol": "IPG",
+"status": "missing",
+"n": 0
+},
+"IPGP": {
+"symbol": "IPGP",
+"status": "ok",
+"n": 4937,
+"first": "2006-12-13",
+"last": "2026-07-31"
+},
+"IQV": {
+"symbol": "IQV",
+"status": "ok",
+"n": 3327,
+"first": "2013-05-09",
+"last": "2026-07-31"
+},
+"IR": {
+"symbol": "IR",
+"status": "ok",
+"n": 2317,
+"first": "2017-05-12",
+"last": "2026-07-31"
+},
+"IRM": {
+"symbol": "IRM",
+"status": "ok",
+"n": 7673,
+"first": "1996-02-01",
+"last": "2026-07-31"
+},
+"ISRG": {
+"symbol": "ISRG",
+"status": "ok",
+"n": 6569,
+"first": "2000-06-16",
+"last": "2026-07-31"
+},
+"IT": {
+"symbol": "IT",
+"status": "ok",
+"n": 8261,
+"first": "1993-10-05",
+"last": "2026-07-31"
+},
+"ITT": {
+"symbol": "ITT",
+"status": "ok",
+"n": 7705,
+"first": "1995-12-15",
+"last": "2026-07-31"
+},
+"ITW": {
+"symbol": "ITW",
+"status": "ok",
+"n": 13460,
+"first": "1973-03-13",
+"last": "2026-07-31"
+},
+"IVZ": {
+"symbol": "IVZ",
+"status": "ok",
+"n": 7783,
+"first": "1995-08-25",
+"last": "2026-07-31"
+},
+"IWM": {
+"symbol": "IWM",
+"status": "ok",
+"n": 6583,
+"first": "2000-05-26",
+"last": "2026-07-31"
+},
+"J": {
+"symbol": "J",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"JAVA": {
+"symbol": "JAVA",
+"status": "ok",
+"n": 1210,
+"first": "2021-10-05",
+"last": "2026-07-31"
+},
+"JBHT": {
+"symbol": "JBHT",
+"status": "ok",
+"n": 10755,
+"first": "1983-11-22",
+"last": "2026-07-31"
+},
+"JBL": {
+"symbol": "JBL",
+"status": "ok",
+"n": 8369,
+"first": "1993-05-03",
+"last": "2026-07-31"
+},
+"JCI": {
+"symbol": "JCI",
+"status": "ok",
+"n": 9784,
+"first": "1987-09-28",
+"last": "2026-07-31"
+},
+"JCP": {
+"symbol": "JCP",
+"status": "missing",
+"n": 0
+},
+"JEC": {
+"symbol": "JEC",
+"status": "missing",
+"n": 0
+},
+"JEF": {
+"symbol": "JEF",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"JH": {
+"symbol": "JH",
+"status": "missing",
+"n": 0
+},
+"JHF": {
+"symbol": "JHF",
+"status": "missing",
+"n": 0
+},
+"JKHY": {
+"symbol": "JKHY",
+"status": "ok",
+"n": 10251,
+"first": "1985-11-20",
+"last": "2026-07-31"
+},
+"JNJ": {
+"symbol": "JNJ",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"JNPR": {
+"symbol": "JNPR",
+"status": "missing",
+"n": 0
+},
+"JNS": {
+"symbol": "JNS",
+"status": "missing",
+"n": 0
+},
+"JNY": {
+"symbol": "JNY",
+"status": "missing",
+"n": 0
+},
+"JOS": {
+"symbol": "JOS",
+"status": "missing",
+"n": 0
+},
+"JOY": {
+"symbol": "JOY",
+"status": "missing",
+"n": 0
+},
+"JP": {
+"symbol": "JP",
+"status": "missing",
+"n": 0
+},
+"JPM": {
+"symbol": "JPM",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"JWN": {
+"symbol": "JWN",
+"status": "missing",
+"n": 0
+},
+"K": {
+"symbol": "K",
+"status": "missing",
+"n": 0
+},
+"KATE": {
+"symbol": "KATE",
+"status": "missing",
+"n": 0
+},
+"KBH": {
+"symbol": "KBH",
+"status": "ok",
+"n": 10076,
+"first": "1986-08-01",
+"last": "2026-07-31"
+},
+"KDP": {
+"symbol": "KDP",
+"status": "ok",
+"n": 4587,
+"first": "2008-05-07",
+"last": "2026-07-31"
+},
+"KEY": {
+"symbol": "KEY",
+"status": "ok",
+"n": 9756,
+"first": "1987-11-05",
+"last": "2026-07-31"
+},
+"KEYS": {
+"symbol": "KEYS",
+"status": "ok",
+"n": 2962,
+"first": "2014-10-20",
+"last": "2026-07-31"
+},
+"KG": {
+"symbol": "KG",
+"status": "ok",
+"n": 4588,
+"first": "2008-05-06",
+"last": "2026-07-31"
+},
+"KHC": {
+"symbol": "KHC",
+"status": "ok",
+"n": 2785,
+"first": "2015-07-06",
+"last": "2026-07-31"
+},
+"KIM": {
+"symbol": "KIM",
+"status": "ok",
+"n": 8732,
+"first": "1991-11-22",
+"last": "2026-07-31"
+},
+"KKR": {
+"symbol": "KKR",
+"status": "ok",
+"n": 4036,
+"first": "2010-07-15",
+"last": "2026-07-31"
+},
+"KLAC": {
+"symbol": "KLAC",
+"status": "ok",
+"n": 11545,
+"first": "1980-10-08",
+"last": "2026-07-31"
+},
+"KM": {
+"symbol": "KM",
+"status": "missing",
+"n": 0
+},
+"KMB": {
+"symbol": "KMB",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"KMG": {
+"symbol": "KMG",
+"status": "ok",
+"n": 5482,
+"first": "1997-01-28",
+"last": "2018-11-15"
+},
+"KMI": {
+"symbol": "KMI",
+"status": "ok",
+"n": 3889,
+"first": "2011-02-11",
+"last": "2026-07-31"
+},
+"KMX": {
+"symbol": "KMX",
+"status": "ok",
+"n": 7418,
+"first": "1997-02-04",
+"last": "2026-07-31"
+},
+"KO": {
+"symbol": "KO",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"KORS": {
+"symbol": "KORS",
+"status": "missing",
+"n": 0
+},
+"KR": {
+"symbol": "KR",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"KRB": {
+"symbol": "KRB",
+"status": "missing",
+"n": 0
+},
+"KRFT": {
+"symbol": "KRFT",
+"status": "missing",
+"n": 0
+},
+"KRI": {
+"symbol": "KRI",
+"status": "missing",
+"n": 0
+},
+"KSE": {
+"symbol": "KSE",
+"status": "missing",
+"n": 0
+},
+"KSS": {
+"symbol": "KSS",
+"status": "ok",
+"n": 8610,
+"first": "1992-05-19",
+"last": "2026-07-31"
+},
+"KSU": {
+"symbol": "KSU",
+"status": "missing",
+"n": 0
+},
+"KVUE": {
+"symbol": "KVUE",
+"status": "ok",
+"n": 813,
+"first": "2023-05-04",
+"last": "2026-07-31"
+},
+"KWP": {
+"symbol": "KWP",
+"status": "missing",
+"n": 0
+},
+"L": {
+"symbol": "L",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"LB": {
+"symbol": "LB",
+"status": "ok",
+"n": 524,
+"first": "2024-06-28",
+"last": "2026-07-31"
+},
+"LDG": {
+"symbol": "LDG",
+"status": "missing",
+"n": 0
+},
+"LDOS": {
+"symbol": "LDOS",
+"status": "ok",
+"n": 4977,
+"first": "2006-10-17",
+"last": "2026-07-31"
+},
+"LDW.B": {
+"symbol": "LDW-B",
+"status": "missing",
+"n": 0
+},
+"LEG": {
+"symbol": "LEG",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"LEHMQ": {
+"symbol": "LEHMQ",
+"status": "missing",
+"n": 0
+},
+"LEN": {
+"symbol": "LEN",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"LH": {
+"symbol": "LH",
+"status": "ok",
+"n": 9151,
+"first": "1990-03-29",
+"last": "2026-07-31"
+},
+"LHX": {
+"symbol": "LHX",
+"status": "ok",
+"n": 11235,
+"first": "1981-12-31",
+"last": "2026-07-31"
+},
+"LIFE": {
+"symbol": "LIFE",
+"status": "ok",
+"n": 127,
+"first": "2026-01-29",
+"last": "2026-07-31"
+},
+"LII": {
+"symbol": "LII",
+"status": "ok",
+"n": 6793,
+"first": "1999-07-29",
+"last": "2026-07-31"
+},
+"LIN": {
+"symbol": "LIN",
+"status": "ok",
+"n": 8590,
+"first": "1992-06-17",
+"last": "2026-07-31"
+},
+"LITE": {
+"symbol": "LITE",
+"status": "ok",
+"n": 2772,
+"first": "2015-07-23",
+"last": "2026-07-31"
+},
+"LKQ": {
+"symbol": "LKQ",
+"status": "ok",
+"n": 5741,
+"first": "2003-10-06",
+"last": "2026-07-31"
+},
+"LLL": {
+"symbol": "LLL",
+"status": "missing",
+"n": 0
+},
+"LLTC": {
+"symbol": "LLTC",
+"status": "missing",
+"n": 0
+},
+"LLX": {
+"symbol": "LLX",
+"status": "missing",
+"n": 0
+},
+"LLY": {
+"symbol": "LLY",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"LM": {
+"symbol": "LM",
+"status": "missing",
+"n": 0
+},
+"LMT": {
+"symbol": "LMT",
+"status": "ok",
+"n": 14265,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"LNC": {
+"symbol": "LNC",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"LNT": {
+"symbol": "LNT",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"LO": {
+"symbol": "LO",
+"status": "missing",
+"n": 0
+},
+"LOR": {
+"symbol": "LOR",
+"status": "missing",
+"n": 0
+},
+"LOW": {
+"symbol": "LOW",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"LPX": {
+"symbol": "LPX",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"LRCX": {
+"symbol": "LRCX",
+"status": "ok",
+"n": 10642,
+"first": "1984-05-04",
+"last": "2026-07-31"
+},
+"LSI": {
+"symbol": "LSI",
+"status": "missing",
+"n": 0
+},
+"LU": {
+"symbol": "LU",
+"status": "ok",
+"n": 1443,
+"first": "2020-10-30",
+"last": "2026-07-31"
+},
+"LUB": {
+"symbol": "LUB",
+"status": "missing",
+"n": 0
+},
+"LULU": {
+"symbol": "LULU",
+"status": "ok",
+"n": 4783,
+"first": "2007-07-27",
+"last": "2026-07-31"
+},
+"LUMN": {
+"symbol": "LUMN",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"LUV": {
+"symbol": "LUV",
+"status": "ok",
+"n": 11740,
+"first": "1980-01-02",
+"last": "2026-07-31"
+},
+"LVLT": {
+"symbol": "LVLT",
+"status": "missing",
+"n": 0
+},
+"LVS": {
+"symbol": "LVS",
+"status": "ok",
+"n": 5440,
+"first": "2004-12-15",
+"last": "2026-07-31"
+},
+"LW": {
+"symbol": "LW",
+"status": "ok",
+"n": 2442,
+"first": "2016-11-10",
+"last": "2026-07-31"
+},
+"LXK": {
+"symbol": "LXK",
+"status": "missing",
+"n": 0
+},
+"LYB": {
+"symbol": "LYB",
+"status": "ok",
+"n": 4090,
+"first": "2010-04-28",
+"last": "2026-07-31"
+},
+"LYV": {
+"symbol": "LYV",
+"status": "ok",
+"n": 5183,
+"first": "2005-12-21",
+"last": "2026-07-31"
+},
+"M": {
+"symbol": "M",
+"status": "ok",
+"n": 8682,
+"first": "1992-02-05",
+"last": "2026-07-31"
+},
+"MA": {
+"symbol": "MA",
+"status": "ok",
+"n": 5077,
+"first": "2006-05-25",
+"last": "2026-07-31"
+},
+"MAA": {
+"symbol": "MAA",
+"status": "ok",
+"n": 8180,
+"first": "1994-01-28",
+"last": "2026-07-31"
+},
+"MAC": {
+"symbol": "MAC",
+"status": "ok",
+"n": 8152,
+"first": "1994-03-10",
+"last": "2026-07-31"
+},
+"MAR": {
+"symbol": "MAR",
+"status": "ok",
+"n": 7134,
+"first": "1998-03-23",
+"last": "2026-07-31"
+},
+"MAS": {
+"symbol": "MAS",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"MAT": {
+"symbol": "MAT",
+"status": "ok",
+"n": 12634,
+"first": "1976-06-17",
+"last": "2026-07-31"
+},
+"MAY": {
+"symbol": "MAY",
+"status": "missing",
+"n": 0
+},
+"MBI": {
+"symbol": "MBI",
+"status": "ok",
+"n": 9845,
+"first": "1987-07-01",
+"last": "2026-07-31"
+},
+"MCD": {
+"symbol": "MCD",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"MCHP": {
+"symbol": "MCHP",
+"status": "ok",
+"n": 8399,
+"first": "1993-03-19",
+"last": "2026-07-31"
+},
+"MCIC": {
+"symbol": "MCIC",
+"status": "ok",
+"n": 7261,
+"first": "1997-09-17",
+"last": "2026-07-30"
+},
+"MCK": {
+"symbol": "MCK",
+"status": "ok",
+"n": 7982,
+"first": "1994-11-10",
+"last": "2026-07-31"
+},
+"MCO": {
+"symbol": "MCO",
+"status": "ok",
+"n": 7990,
+"first": "1994-10-31",
+"last": "2026-07-31"
+},
+"MD": {
+"symbol": "MD",
+"status": "ok",
+"n": 7766,
+"first": "1995-09-20",
+"last": "2026-07-31"
+},
+"MDLZ": {
+"symbol": "MDLZ",
+"status": "ok",
+"n": 6320,
+"first": "2001-06-13",
+"last": "2026-07-31"
+},
+"MDP": {
+"symbol": "MDP",
+"status": "missing",
+"n": 0
+},
+"MDR": {
+"symbol": "MDR",
+"status": "missing",
+"n": 0
+},
+"MDT": {
+"symbol": "MDT",
+"status": "ok",
+"n": 13425,
+"first": "1973-05-02",
+"last": "2026-07-31"
+},
+"MEA": {
+"symbol": "MEA",
+"status": "missing",
+"n": 0
+},
+"MEDI": {
+"symbol": "MEDI",
+"status": "ok",
+"n": 927,
+"first": "2022-11-17",
+"last": "2026-07-31"
+},
+"MEE": {
+"symbol": "MEE",
+"status": "missing",
+"n": 0
+},
+"MEL": {
+"symbol": "MEL",
+"status": "missing",
+"n": 0
+},
+"MER": {
+"symbol": "MER",
+"status": "ok",
+"n": 1,
+"first": "2026-07-17",
+"last": "2026-07-17"
+},
+"MERQ": {
+"symbol": "MERQ",
+"status": "missing",
+"n": 0
+},
+"MET": {
+"symbol": "MET",
+"status": "ok",
+"n": 6619,
+"first": "2000-04-05",
+"last": "2026-07-31"
+},
+"META": {
+"symbol": "META",
+"status": "ok",
+"n": 3570,
+"first": "2012-05-18",
+"last": "2026-07-31"
+},
+"MFE": {
+"symbol": "MFE",
+"status": "missing",
+"n": 0
+},
+"MGM": {
+"symbol": "MGM",
+"status": "ok",
+"n": 9634,
+"first": "1988-05-02",
+"last": "2026-07-31"
+},
+"MHK": {
+"symbol": "MHK",
+"status": "ok",
+"n": 8643,
+"first": "1992-04-01",
+"last": "2026-07-31"
+},
+"MHS": {
+"symbol": "MHS",
+"status": "ok",
+"n": 1537,
+"first": "2020-02-12",
+"last": "2026-07-17"
+},
+"MI": {
+"symbol": "MI",
+"status": "ok",
+"n": 2684,
+"first": "2015-11-25",
+"last": "2026-07-31"
+},
+"MII": {
+"symbol": "MII",
+"status": "missing",
+"n": 0
+},
+"MIL": {
+"symbol": "MIL",
+"status": "missing",
+"n": 0
+},
+"MIR": {
+"symbol": "MIR",
+"status": "ok",
+"n": 1493,
+"first": "2020-08-20",
+"last": "2026-07-31"
+},
+"MJN": {
+"symbol": "MJN",
+"status": "missing",
+"n": 0
+},
+"MKC": {
+"symbol": "MKC",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"MKG": {
+"symbol": "MKG",
+"status": "missing",
+"n": 0
+},
+"MKTX": {
+"symbol": "MKTX",
+"status": "ok",
+"n": 5467,
+"first": "2004-11-05",
+"last": "2026-07-31"
+},
+"MLM": {
+"symbol": "MLM",
+"status": "ok",
+"n": 8166,
+"first": "1994-02-17",
+"last": "2026-07-31"
+},
+"MMC": {
+"symbol": "MMC",
+"status": "missing",
+"n": 0
+},
+"MMI": {
+"symbol": "MMI",
+"status": "ok",
+"n": 3205,
+"first": "2013-10-31",
+"last": "2026-07-31"
+},
+"MMM": {
+"symbol": "MMM",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"MNK": {
+"symbol": "MNK",
+"status": "missing",
+"n": 0
+},
+"MNR": {
+"symbol": "MNR",
+"status": "ok",
+"n": 693,
+"first": "2023-10-25",
+"last": "2026-07-31"
+},
+"MNST": {
+"symbol": "MNST",
+"status": "ok",
+"n": 10239,
+"first": "1985-12-09",
+"last": "2026-07-31"
+},
+"MO": {
+"symbol": "MO",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"MOB": {
+"symbol": "MOB",
+"status": "ok",
+"n": 986,
+"first": "2022-08-25",
+"last": "2026-07-31"
+},
+"MOH": {
+"symbol": "MOH",
+"status": "ok",
+"n": 5807,
+"first": "2003-07-02",
+"last": "2026-07-31"
+},
+"MOLX": {
+"symbol": "MOLX",
+"status": "missing",
+"n": 0
+},
+"MON": {
+"symbol": "MON",
+"status": "missing",
+"n": 0
+},
+"MOS": {
+"symbol": "MOS",
+"status": "ok",
+"n": 9701,
+"first": "1988-01-26",
+"last": "2026-07-31"
+},
+"MPC": {
+"symbol": "MPC",
+"status": "ok",
+"n": 3797,
+"first": "2011-06-24",
+"last": "2026-07-31"
+},
+"MPWR": {
+"symbol": "MPWR",
+"status": "ok",
+"n": 5457,
+"first": "2004-11-19",
+"last": "2026-07-31"
+},
+"MRK": {
+"symbol": "MRK",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"MRNA": {
+"symbol": "MRNA",
+"status": "ok",
+"n": 1921,
+"first": "2018-12-07",
+"last": "2026-07-31"
+},
+"MRO": {
+"symbol": "MRO",
+"status": "missing",
+"n": 0
+},
+"MRSH": {
+"symbol": "MRSH",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"MRVL": {
+"symbol": "MRVL",
+"status": "ok",
+"n": 6559,
+"first": "2000-06-30",
+"last": "2026-07-31"
+},
+"MS": {
+"symbol": "MS",
+"status": "ok",
+"n": 8417,
+"first": "1993-02-23",
+"last": "2026-07-31"
+},
+"MSCI": {
+"symbol": "MSCI",
+"status": "ok",
+"n": 4705,
+"first": "2007-11-15",
+"last": "2026-07-31"
+},
+"MSFT": {
+"symbol": "MSFT",
+"status": "ok",
+"n": 10174,
+"first": "1986-03-13",
+"last": "2026-07-31"
+},
+"MSI": {
+"symbol": "MSI",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"MST": {
+"symbol": "MST",
+"status": "ok",
+"n": 313,
+"first": "2025-05-02",
+"last": "2026-07-31"
+},
+"MTB": {
+"symbol": "MTB",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"MTCH": {
+"symbol": "MTCH",
+"status": "ok",
+"n": 8441,
+"first": "1993-01-19",
+"last": "2026-07-31"
+},
+"MTD": {
+"symbol": "MTD",
+"status": "ok",
+"n": 7220,
+"first": "1997-11-14",
+"last": "2026-07-31"
+},
+"MTG": {
+"symbol": "MTG",
+"status": "ok",
+"n": 8808,
+"first": "1991-08-07",
+"last": "2026-07-31"
+},
+"MTL": {
+"symbol": "MTL",
+"status": "missing",
+"n": 0
+},
+"MTLQQ": {
+"symbol": "MTLQQ",
+"status": "missing",
+"n": 0
+},
+"MTW": {
+"symbol": "MTW",
+"status": "ok",
+"n": 9154,
+"first": "1990-03-26",
+"last": "2026-07-31"
+},
+"MU": {
+"symbol": "MU",
+"status": "ok",
+"n": 10623,
+"first": "1984-06-01",
+"last": "2026-07-31"
+},
+"MUR": {
+"symbol": "MUR",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"MWI": {
+"symbol": "MWI",
+"status": "missing",
+"n": 0
+},
+"MWV": {
+"symbol": "MWV",
+"status": "missing",
+"n": 0
+},
+"MWW": {
+"symbol": "MWW",
+"status": "missing",
+"n": 0
+},
+"MXIM": {
+"symbol": "MXIM",
+"status": "missing",
+"n": 0
+},
+"MYG": {
+"symbol": "MYG",
+"status": "missing",
+"n": 0
+},
+"MYL": {
+"symbol": "MYL",
+"status": "missing",
+"n": 0
+},
+"MZIAQ": {
+"symbol": "MZIAQ",
+"status": "missing",
+"n": 0
+},
+"NAE": {
+"symbol": "NAE",
+"status": "missing",
+"n": 0
+},
+"NAV": {
+"symbol": "NAV",
+"status": "missing",
+"n": 0
+},
+"NAVI": {
+"symbol": "NAVI",
+"status": "ok",
+"n": 3090,
+"first": "2014-04-17",
+"last": "2026-07-31"
+},
+"NBL": {
+"symbol": "NBL",
+"status": "missing",
+"n": 0
+},
+"NBR": {
+"symbol": "NBR",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"NC": {
+"symbol": "NC",
+"status": "ok",
+"n": 12381,
+"first": "1977-06-17",
+"last": "2026-07-31"
+},
+"NCC": {
+"symbol": "NCC",
+"status": "missing",
+"n": 0
+},
+"NCE": {
+"symbol": "NCE",
+"status": "missing",
+"n": 0
+},
+"NCLH": {
+"symbol": "NCLH",
+"status": "ok",
+"n": 3403,
+"first": "2013-01-18",
+"last": "2026-07-31"
+},
+"NCR": {
+"symbol": "NCR",
+"status": "missing",
+"n": 0
+},
+"NDAQ": {
+"symbol": "NDAQ",
+"status": "ok",
+"n": 6060,
+"first": "2002-07-01",
+"last": "2026-07-31"
+},
+"NDSN": {
+"symbol": "NDSN",
+"status": "ok",
+"n": 11687,
+"first": "1980-03-18",
+"last": "2026-07-31"
+},
+"NE": {
+"symbol": "NE",
+"status": "ok",
+"n": 1292,
+"first": "2021-06-09",
+"last": "2026-07-31"
+},
+"NEE": {
+"symbol": "NEE",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"NEM": {
+"symbol": "NEM",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"NFB": {
+"symbol": "NFB",
+"status": "missing",
+"n": 0
+},
+"NFLX": {
+"symbol": "NFLX",
+"status": "ok",
+"n": 6086,
+"first": "2002-05-23",
+"last": "2026-07-31"
+},
+"NFX": {
+"symbol": "NFX",
+"status": "ok",
+"n": 19,
+"first": "2026-07-07",
+"last": "2026-07-31"
+},
+"NGH": {
+"symbol": "NGH",
+"status": "missing",
+"n": 0
+},
+"NI": {
+"symbol": "NI",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"NKE": {
+"symbol": "NKE",
+"status": "ok",
+"n": 11508,
+"first": "1980-12-02",
+"last": "2026-07-31"
+},
+"NKTR": {
+"symbol": "NKTR",
+"status": "ok",
+"n": 8116,
+"first": "1994-05-03",
+"last": "2026-07-31"
+},
+"NLC": {
+"symbol": "NLC",
+"status": "missing",
+"n": 0
+},
+"NLOK": {
+"symbol": "NLOK",
+"status": "missing",
+"n": 0
+},
+"NLSN": {
+"symbol": "NLSN",
+"status": "missing",
+"n": 0
+},
+"NLV": {
+"symbol": "NLV",
+"status": "missing",
+"n": 0
+},
+"NMK": {
+"symbol": "NMK",
+"status": "missing",
+"n": 0
+},
+"NOC": {
+"symbol": "NOC",
+"status": "ok",
+"n": 11235,
+"first": "1981-12-31",
+"last": "2026-07-31"
+},
+"NOV": {
+"symbol": "NOV",
+"status": "ok",
+"n": 7485,
+"first": "1996-10-29",
+"last": "2026-07-31"
+},
+"NOVL": {
+"symbol": "NOVL",
+"status": "missing",
+"n": 0
+},
+"NOW": {
+"symbol": "NOW",
+"status": "ok",
+"n": 3541,
+"first": "2012-06-29",
+"last": "2026-07-31"
+},
+"NRG": {
+"symbol": "NRG",
+"status": "ok",
+"n": 5701,
+"first": "2003-12-02",
+"last": "2026-07-31"
+},
+"NRTLQ": {
+"symbol": "NRTLQ",
+"status": "missing",
+"n": 0
+},
+"NSC": {
+"symbol": "NSC",
+"status": "ok",
+"n": 11130,
+"first": "1982-06-02",
+"last": "2026-07-31"
+},
+"NSI": {
+"symbol": "NSI",
+"status": "ok",
+"n": 663,
+"first": "2023-12-07",
+"last": "2026-07-31"
+},
+"NSM": {
+"symbol": "NSM",
+"status": "ok",
+"n": 1610,
+"first": "2012-03-08",
+"last": "2018-07-31"
+},
+"NTAP": {
+"symbol": "NTAP",
+"status": "ok",
+"n": 7722,
+"first": "1995-11-21",
+"last": "2026-07-31"
+},
+"NTRS": {
+"symbol": "NTRS",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"NUE": {
+"symbol": "NUE",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"NVDA": {
+"symbol": "NVDA",
+"status": "ok",
+"n": 6923,
+"first": "1999-01-22",
+"last": "2026-07-31"
+},
+"NVLS": {
+"symbol": "NVLS",
+"status": "missing",
+"n": 0
+},
+"NVR": {
+"symbol": "NVR",
+"status": "ok",
+"n": 10336,
+"first": "1985-07-22",
+"last": "2026-07-31"
+},
+"NWL": {
+"symbol": "NWL",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"NWS": {
+"symbol": "NWS",
+"status": "ok",
+"n": 3299,
+"first": "2013-06-19",
+"last": "2026-07-31"
+},
+"NWSA": {
+"symbol": "NWSA",
+"status": "ok",
+"n": 3299,
+"first": "2013-06-19",
+"last": "2026-07-31"
+},
+"NXPI": {
+"symbol": "NXPI",
+"status": "ok",
+"n": 4020,
+"first": "2010-08-06",
+"last": "2026-07-31"
+},
+"NXTL": {
+"symbol": "NXTL",
+"status": "missing",
+"n": 0
+},
+"NYN": {
+"symbol": "NYN",
+"status": "missing",
+"n": 0
+},
+"NYT": {
+"symbol": "NYT",
+"status": "ok",
+"n": 13424,
+"first": "1973-05-03",
+"last": "2026-07-31"
+},
+"NYX": {
+"symbol": "NYX",
+"status": "missing",
+"n": 0
+},
+"O": {
+"symbol": "O",
+"status": "ok",
+"n": 7999,
+"first": "1994-10-18",
+"last": "2026-07-31"
+},
+"OAT": {
+"symbol": "OAT",
+"status": "missing",
+"n": 0
+},
+"ODFL": {
+"symbol": "ODFL",
+"status": "ok",
+"n": 8753,
+"first": "1991-10-24",
+"last": "2026-07-31"
+},
+"ODP": {
+"symbol": "ODP",
+"status": "missing",
+"n": 0
+},
+"OGN": {
+"symbol": "OGN",
+"status": "ok",
+"n": 1309,
+"first": "2021-05-14",
+"last": "2026-07-31"
+},
+"OI": {
+"symbol": "OI",
+"status": "ok",
+"n": 8720,
+"first": "1991-12-11",
+"last": "2026-07-31"
+},
+"OK": {
+"symbol": "OK",
+"status": "missing",
+"n": 0
+},
+"OKE": {
+"symbol": "OKE",
+"status": "ok",
+"n": 11550,
+"first": "1980-10-01",
+"last": "2026-07-31"
+},
+"OM": {
+"symbol": "OM",
+"status": "ok",
+"n": 1476,
+"first": "2020-09-15",
+"last": "2026-07-31"
+},
+"OMC": {
+"symbol": "OMC",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"OMX": {
+"symbol": "OMX",
+"status": "missing",
+"n": 0
+},
+"ON": {
+"symbol": "ON",
+"status": "ok",
+"n": 6601,
+"first": "2000-05-02",
+"last": "2026-07-31"
+},
+"ONE": {
+"symbol": "ONE",
+"status": "missing",
+"n": 0
+},
+"ORCL": {
+"symbol": "ORCL",
+"status": "ok",
+"n": 10175,
+"first": "1986-03-12",
+"last": "2026-07-31"
+},
+"ORLY": {
+"symbol": "ORLY",
+"status": "ok",
+"n": 8375,
+"first": "1993-04-23",
+"last": "2026-07-31"
+},
+"ORX": {
+"symbol": "ORX",
+"status": "missing",
+"n": 0
+},
+"OTIS": {
+"symbol": "OTIS",
+"status": "ok",
+"n": 1600,
+"first": "2020-03-19",
+"last": "2026-07-31"
+},
+"OWENQ": {
+"symbol": "OWENQ",
+"status": "missing",
+"n": 0
+},
+"OXY": {
+"symbol": "OXY",
+"status": "ok",
+"n": 11235,
+"first": "1981-12-31",
+"last": "2026-07-31"
+},
+"PAC": {
+"symbol": "PAC",
+"status": "ok",
+"n": 5139,
+"first": "2006-02-27",
+"last": "2026-07-31"
+},
+"PALM": {
+"symbol": "PALM",
+"status": "missing",
+"n": 0
+},
+"PANW": {
+"symbol": "PANW",
+"status": "ok",
+"n": 3527,
+"first": "2012-07-20",
+"last": "2026-07-31"
+},
+"PARA": {
+"symbol": "PARA",
+"status": "missing",
+"n": 0
+},
+"PAS": {
+"symbol": "PAS",
+"status": "missing",
+"n": 0
+},
+"PAYC": {
+"symbol": "PAYC",
+"status": "ok",
+"n": 3092,
+"first": "2014-04-15",
+"last": "2026-07-31"
+},
+"PAYX": {
+"symbol": "PAYX",
+"status": "ok",
+"n": 10816,
+"first": "1983-08-26",
+"last": "2026-07-31"
+},
+"PBCT": {
+"symbol": "PBCT",
+"status": "missing",
+"n": 0
+},
+"PBG": {
+"symbol": "PBG",
+"status": "missing",
+"n": 0
+},
+"PBI": {
+"symbol": "PBI",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"PBY": {
+"symbol": "PBY",
+"status": "ok",
+"n": 753,
+"first": "2018-06-18",
+"last": "2021-06-14"
+},
+"PCAR": {
+"symbol": "PCAR",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"PCG": {
+"symbol": "PCG",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"PCH": {
+"symbol": "PCH",
+"status": "missing",
+"n": 0
+},
+"PCL": {
+"symbol": "PCL",
+"status": "ok",
+"n": 249,
+"first": "2025-08-05",
+"last": "2026-07-31"
+},
+"PCP": {
+"symbol": "PCP",
+"status": "missing",
+"n": 0
+},
+"PCS": {
+"symbol": "PCS",
+"status": "ok",
+"n": 251,
+"first": "2025-08-01",
+"last": "2026-07-31"
+},
+"PD": {
+"symbol": "PD",
+"status": "ok",
+"n": 1836,
+"first": "2019-04-11",
+"last": "2026-07-31"
+},
+"PDCO": {
+"symbol": "PDCO",
+"status": "missing",
+"n": 0
+},
+"PDG": {
+"symbol": "PDG",
+"status": "missing",
+"n": 0
+},
+"PEAK": {
+"symbol": "PEAK",
+"status": "missing",
+"n": 0
+},
+"PEG": {
+"symbol": "PEG",
+"status": "ok",
+"n": 11740,
+"first": "1980-01-02",
+"last": "2026-07-31"
+},
+"PEL": {
+"symbol": "PEL",
+"status": "missing",
+"n": 0
+},
+"PENN": {
+"symbol": "PENN",
+"status": "ok",
+"n": 8099,
+"first": "1994-05-26",
+"last": "2026-07-31"
+},
+"PEP": {
+"symbol": "PEP",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"PET": {
+"symbol": "PET",
+"status": "missing",
+"n": 0
+},
+"PETM": {
+"symbol": "PETM",
+"status": "missing",
+"n": 0
+},
+"PFE": {
+"symbol": "PFE",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"PFG": {
+"symbol": "PFG",
+"status": "ok",
+"n": 6232,
+"first": "2001-10-23",
+"last": "2026-07-31"
+},
+"PG": {
+"symbol": "PG",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"PGL": {
+"symbol": "PGL",
+"status": "missing",
+"n": 0
+},
+"PGN": {
+"symbol": "PGN",
+"status": "missing",
+"n": 0
+},
+"PGR": {
+"symbol": "PGR",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"PH": {
+"symbol": "PH",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"PHA": {
+"symbol": "PHA",
+"status": "missing",
+"n": 0
+},
+"PHB": {
+"symbol": "PHB",
+"status": "ok",
+"n": 1,
+"first": "2026-07-17",
+"last": "2026-07-17"
+},
+"PHM": {
+"symbol": "PHM",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"PKG": {
+"symbol": "PKG",
+"status": "ok",
+"n": 6666,
+"first": "2000-01-28",
+"last": "2026-07-31"
+},
+"PKI": {
+"symbol": "PKI",
+"status": "missing",
+"n": 0
+},
+"PLD": {
+"symbol": "PLD",
+"status": "ok",
+"n": 7215,
+"first": "1997-11-21",
+"last": "2026-07-31"
+},
+"PLL": {
+"symbol": "PLL",
+"status": "missing",
+"n": 0
+},
+"PLTR": {
+"symbol": "PLTR",
+"status": "ok",
+"n": 1465,
+"first": "2020-09-30",
+"last": "2026-07-31"
+},
+"PM": {
+"symbol": "PM",
+"status": "ok",
+"n": 4623,
+"first": "2008-03-17",
+"last": "2026-07-31"
+},
+"PMCS": {
+"symbol": "PMCS",
+"status": "missing",
+"n": 0
+},
+"PMI": {
+"symbol": "PMI",
+"status": "ok",
+"n": 231,
+"first": "2025-08-29",
+"last": "2026-07-31"
+},
+"PNC": {
+"symbol": "PNC",
+"status": "ok",
+"n": 12781,
+"first": "1975-11-17",
+"last": "2026-07-31"
+},
+"PNR": {
+"symbol": "PNR",
+"status": "ok",
+"n": 13424,
+"first": "1973-05-03",
+"last": "2026-07-31"
+},
+"PNU": {
+"symbol": "PNU",
+"status": "missing",
+"n": 0
+},
+"PNW": {
+"symbol": "PNW",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"PODD": {
+"symbol": "PODD",
+"status": "ok",
+"n": 4834,
+"first": "2007-05-15",
+"last": "2026-07-31"
+},
+"POM": {
+"symbol": "POM",
+"status": "ok",
+"n": 204,
+"first": "2025-10-08",
+"last": "2026-07-31"
+},
+"POOL": {
+"symbol": "POOL",
+"status": "ok",
+"n": 7749,
+"first": "1995-10-13",
+"last": "2026-07-31"
+},
+"PPG": {
+"symbol": "PPG",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"PPL": {
+"symbol": "PPL",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"PPW": {
+"symbol": "PPW",
+"status": "missing",
+"n": 0
+},
+"PRD": {
+"symbol": "PRD",
+"status": "missing",
+"n": 0
+},
+"PRGO": {
+"symbol": "PRGO",
+"status": "ok",
+"n": 8716,
+"first": "1991-12-17",
+"last": "2026-07-31"
+},
+"PRU": {
+"symbol": "PRU",
+"status": "ok",
+"n": 6196,
+"first": "2001-12-13",
+"last": "2026-07-31"
+},
+"PSA": {
+"symbol": "PSA",
+"status": "ok",
+"n": 11517,
+"first": "1980-11-18",
+"last": "2026-07-31"
+},
+"PSFT": {
+"symbol": "PSFT",
+"status": "missing",
+"n": 0
+},
+"PSKY": {
+"symbol": "PSKY",
+"status": "ok",
+"n": 5195,
+"first": "2005-12-05",
+"last": "2026-07-31"
+},
+"PSX": {
+"symbol": "PSX",
+"status": "ok",
+"n": 3596,
+"first": "2012-04-12",
+"last": "2026-07-31"
+},
+"PTC": {
+"symbol": "PTC",
+"status": "ok",
+"n": 9227,
+"first": "1989-12-08",
+"last": "2026-07-31"
+},
+"PTV": {
+"symbol": "PTV",
+"status": "missing",
+"n": 0
+},
+"PVH": {
+"symbol": "PVH",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"PVN": {
+"symbol": "PVN",
+"status": "missing",
+"n": 0
+},
+"PVT": {
+"symbol": "PVT",
+"status": "missing",
+"n": 0
+},
+"PWER": {
+"symbol": "PWER",
+"status": "ok",
+"n": 669,
+"first": "2023-11-29",
+"last": "2026-07-31"
+},
+"PWJ": {
+"symbol": "PWJ",
+"status": "ok",
+"n": 4663,
+"first": "2008-01-02",
+"last": "2026-07-17"
+},
+"PWR": {
+"symbol": "PWR",
+"status": "ok",
+"n": 7160,
+"first": "1998-02-12",
+"last": "2026-07-31"
+},
+"PX": {
+"symbol": "PX",
+"status": "missing",
+"n": 0
+},
+"PXD": {
+"symbol": "PXD",
+"status": "missing",
+"n": 0
+},
+"PYPL": {
+"symbol": "PYPL",
+"status": "ok",
+"n": 2785,
+"first": "2015-07-06",
+"last": "2026-07-31"
+},
+"PZE": {
+"symbol": "PZE",
+"status": "ok",
+"n": 2174,
+"first": "2009-09-30",
+"last": "2018-05-18"
+},
+"Q": {
+"symbol": "Q",
+"status": "ok",
+"n": 191,
+"first": "2025-10-27",
+"last": "2026-07-31"
+},
+"QCOM": {
+"symbol": "QCOM",
+"status": "ok",
+"n": 8718,
+"first": "1991-12-13",
+"last": "2026-07-31"
+},
+"QEP": {
+"symbol": "QEP",
+"status": "missing",
+"n": 0
+},
+"QLGC": {
+"symbol": "QLGC",
+"status": "missing",
+"n": 0
+},
+"QQQ": {
+"symbol": "QQQ",
+"status": "ok",
+"n": 6891,
+"first": "1999-03-10",
+"last": "2026-07-31"
+},
+"QRVO": {
+"symbol": "QRVO",
+"status": "ok",
+"n": 2911,
+"first": "2015-01-02",
+"last": "2026-07-31"
+},
+"QTRN": {
+"symbol": "QTRN",
+"status": "missing",
+"n": 0
+},
+"R": {
+"symbol": "R",
+"status": "ok",
+"n": 11740,
+"first": "1980-01-02",
+"last": "2026-07-31"
+},
+"RAD": {
+"symbol": "RAD",
+"status": "missing",
+"n": 0
+},
+"RAI": {
+"symbol": "RAI",
+"status": "missing",
+"n": 0
+},
+"RAL": {
+"symbol": "RAL",
+"status": "ok",
+"n": 277,
+"first": "2025-06-25",
+"last": "2026-07-31"
+},
+"RATL": {
+"symbol": "RATL",
+"status": "missing",
+"n": 0
+},
+"RBD": {
+"symbol": "RBD",
+"status": "missing",
+"n": 0
+},
+"RBK": {
+"symbol": "RBK",
+"status": "missing",
+"n": 0
+},
+"RCL": {
+"symbol": "RCL",
+"status": "ok",
+"n": 8372,
+"first": "1993-04-28",
+"last": "2026-07-31"
+},
+"RDC": {
+"symbol": "RDC",
+"status": "missing",
+"n": 0
+},
+"RDS.A": {
+"symbol": "RDS-A",
+"status": "missing",
+"n": 0
+},
+"RE": {
+"symbol": "RE",
+"status": "missing",
+"n": 0
+},
+"REG": {
+"symbol": "REG",
+"status": "ok",
+"n": 8243,
+"first": "1993-10-29",
+"last": "2026-07-31"
+},
+"REGN": {
+"symbol": "REGN",
+"status": "ok",
+"n": 8897,
+"first": "1991-04-02",
+"last": "2026-07-31"
+},
+"RF": {
+"symbol": "RF",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"RHI": {
+"symbol": "RHI",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"RHT": {
+"symbol": "RHT",
+"status": "missing",
+"n": 0
+},
+"RIG": {
+"symbol": "RIG",
+"status": "ok",
+"n": 8350,
+"first": "1993-05-28",
+"last": "2026-07-31"
+},
+"RJF": {
+"symbol": "RJF",
+"status": "ok",
+"n": 10855,
+"first": "1983-07-01",
+"last": "2026-07-31"
+},
+"RL": {
+"symbol": "RL",
+"status": "ok",
+"n": 7329,
+"first": "1997-06-12",
+"last": "2026-07-31"
+},
+"RLM": {
+"symbol": "RLM",
+"status": "missing",
+"n": 0
+},
+"RMD": {
+"symbol": "RMD",
+"status": "ok",
+"n": 7842,
+"first": "1995-06-02",
+"last": "2026-07-31"
+},
+"RML": {
+"symbol": "RML",
+"status": "missing",
+"n": 0
+},
+"RNB": {
+"symbol": "RNB",
+"status": "missing",
+"n": 0
+},
+"ROH": {
+"symbol": "ROH",
+"status": "missing",
+"n": 0
+},
+"ROK": {
+"symbol": "ROK",
+"status": "ok",
+"n": 11235,
+"first": "1981-12-31",
+"last": "2026-07-31"
+},
+"ROL": {
+"symbol": "ROL",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"ROP": {
+"symbol": "ROP",
+"status": "ok",
+"n": 8676,
+"first": "1992-02-13",
+"last": "2026-07-31"
+},
+"ROST": {
+"symbol": "ROST",
+"status": "ok",
+"n": 10323,
+"first": "1985-08-08",
+"last": "2026-07-31"
+},
+"RRC": {
+"symbol": "RRC",
+"status": "ok",
+"n": 11622,
+"first": "1980-06-19",
+"last": "2026-07-31"
+},
+"RRD": {
+"symbol": "RRD",
+"status": "missing",
+"n": 0
+},
+"RSG": {
+"symbol": "RSG",
+"status": "ok",
+"n": 7064,
+"first": "1998-07-01",
+"last": "2026-07-31"
+},
+"RSHCQ": {
+"symbol": "RSHCQ",
+"status": "missing",
+"n": 0
+},
+"RTN": {
+"symbol": "RTN",
+"status": "missing",
+"n": 0
+},
+"RTX": {
+"symbol": "RTX",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"RVTY": {
+"symbol": "RVTY",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"RX": {
+"symbol": "RX",
+"status": "missing",
+"n": 0
+},
+"RYAN": {
+"symbol": "RYAN",
+"status": "ok",
+"n": 1262,
+"first": "2021-07-22",
+"last": "2026-07-31"
+},
+"RYC": {
+"symbol": "RYC",
+"status": "missing",
+"n": 0
+},
+"RYI": {
+"symbol": "RYI",
+"status": "missing",
+"n": 0
+},
+"S": {
+"symbol": "S",
+"status": "ok",
+"n": 1277,
+"first": "2021-06-30",
+"last": "2026-07-31"
+},
+"SAF": {
+"symbol": "SAF",
+"status": "ok",
+"n": 756,
+"first": "2018-08-29",
+"last": "2021-08-30"
+},
+"SAI": {
+"symbol": "SAI",
+"status": "missing",
+"n": 0
+},
+"SANM": {
+"symbol": "SANM",
+"status": "ok",
+"n": 8382,
+"first": "1993-04-14",
+"last": "2026-07-31"
+},
+"SAPE": {
+"symbol": "SAPE",
+"status": "missing",
+"n": 0
+},
+"SATS": {
+"symbol": "SATS",
+"status": "ok",
+"n": 1,
+"first": "2026-07-17",
+"last": "2026-07-17"
+},
+"SB": {
+"symbol": "SB",
+"status": "ok",
+"n": 4571,
+"first": "2008-05-30",
+"last": "2026-07-31"
+},
+"SBAC": {
+"symbol": "SBAC",
+"status": "ok",
+"n": 6823,
+"first": "1999-06-16",
+"last": "2026-07-31"
+},
+"SBL": {
+"symbol": "SBL",
+"status": "missing",
+"n": 0
+},
+"SBNY": {
+"symbol": "SBNY",
+"status": "ok",
+"n": 491,
+"first": "2024-08-15",
+"last": "2026-07-31"
+},
+"SBUX": {
+"symbol": "SBUX",
+"status": "ok",
+"n": 8583,
+"first": "1992-06-26",
+"last": "2026-07-31"
+},
+"SCG": {
+"symbol": "SCG",
+"status": "ok",
+"n": 872,
+"first": "2015-07-16",
+"last": "2018-12-31"
+},
+"SCHW": {
+"symbol": "SCHW",
+"status": "ok",
+"n": 9788,
+"first": "1987-09-22",
+"last": "2026-07-31"
+},
+"SCI": {
+"symbol": "SCI",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"SDS": {
+"symbol": "SDS",
+"status": "ok",
+"n": 5044,
+"first": "2006-07-13",
+"last": "2026-07-31"
+},
+"SE": {
+"symbol": "SE",
+"status": "ok",
+"n": 2205,
+"first": "2017-10-20",
+"last": "2026-07-31"
+},
+"SEBL": {
+"symbol": "SEBL",
+"status": "missing",
+"n": 0
+},
+"SEDG": {
+"symbol": "SEDG",
+"status": "ok",
+"n": 2854,
+"first": "2015-03-26",
+"last": "2026-07-31"
+},
+"SEE": {
+"symbol": "SEE",
+"status": "missing",
+"n": 0
+},
+"SEG": {
+"symbol": "SEG",
+"status": "ok",
+"n": 503,
+"first": "2024-07-30",
+"last": "2026-07-31"
+},
+"SFA": {
+"symbol": "SFA",
+"status": "missing",
+"n": 0
+},
+"SFS": {
+"symbol": "SFS",
+"status": "missing",
+"n": 0
+},
+"SGID": {
+"symbol": "SGID",
+"status": "missing",
+"n": 0
+},
+"SGP": {
+"symbol": "SGP",
+"status": "ok",
+"n": 121,
+"first": "2026-02-06",
+"last": "2026-07-31"
+},
+"SHLD": {
+"symbol": "SHLD",
+"status": "ok",
+"n": 722,
+"first": "2023-09-14",
+"last": "2026-07-31"
+},
+"SHN": {
+"symbol": "SHN",
+"status": "missing",
+"n": 0
+},
+"SHW": {
+"symbol": "SHW",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"SIAL": {
+"symbol": "SIAL",
+"status": "missing",
+"n": 0
+},
+"SIG": {
+"symbol": "SIG",
+"status": "ok",
+"n": 9583,
+"first": "1988-07-14",
+"last": "2026-07-31"
+},
+"SII": {
+"symbol": "SII",
+"status": "ok",
+"n": 4136,
+"first": "2010-02-22",
+"last": "2026-07-31"
+},
+"SIVB": {
+"symbol": "SIVB",
+"status": "missing",
+"n": 0
+},
+"SJM": {
+"symbol": "SJM",
+"status": "ok",
+"n": 7990,
+"first": "1994-10-31",
+"last": "2026-07-31"
+},
+"SK": {
+"symbol": "SK",
+"status": "ok",
+"n": 14,
+"first": "2026-07-14",
+"last": "2026-07-31"
+},
+"SLB": {
+"symbol": "SLB",
+"status": "ok",
+"n": 11235,
+"first": "1981-12-31",
+"last": "2026-07-31"
+},
+"SLG": {
+"symbol": "SLG",
+"status": "ok",
+"n": 7284,
+"first": "1997-08-15",
+"last": "2026-07-31"
+},
+"SLM": {
+"symbol": "SLM",
+"status": "ok",
+"n": 10797,
+"first": "1983-09-23",
+"last": "2026-07-31"
+},
+"SLR": {
+"symbol": "SLR",
+"status": "missing",
+"n": 0
+},
+"SMCI": {
+"symbol": "SMCI",
+"status": "ok",
+"n": 4866,
+"first": "2007-03-29",
+"last": "2026-07-31"
+},
+"SMI": {
+"symbol": "SMI",
+"status": "ok",
+"n": 954,
+"first": "2021-09-08",
+"last": "2025-06-26"
+},
+"SMS": {
+"symbol": "SMS",
+"status": "missing",
+"n": 0
+},
+"SNA": {
+"symbol": "SNA",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"SNDK": {
+"symbol": "SNDK",
+"status": "ok",
+"n": 367,
+"first": "2025-02-13",
+"last": "2026-07-31"
+},
+"SNI": {
+"symbol": "SNI",
+"status": "missing",
+"n": 0
+},
+"SNPS": {
+"symbol": "SNPS",
+"status": "ok",
+"n": 8668,
+"first": "1992-02-26",
+"last": "2026-07-31"
+},
+"SNT": {
+"symbol": "SNT",
+"status": "ok",
+"n": 8397,
+"first": "1993-03-23",
+"last": "2026-07-31"
+},
+"SNV": {
+"symbol": "SNV",
+"status": "missing",
+"n": 0
+},
+"SO": {
+"symbol": "SO",
+"status": "ok",
+"n": 11235,
+"first": "1981-12-31",
+"last": "2026-07-31"
+},
+"SOLS": {
+"symbol": "SOLS",
+"status": "ok",
+"n": 196,
+"first": "2025-10-20",
+"last": "2026-07-31"
+},
+"SOLV": {
+"symbol": "SOLV",
+"status": "ok",
+"n": 589,
+"first": "2024-03-26",
+"last": "2026-07-31"
+},
+"SOTR": {
+"symbol": "SOTR",
+"status": "missing",
+"n": 0
+},
+"SOV": {
+"symbol": "SOV",
+"status": "missing",
+"n": 0
+},
+"SPG": {
+"symbol": "SPG",
+"status": "ok",
+"n": 8212,
+"first": "1993-12-14",
+"last": "2026-07-31"
+},
+"SPGI": {
+"symbol": "SPGI",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"SPLS": {
+"symbol": "SPLS",
+"status": "ok",
+"n": 135,
+"first": "2026-01-16",
+"last": "2026-07-31"
+},
+"SPY": {
+"symbol": "SPY",
+"status": "ok",
+"n": 8433,
+"first": "1993-01-29",
+"last": "2026-07-31"
+},
+"SRCL": {
+"symbol": "SRCL",
+"status": "missing",
+"n": 0
+},
+"SRE": {
+"symbol": "SRE",
+"status": "ok",
+"n": 7066,
+"first": "1998-06-29",
+"last": "2026-07-31"
+},
+"SRR": {
+"symbol": "SRR",
+"status": "missing",
+"n": 0
+},
+"SSP": {
+"symbol": "SSP",
+"status": "ok",
+"n": 9592,
+"first": "1988-06-30",
+"last": "2026-07-31"
+},
+"STE": {
+"symbol": "STE",
+"status": "ok",
+"n": 8602,
+"first": "1992-06-01",
+"last": "2026-07-31"
+},
+"STI": {
+"symbol": "STI",
+"status": "ok",
+"n": 1066,
+"first": "2022-05-02",
+"last": "2026-07-31"
+},
+"STJ": {
+"symbol": "STJ",
+"status": "missing",
+"n": 0
+},
+"STLD": {
+"symbol": "STLD",
+"status": "ok",
+"n": 7467,
+"first": "1996-11-22",
+"last": "2026-07-31"
+},
+"STO": {
+"symbol": "STO",
+"status": "missing",
+"n": 0
+},
+"STR": {
+"symbol": "STR",
+"status": "missing",
+"n": 0
+},
+"STT": {
+"symbol": "STT",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"STX": {
+"symbol": "STX",
+"status": "ok",
+"n": 5946,
+"first": "2002-12-11",
+"last": "2026-07-31"
+},
+"STZ": {
+"symbol": "STZ",
+"status": "ok",
+"n": 8654,
+"first": "1992-03-17",
+"last": "2026-07-31"
+},
+"SUB": {
+"symbol": "SUB",
+"status": "ok",
+"n": 4450,
+"first": "2008-11-19",
+"last": "2026-07-31"
+},
+"SUN": {
+"symbol": "SUN",
+"status": "ok",
+"n": 3484,
+"first": "2012-09-20",
+"last": "2026-07-31"
+},
+"SUNEQ": {
+"symbol": "SUNEQ",
+"status": "missing",
+"n": 0
+},
+"SVU": {
+"symbol": "SVU",
+"status": "ok",
+"n": 11602,
+"first": "1972-06-06",
+"last": "2018-10-22"
+},
+"SW": {
+"symbol": "SW",
+"status": "ok",
+"n": 4559,
+"first": "2008-06-17",
+"last": "2026-07-31"
+},
+"SWK": {
+"symbol": "SWK",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"SWKS": {
+"symbol": "SWKS",
+"status": "ok",
+"n": 10555,
+"first": "1984-09-07",
+"last": "2026-07-31"
+},
+"SWN": {
+"symbol": "SWN",
+"status": "missing",
+"n": 0
+},
+"SWY": {
+"symbol": "SWY",
+"status": "missing",
+"n": 0
+},
+"SXCL": {
+"symbol": "SXCL",
+"status": "missing",
+"n": 0
+},
+"SYF": {
+"symbol": "SYF",
+"status": "ok",
+"n": 3018,
+"first": "2014-07-31",
+"last": "2026-07-31"
+},
+"SYK": {
+"symbol": "SYK",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"SYMC": {
+"symbol": "SYMC",
+"status": "missing",
+"n": 0
+},
+"SYY": {
+"symbol": "SYY",
+"status": "ok",
+"n": 13421,
+"first": "1973-05-08",
+"last": "2026-07-31"
+},
+"T": {
+"symbol": "T",
+"status": "ok",
+"n": 10756,
+"first": "1983-11-21",
+"last": "2026-07-31"
+},
+"TA": {
+"symbol": "TA",
+"status": "missing",
+"n": 0
+},
+"TAP": {
+"symbol": "TAP",
+"status": "ok",
+"n": 12891,
+"first": "1975-06-12",
+"last": "2026-07-31"
+},
+"TCOMA": {
+"symbol": "TCOMA",
+"status": "missing",
+"n": 0
+},
+"TDC": {
+"symbol": "TDC",
+"status": "ok",
+"n": 4738,
+"first": "2007-10-01",
+"last": "2026-07-31"
+},
+"TDG": {
+"symbol": "TDG",
+"status": "ok",
+"n": 5127,
+"first": "2006-03-15",
+"last": "2026-07-31"
+},
+"TDM": {
+"symbol": "TDM",
+"status": "missing",
+"n": 0
+},
+"TDY": {
+"symbol": "TDY",
+"status": "ok",
+"n": 6711,
+"first": "1999-11-23",
+"last": "2026-07-31"
+},
+"TE": {
+"symbol": "TE",
+"status": "ok",
+"n": 1647,
+"first": "2020-01-10",
+"last": "2026-07-31"
+},
+"TECH": {
+"symbol": "TECH",
+"status": "ok",
+"n": 9437,
+"first": "1989-02-09",
+"last": "2026-07-31"
+},
+"TEG": {
+"symbol": "TEG",
+"status": "missing",
+"n": 0
+},
+"TEK": {
+"symbol": "TEK",
+"status": "ok",
+"n": 444,
+"first": "2024-10-22",
+"last": "2026-07-31"
+},
+"TEL": {
+"symbol": "TEL",
+"status": "ok",
+"n": 4813,
+"first": "2007-06-14",
+"last": "2026-07-31"
+},
+"TEN": {
+"symbol": "TEN",
+"status": "ok",
+"n": 6142,
+"first": "2002-03-05",
+"last": "2026-07-31"
+},
+"TER": {
+"symbol": "TER",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"TEX": {
+"symbol": "TEX",
+"status": "ok",
+"n": 11686,
+"first": "1980-03-19",
+"last": "2026-07-31"
+},
+"TFC": {
+"symbol": "TFC",
+"status": "ok",
+"n": 11687,
+"first": "1980-03-18",
+"last": "2026-07-31"
+},
+"TFX": {
+"symbol": "TFX",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"TGNA": {
+"symbol": "TGNA",
+"status": "missing",
+"n": 0
+},
+"TGT": {
+"symbol": "TGT",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"THC": {
+"symbol": "THC",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"THY": {
+"symbol": "THY",
+"status": "ok",
+"n": 1532,
+"first": "2020-06-25",
+"last": "2026-07-31"
+},
+"TIE": {
+"symbol": "TIE",
+"status": "missing",
+"n": 0
+},
+"TIF": {
+"symbol": "TIF",
+"status": "missing",
+"n": 0
+},
+"TIN": {
+"symbol": "TIN",
+"status": "missing",
+"n": 0
+},
+"TJX": {
+"symbol": "TJX",
+"status": "ok",
+"n": 9848,
+"first": "1987-06-26",
+"last": "2026-07-31"
+},
+"TKO": {
+"symbol": "TKO",
+"status": "ok",
+"n": 6736,
+"first": "1999-10-19",
+"last": "2026-07-31"
+},
+"TKR": {
+"symbol": "TKR",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"TLAB": {
+"symbol": "TLAB",
+"status": "missing",
+"n": 0
+},
+"TLT": {
+"symbol": "TLT",
+"status": "ok",
+"n": 6040,
+"first": "2002-07-30",
+"last": "2026-07-31"
+},
+"TMC": {
+"symbol": "TMC",
+"status": "ok",
+"n": 1227,
+"first": "2021-09-10",
+"last": "2026-07-31"
+},
+"TMC.A": {
+"symbol": "TMC-A",
+"status": "missing",
+"n": 0
+},
+"TMK": {
+"symbol": "TMK",
+"status": "missing",
+"n": 0
+},
+"TMO": {
+"symbol": "TMO",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"TMUS": {
+"symbol": "TMUS",
+"status": "ok",
+"n": 4852,
+"first": "2007-04-19",
+"last": "2026-07-31"
+},
+"TNB": {
+"symbol": "TNB",
+"status": "missing",
+"n": 0
+},
+"TOS": {
+"symbol": "TOS",
+"status": "ok",
+"n": 127,
+"first": "2026-01-29",
+"last": "2026-07-31"
+},
+"TOY": {
+"symbol": "TOY",
+"status": "missing",
+"n": 0
+},
+"TPL": {
+"symbol": "TPL",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"TPR": {
+"symbol": "TPR",
+"status": "ok",
+"n": 6491,
+"first": "2000-10-06",
+"last": "2026-07-31"
+},
+"TRB": {
+"symbol": "TRB",
+"status": "missing",
+"n": 0
+},
+"TRGP": {
+"symbol": "TRGP",
+"status": "ok",
+"n": 3935,
+"first": "2010-12-07",
+"last": "2026-07-31"
+},
+"TRIP": {
+"symbol": "TRIP",
+"status": "ok",
+"n": 3682,
+"first": "2011-12-07",
+"last": "2026-07-31"
+},
+"TRMB": {
+"symbol": "TRMB",
+"status": "ok",
+"n": 9073,
+"first": "1990-07-20",
+"last": "2026-07-31"
+},
+"TROW": {
+"symbol": "TROW",
+"status": "ok",
+"n": 10161,
+"first": "1986-04-02",
+"last": "2026-07-31"
+},
+"TRV": {
+"symbol": "TRV",
+"status": "ok",
+"n": 12781,
+"first": "1975-11-17",
+"last": "2026-07-31"
+},
+"TRW": {
+"symbol": "TRW",
+"status": "missing",
+"n": 0
+},
+"TSCO": {
+"symbol": "TSCO",
+"status": "ok",
+"n": 8166,
+"first": "1994-02-17",
+"last": "2026-07-31"
+},
+"TSG": {
+"symbol": "TSG",
+"status": "missing",
+"n": 0
+},
+"TSLA": {
+"symbol": "TSLA",
+"status": "ok",
+"n": 4047,
+"first": "2010-06-29",
+"last": "2026-07-31"
+},
+"TSN": {
+"symbol": "TSN",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"TSS": {
+"symbol": "TSS",
+"status": "missing",
+"n": 0
+},
+"TT": {
+"symbol": "TT",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"TTD": {
+"symbol": "TTD",
+"status": "ok",
+"n": 2478,
+"first": "2016-09-21",
+"last": "2026-07-31"
+},
+"TTWO": {
+"symbol": "TTWO",
+"status": "ok",
+"n": 7370,
+"first": "1997-04-15",
+"last": "2026-07-31"
+},
+"TUP": {
+"symbol": "TUP",
+"status": "missing",
+"n": 0
+},
+"TWC": {
+"symbol": "TWC",
+"status": "missing",
+"n": 0
+},
+"TWTR": {
+"symbol": "TWTR",
+"status": "missing",
+"n": 0
+},
+"TWX": {
+"symbol": "TWX",
+"status": "ok",
+"n": 6598,
+"first": "1992-03-19",
+"last": "2018-06-15"
+},
+"TX": {
+"symbol": "TX",
+"status": "ok",
+"n": 5156,
+"first": "2006-02-01",
+"last": "2026-07-31"
+},
+"TXN": {
+"symbol": "TXN",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"TXT": {
+"symbol": "TXT",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"TXU": {
+"symbol": "TXU",
+"status": "missing",
+"n": 0
+},
+"TYL": {
+"symbol": "TYL",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"UA": {
+"symbol": "UA",
+"status": "ok",
+"n": 2604,
+"first": "2016-03-23",
+"last": "2026-07-31"
+},
+"UAA": {
+"symbol": "UAA",
+"status": "ok",
+"n": 5205,
+"first": "2005-11-18",
+"last": "2026-07-31"
+},
+"UAL": {
+"symbol": "UAL",
+"status": "ok",
+"n": 5153,
+"first": "2006-02-06",
+"last": "2026-07-31"
+},
+"UAWGQ": {
+"symbol": "UAWGQ",
+"status": "missing",
+"n": 0
+},
+"UBER": {
+"symbol": "UBER",
+"status": "ok",
+"n": 1816,
+"first": "2019-05-10",
+"last": "2026-07-31"
+},
+"UCC": {
+"symbol": "UCC",
+"status": "ok",
+"n": 4904,
+"first": "2007-02-02",
+"last": "2026-07-31"
+},
+"UCL": {
+"symbol": "UCL",
+"status": "ok",
+"n": 1543,
+"first": "2020-06-10",
+"last": "2026-07-31"
+},
+"UCM": {
+"symbol": "UCM",
+"status": "missing",
+"n": 0
+},
+"UDR": {
+"symbol": "UDR",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"UHS": {
+"symbol": "UHS",
+"status": "ok",
+"n": 11357,
+"first": "1981-07-09",
+"last": "2026-07-31"
+},
+"UIS": {
+"symbol": "UIS",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"UK": {
+"symbol": "UK",
+"status": "ok",
+"n": 1690,
+"first": "2019-11-07",
+"last": "2026-07-31"
+},
+"ULTA": {
+"symbol": "ULTA",
+"status": "ok",
+"n": 4720,
+"first": "2007-10-25",
+"last": "2026-07-31"
+},
+"UMG": {
+"symbol": "UMG",
+"status": "missing",
+"n": 0
+},
+"UN": {
+"symbol": "UN",
+"status": "ok",
+"n": 19,
+"first": "2026-07-07",
+"last": "2026-07-31"
+},
+"UNH": {
+"symbol": "UNH",
+"status": "ok",
+"n": 10527,
+"first": "1984-10-17",
+"last": "2026-07-31"
+},
+"UNM": {
+"symbol": "UNM",
+"status": "ok",
+"n": 10008,
+"first": "1986-11-06",
+"last": "2026-07-31"
+},
+"UNP": {
+"symbol": "UNP",
+"status": "ok",
+"n": 11740,
+"first": "1980-01-02",
+"last": "2026-07-31"
+},
+"UPC": {
+"symbol": "UPC",
+"status": "ok",
+"n": 1346,
+"first": "2021-03-23",
+"last": "2026-07-31"
+},
+"UPR": {
+"symbol": "UPR",
+"status": "missing",
+"n": 0
+},
+"UPS": {
+"symbol": "UPS",
+"status": "ok",
+"n": 6720,
+"first": "1999-11-10",
+"last": "2026-07-31"
+},
+"URBN": {
+"symbol": "URBN",
+"status": "ok",
+"n": 8236,
+"first": "1993-11-09",
+"last": "2026-07-31"
+},
+"URI": {
+"symbol": "URI",
+"status": "ok",
+"n": 7197,
+"first": "1997-12-18",
+"last": "2026-07-31"
+},
+"USB": {
+"symbol": "USB",
+"status": "ok",
+"n": 13424,
+"first": "1973-05-03",
+"last": "2026-07-31"
+},
+"USBC": {
+"symbol": "USBC",
+"status": "ok",
+"n": 5103,
+"first": "2006-04-18",
+"last": "2026-07-31"
+},
+"USH": {
+"symbol": "USH",
+"status": "missing",
+"n": 0
+},
+"USHC": {
+"symbol": "USHC",
+"status": "missing",
+"n": 0
+},
+"USS": {
+"symbol": "USS",
+"status": "missing",
+"n": 0
+},
+"UST": {
+"symbol": "UST",
+"status": "ok",
+"n": 4149,
+"first": "2010-02-02",
+"last": "2026-07-31"
+},
+"USW": {
+"symbol": "USW",
+"status": "missing",
+"n": 0
+},
+"UTX": {
+"symbol": "UTX",
+"status": "missing",
+"n": 0
+},
+"UVN": {
+"symbol": "UVN",
+"status": "missing",
+"n": 0
+},
+"V": {
+"symbol": "V",
+"status": "ok",
+"n": 4621,
+"first": "2008-03-19",
+"last": "2026-07-31"
+},
+"VAR": {
+"symbol": "VAR",
+"status": "missing",
+"n": 0
+},
+"VAT": {
+"symbol": "VAT",
+"status": "missing",
+"n": 0
+},
+"VEEV": {
+"symbol": "VEEV",
+"status": "ok",
+"n": 3216,
+"first": "2013-10-16",
+"last": "2026-07-31"
+},
+"VFC": {
+"symbol": "VFC",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"VIAB": {
+"symbol": "VIAB",
+"status": "missing",
+"n": 0
+},
+"VIAC": {
+"symbol": "VIAC",
+"status": "missing",
+"n": 0
+},
+"VIAV": {
+"symbol": "VIAV",
+"status": "ok",
+"n": 8230,
+"first": "1993-11-17",
+"last": "2026-07-31"
+},
+"VICI": {
+"symbol": "VICI",
+"status": "ok",
+"n": 2156,
+"first": "2018-01-02",
+"last": "2026-07-31"
+},
+"VLO": {
+"symbol": "VLO",
+"status": "ok",
+"n": 11234,
+"first": "1982-01-04",
+"last": "2026-07-31"
+},
+"VLTO": {
+"symbol": "VLTO",
+"status": "ok",
+"n": 708,
+"first": "2023-10-04",
+"last": "2026-07-31"
+},
+"VMC": {
+"symbol": "VMC",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"VNO": {
+"symbol": "VNO",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"VNT": {
+"symbol": "VNT",
+"status": "ok",
+"n": 1469,
+"first": "2020-09-24",
+"last": "2026-07-31"
+},
+"VO": {
+"symbol": "VO",
+"status": "ok",
+"n": 5661,
+"first": "2004-01-30",
+"last": "2026-07-31"
+},
+"VRSK": {
+"symbol": "VRSK",
+"status": "ok",
+"n": 4229,
+"first": "2009-10-07",
+"last": "2026-07-31"
+},
+"VRSN": {
+"symbol": "VRSN",
+"status": "ok",
+"n": 7169,
+"first": "1998-01-30",
+"last": "2026-07-31"
+},
+"VRT": {
+"symbol": "VRT",
+"status": "ok",
+"n": 2009,
+"first": "2018-08-02",
+"last": "2026-07-31"
+},
+"VRTS": {
+"symbol": "VRTS",
+"status": "ok",
+"n": 4421,
+"first": "2009-01-02",
+"last": "2026-07-31"
+},
+"VRTX": {
+"symbol": "VRTX",
+"status": "ok",
+"n": 8818,
+"first": "1991-07-24",
+"last": "2026-07-31"
+},
+"VST": {
+"symbol": "VST",
+"status": "ok",
+"n": 2468,
+"first": "2016-10-05",
+"last": "2026-07-31"
+},
+"VSTNQ": {
+"symbol": "VSTNQ",
+"status": "missing",
+"n": 0
+},
+"VTR": {
+"symbol": "VTR",
+"status": "ok",
+"n": 7356,
+"first": "1997-05-05",
+"last": "2026-07-31"
+},
+"VTRS": {
+"symbol": "VTRS",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"VTSS": {
+"symbol": "VTSS",
+"status": "missing",
+"n": 0
+},
+"VZ": {
+"symbol": "VZ",
+"status": "ok",
+"n": 10756,
+"first": "1983-11-21",
+"last": "2026-07-31"
+},
+"WAB": {
+"symbol": "WAB",
+"status": "ok",
+"n": 7832,
+"first": "1995-06-16",
+"last": "2026-07-31"
+},
+"WAI": {
+"symbol": "WAI",
+"status": "ok",
+"n": 5,
+"first": "2026-07-17",
+"last": "2026-07-23"
+},
+"WAMUQ": {
+"symbol": "WAMUQ",
+"status": "missing",
+"n": 0
+},
+"WAT": {
+"symbol": "WAT",
+"status": "ok",
+"n": 7724,
+"first": "1995-11-17",
+"last": "2026-07-31"
+},
+"WB": {
+"symbol": "WB",
+"status": "ok",
+"n": 3090,
+"first": "2014-04-17",
+"last": "2026-07-31"
+},
+"WBA": {
+"symbol": "WBA",
+"status": "missing",
+"n": 0
+},
+"WBD": {
+"symbol": "WBD",
+"status": "ok",
+"n": 5299,
+"first": "2005-07-08",
+"last": "2026-07-31"
+},
+"WCG": {
+"symbol": "WCG",
+"status": "missing",
+"n": 0
+},
+"WCOEQ": {
+"symbol": "WCOEQ",
+"status": "missing",
+"n": 0
+},
+"WDAY": {
+"symbol": "WDAY",
+"status": "ok",
+"n": 3468,
+"first": "2012-10-12",
+"last": "2026-07-31"
+},
+"WDC": {
+"symbol": "WDC",
+"status": "ok",
+"n": 12035,
+"first": "1978-10-31",
+"last": "2026-07-31"
+},
+"WEC": {
+"symbol": "WEC",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"WELL": {
+"symbol": "WELL",
+"status": "ok",
+"n": 11686,
+"first": "1980-03-19",
+"last": "2026-07-31"
+},
+"WEN": {
+"symbol": "WEN",
+"status": "ok",
+"n": 11653,
+"first": "1980-05-06",
+"last": "2026-07-31"
+},
+"WFC": {
+"symbol": "WFC",
+"status": "ok",
+"n": 13654,
+"first": "1972-06-01",
+"last": "2026-07-31"
+},
+"WFM": {
+"symbol": "WFM",
+"status": "missing",
+"n": 0
+},
+"WFT": {
+"symbol": "WFT",
+"status": "missing",
+"n": 0
+},
+"WHR": {
+"symbol": "WHR",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"WIN": {
+"symbol": "WIN",
+"status": "missing",
+"n": 0
+},
+"WLA": {
+"symbol": "WLA",
+"status": "missing",
+"n": 0
+},
+"WLL": {
+"symbol": "WLL",
+"status": "missing",
+"n": 0
+},
+"WLP": {
+"symbol": "WLP",
+"status": "missing",
+"n": 0
+},
+"WLTW": {
+"symbol": "WLTW",
+"status": "missing",
+"n": 0
+},
+"WM": {
+"symbol": "WM",
+"status": "ok",
+"n": 9598,
+"first": "1988-06-22",
+"last": "2026-07-31"
+},
+"WMB": {
+"symbol": "WMB",
+"status": "ok",
+"n": 11235,
+"first": "1981-12-31",
+"last": "2026-07-31"
+},
+"WMT": {
+"symbol": "WMT",
+"status": "ok",
+"n": 13594,
+"first": "1972-08-25",
+"last": "2026-07-31"
+},
+"WMX": {
+"symbol": "WMX",
+"status": "missing",
+"n": 0
+},
+"WNDXQ": {
+"symbol": "WNDXQ",
+"status": "missing",
+"n": 0
+},
+"WOR": {
+"symbol": "WOR",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"WPX": {
+"symbol": "WPX",
+"status": "missing",
+"n": 0
+},
+"WRB": {
+"symbol": "WRB",
+"status": "ok",
+"n": 13304,
+"first": "1973-10-23",
+"last": "2026-07-31"
+},
+"WRK": {
+"symbol": "WRK",
+"status": "missing",
+"n": 0
+},
+"WSM": {
+"symbol": "WSM",
+"status": "ok",
+"n": 10852,
+"first": "1983-07-07",
+"last": "2026-07-31"
+},
+"WST": {
+"symbol": "WST",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"WTW": {
+"symbol": "WTW",
+"status": "ok",
+"n": 6321,
+"first": "2001-06-12",
+"last": "2026-07-31"
+},
+"WU": {
+"symbol": "WU",
+"status": "ok",
+"n": 4988,
+"first": "2006-10-02",
+"last": "2026-07-31"
+},
+"WWY": {
+"symbol": "WWY",
+"status": "missing",
+"n": 0
+},
+"WY": {
+"symbol": "WY",
+"status": "ok",
+"n": 13424,
+"first": "1973-05-03",
+"last": "2026-07-31"
+},
+"WYE": {
+"symbol": "WYE",
+"status": "missing",
+"n": 0
+},
+"WYND": {
+"symbol": "WYND",
+"status": "missing",
+"n": 0
+},
+"WYNN": {
+"symbol": "WYNN",
+"status": "ok",
+"n": 5978,
+"first": "2002-10-25",
+"last": "2026-07-31"
+},
+"X": {
+"symbol": "X",
+"status": "missing",
+"n": 0
+},
+"XEC": {
+"symbol": "XEC",
+"status": "missing",
+"n": 0
+},
+"XEL": {
+"symbol": "XEL",
+"status": "ok",
+"n": 13474,
+"first": "1973-02-21",
+"last": "2026-07-31"
+},
+"XL": {
+"symbol": "XL",
+"status": "missing",
+"n": 0
+},
+"XLNX": {
+"symbol": "XLNX",
+"status": "missing",
+"n": 0
+},
+"XOM": {
+"symbol": "XOM",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"XRAY": {
+"symbol": "XRAY",
+"status": "ok",
+"n": 9816,
+"first": "1987-08-12",
+"last": "2026-07-31"
+},
+"XRX": {
+"symbol": "XRX",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"XTO": {
+"symbol": "XTO",
+"status": "missing",
+"n": 0
+},
+"XYL": {
+"symbol": "XYL",
+"status": "ok",
+"n": 3720,
+"first": "2011-10-13",
+"last": "2026-07-31"
+},
+"XYZ": {
+"symbol": "XYZ",
+"status": "ok",
+"n": 2688,
+"first": "2015-11-19",
+"last": "2026-07-31"
+},
+"YNR": {
+"symbol": "YNR",
+"status": "missing",
+"n": 0
+},
+"YRCW": {
+"symbol": "YRCW",
+"status": "missing",
+"n": 0
+},
+"YUM": {
+"symbol": "YUM",
+"status": "ok",
+"n": 7262,
+"first": "1997-09-17",
+"last": "2026-07-31"
+},
+"ZBH": {
+"symbol": "ZBH",
+"status": "ok",
+"n": 6291,
+"first": "2001-07-25",
+"last": "2026-07-31"
+},
+"ZBRA": {
+"symbol": "ZBRA",
+"status": "ok",
+"n": 8802,
+"first": "1991-08-15",
+"last": "2026-07-31"
+},
+"ZION": {
+"symbol": "ZION",
+"status": "ok",
+"n": 11688,
+"first": "1980-03-17",
+"last": "2026-07-31"
+},
+"ZTS": {
+"symbol": "ZTS",
+"status": "ok",
+"n": 3394,
+"first": "2013-02-01",
+"last": "2026-07-31"
+},
+"^GSPC": {
+"symbol": "^GSPC",
+"status": "ok",
+"n": 14266,
+"first": "1970-01-02",
+"last": "2026-07-31"
+},
+"^VIX": {
+"symbol": "^VIX",
+"status": "ok",
+"n": 9213,
+"first": "1990-01-02",
+"last": "2026-07-31"
+}
+}

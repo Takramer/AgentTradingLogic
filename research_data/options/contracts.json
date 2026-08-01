@@ -1,0 +1,92 @@
+{
+ "05ac22d5-286f-4ed0-8d65-0458aa833224": {
+  "captures": 1,
+  "exp": "2026-08-21",
+  "first_seen": "2026-07-31T20:15:00Z",
+  "last_seen": "2026-07-31T20:15:00Z",
+  "strike": 745.0,
+  "symbol": "SPY",
+  "type": "call"
+ },
+ "44317a29-d287-4616-bb2c-a869104ed60f": {
+  "captures": 1,
+  "exp": "2026-08-21",
+  "first_seen": "2026-07-31T20:15:00Z",
+  "last_seen": "2026-07-31T20:15:00Z",
+  "strike": 745.0,
+  "symbol": "SPY",
+  "type": "put"
+ },
+ "4efcff11-4865-4b1b-be4a-ef3ce2ca1779": {
+  "captures": 1,
+  "exp": "2026-12-18",
+  "first_seen": "2026-07-31T20:15:00Z",
+  "last_seen": "2026-07-31T20:15:00Z",
+  "strike": 745.0,
+  "symbol": "SPY",
+  "type": "put"
+ },
+ "53c57186-8b10-4cdc-9211-c17d393053b9": {
+  "captures": 1,
+  "exp": "2026-08-03",
+  "first_seen": "2026-07-31T20:15:00Z",
+  "last_seen": "2026-07-31T20:15:00Z",
+  "strike": 740.0,
+  "symbol": "SPY",
+  "type": "call"
+ },
+ "72c87aed-b512-4cb7-a8c1-fa8caad43783": {
+  "captures": 1,
+  "exp": "2026-08-03",
+  "first_seen": "2026-07-31T20:15:00Z",
+  "last_seen": "2026-07-31T20:15:00Z",
+  "strike": 750.0,
+  "symbol": "SPY",
+  "type": "call"
+ },
+ "76ff6b08-9091-4b2f-b657-a184b57ae492": {
+  "captures": 1,
+  "exp": "2026-12-18",
+  "first_seen": "2026-07-31T20:15:00Z",
+  "last_seen": "2026-07-31T20:15:00Z",
+  "strike": 745.0,
+  "symbol": "SPY",
+  "type": "call"
+ },
+ "b7f3235b-7b38-4e5d-89b1-6d8f94540607": {
+  "captures": 1,
+  "exp": "2026-08-03",
+  "first_seen": "2026-07-31T20:15:00Z",
+  "last_seen": "2026-07-31T20:15:00Z",
+  "strike": 745.0,
+  "symbol": "SPY",
+  "type": "call"
+ },
+ "c0fb9a2c-51e7-4d62-aa12-23796cb00bbe": {
+  "captures": 1,
+  "exp": "2026-08-03",
+  "first_seen": "2026-07-31T20:15:00Z",
+  "last_seen": "2026-07-31T20:15:00Z",
+  "strike": 744.0,
+  "symbol": "SPY",
+  "type": "call"
+ },
+ "ef24a40d-4fbf-427a-91e6-cfedf7e9ae74": {
+  "captures": 1,
+  "exp": "2026-08-03",
+  "first_seen": "2026-07-31T20:15:00Z",
+  "last_seen": "2026-07-31T20:15:00Z",
+  "strike": 745.0,
+  "symbol": "SPY",
+  "type": "put"
+ },
+ "fe3677d9-ab3b-434b-8db2-523a4a0198bc": {
+  "captures": 1,
+  "exp": "2026-09-18",
+  "first_seen": "2026-07-31T20:15:00Z",
+  "last_seen": "2026-07-31T20:15:00Z",
+  "strike": 745.0,
+  "symbol": "SPY",
+  "type": "call"
+ }
+}

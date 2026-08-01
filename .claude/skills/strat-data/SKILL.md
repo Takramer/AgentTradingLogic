@@ -45,15 +45,19 @@ helper is budget-aware — don't loop it.
 
 ## 2. Regenerate the artifacts (in dependency order)
 
-Run from repo root, always `--cost-bps 5`. Cap the universe while checking the
-plumbing (`--max-tickers 150`), then drop the cap for the real run.
+Run from repo root. **Omit `--cost-bps`** — every CLI now resolves it from
+`config.json` `costs.round_trip_bps` (30, measured) via `rhengine/costs.py`.
+Passing `5` was the old written rule and it is wrong: 5 bps is a mega-cap
+number on a $500k/day universe, and measured breakeven is 11.2 bps. Cap the
+universe while checking the plumbing (`--max-tickers 150`), then drop the cap
+for the real run.
 
 ```powershell
 # a. Signal-level trades — the base artifact most tools/notebooks read
-py -m rhengine.backtest --lookback-days 400 --cost-bps 5 --csv tests/results/cv_trades.csv
+py -m rhengine.backtest --lookback-days 400 --csv tests/results/cv_trades.csv
 
 # b. Refined-set trades (VBT path) — Monte Carlo notebook input
-py -m rhengine.mc_refined --lookback-days 730 --cost-bps 5 --csv tests/results/refined_trades.csv
+py -m rhengine.mc_refined --lookback-days 730 --csv tests/results/refined_trades.csv
 
 # c. IC signal panel (scores + forward returns)
 py -m rhengine.ic --max-tickers 300 --csv tests/results/ic_panel_auto.csv

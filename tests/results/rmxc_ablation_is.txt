@@ -1,0 +1,13 @@
+
+=== RMX-C leave-one-out  2010-07-01 .. 2018-12-31 @ 10 bps ===
+             n_sleeves  cagr_pct  sharpe  max_dd_pct  alpha_spy_t  alpha_cw_t  alpha_cw_pct  turnover_pct  d_alpha_t
+config                                                                                                              
+ALL                  5     13.46    0.86      -21.90        -0.21       -0.22         -0.26        382.08       0.00
+-quality             4     12.89    0.80      -26.24        -0.91       -0.82         -1.40        475.58       0.61
+-momentum            4     13.17    0.85      -22.27        -0.47       -0.39         -0.54        434.79       0.18
+-reversal            4     13.60    0.88      -21.58         0.67        0.62          0.61        191.89      -0.83
+-investment          4     14.06    0.88      -22.74         0.22        0.18          0.25        441.22      -0.40
+-issuance            4     13.40    0.85      -21.90        -0.23       -0.23         -0.29        399.21       0.02
+
+d_alpha_t > 0 means the dropped sleeve was ADDING alpha t.
+Swings below ~0.5 t are noise on this sample length.

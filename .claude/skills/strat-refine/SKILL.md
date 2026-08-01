@@ -26,7 +26,12 @@ scoring math.
   on PATH. `tzdata` is required (already installed).
 - Data source is set in `config.json` (`data_source`). Full-market `massive`
   cache exists; `yahoo` is the keyless per-symbol fallback.
-- **Always pass `--cost-bps 5`.** Never report or trust whole-history numbers.
+- **Never pass `--cost-bps`.** It resolves from `config.json`
+  `costs.round_trip_bps` (30, measured) through `rhengine/costs.py`. The old
+  "always pass 5" rule is what produced the 0-bps headline artifact the audit
+  killed, and 5 bps is a mega-cap number on a $500k/day universe — measured
+  breakeven is 11.2 bps incremental. Override only to run a cost *sweep*.
+- Never report or trust whole-history numbers.
 - Event-loop tools (`backtest`, `ic`, `crossval`, `sanity` fresh, `nulltest`)
   are slow at full-market scale — add `--max-tickers 150` (or lower) while
   iterating, then confirm the finalist on the full universe.
@@ -43,7 +48,7 @@ whole table, unless a number is surprising.
    `py -m rhengine.sanity --trades-csv <csv>` — or `--strict` in a gate.
    FAIL here means stop and fix; don't tune a broken backtest.
 2. **Ablation — is the rule drag or edge?**
-   `py -m rhengine.ablate --strategy <s> --cost-bps 5` (add `--regime choppy`
+   `py -m rhengine.ablate --strategy <s>` (add `--regime choppy`
    for a routed strategy like bollinger). A leg subset above the `*` production
    row with a healthy OOS sample = the missing legs are drag → cut them via
    `config.json` `legMask`.
@@ -60,6 +65,11 @@ whole table, unless a number is surprising.
    `py -m rhengine.crossval --strategy <s> --folds 5`. Want most blocks
    positive and no single badly-negative block. `--select --params <p>` checks
    whether the best value is stable across folds.
+5b. **Regime segmentation — the macro-defense test.**
+   `py -m rhengine.crossval --strategy <s> --by-regime` buckets trades by SPY
+   regime and VIX. Edge positive in only one regime = a routing/macro-filter
+   signal (run it only there, or flatten elsewhere on a 50/200 death cross via
+   `bear_regime_only`), not a reason to keep bleeding in the others.
 6. **Random-entry null — does the entry beat luck?**
    `py -m rhengine.nulltest --strategy <s> --max-tickers 300`. p<=0.05 on avg R
    = real entry edge; FAIL = the performance is exit engine + drift.

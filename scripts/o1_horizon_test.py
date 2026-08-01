@@ -169,7 +169,8 @@ def main():
             "bps", "meanR", "PF", "dayclust t", "portfolio", "maxDD", "Sharpe", "taken"))
         for bps in COSTS:
             cost = np.zeros_like(r0)
-            cost[ok] = 2.0 * (bps / 1e4) / sp[ok]
+            # ROUND TRIP, no 2x — see backtest._cost_r. Missed by commit e753c64.
+            cost[ok] = (bps / 1e4) / sp[ok]
             r = r0 - cost
             gl = -r[r <= 0].sum()
             pf = (r[r > 0].sum() / gl) if gl > 0 else float("inf")

@@ -117,7 +117,10 @@ def main():
             "bps", "meanR", "PF", "dayclust t", "portfolio", "maxDD", "Sharpe"))
         for bps in COSTS:
             cost = np.zeros_like(r0)
-            cost[ok] = 2.0 * (bps / 1e4) / sp[ok]
+            # ROUND TRIP, no 2x. See backtest._cost_r: `bps` is the total in-and-out
+            # cost, not per side. This script kept the doubling after commit e753c64
+            # fixed the four engine paths, so every "30 bps" row here was really 60.
+            cost[ok] = (bps / 1e4) / sp[ok]
             r = r0 - cost
             gl = -r[r <= 0].sum()
             pf = (r[r > 0].sum() / gl) if gl > 0 else float("inf")

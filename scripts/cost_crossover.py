@@ -81,7 +81,9 @@ def main():
 
     for bps in LEVELS:
         cost = np.zeros_like(r0)
-        cost[ok] = 2.0 * (bps / 1e4) / stop_pct[ok]
+        # ROUND TRIP, no 2x — see backtest._cost_r. Missed by commit e753c64,
+        # so every crossover level printed here was double its label.
+        cost[ok] = (bps / 1e4) / stop_pct[ok]
         r = r0 - cost
         gw = r[r > 0].sum()
         gl = -r[r <= 0].sum()

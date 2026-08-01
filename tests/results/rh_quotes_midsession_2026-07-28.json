@@ -1,0 +1,1487 @@
+{
+ "_captured": "2026-07-28T13:46-13:47 ET",
+ "_label": "MID-SESSION, not opening. The 09:37 cron fired ~4h late, same as 2026-07-27.",
+ "_source": "Robinhood get_equity_quotes",
+ "results": [
+  {
+   "symbol": "AOUT",
+   "bid_price": "12.70",
+   "ask_price": "12.84"
+  },
+  {
+   "symbol": "AVBC",
+   "bid_price": "22.39",
+   "ask_price": "22.59"
+  },
+  {
+   "symbol": "BKT",
+   "bid_price": "10.05",
+   "ask_price": "10.29"
+  },
+  {
+   "symbol": "BOTJ",
+   "bid_price": "27.70",
+   "ask_price": "28.00"
+  },
+  {
+   "symbol": "BSVN",
+   "bid_price": "50.36",
+   "ask_price": "50.66"
+  },
+  {
+   "symbol": "CMTV",
+   "bid_price": "40.41",
+   "ask_price": "40.54"
+  },
+  {
+   "symbol": "DHF",
+   "bid_price": "2.35",
+   "ask_price": "2.36"
+  },
+  {
+   "symbol": "EVI",
+   "bid_price": "15.38",
+   "ask_price": "15.59"
+  },
+  {
+   "symbol": "FINS",
+   "bid_price": "12.50",
+   "ask_price": "12.53"
+  },
+  {
+   "symbol": "HGLB",
+   "bid_price": "7.26",
+   "ask_price": "7.45"
+  },
+  {
+   "symbol": "HWBK",
+   "bid_price": "38.97",
+   "ask_price": "39.59"
+  },
+  {
+   "symbol": "IAE",
+   "bid_price": "8.32",
+   "ask_price": "8.35"
+  },
+  {
+   "symbol": "IQST",
+   "bid_price": "0.9749",
+   "ask_price": "1.01"
+  },
+  {
+   "symbol": "JMSB",
+   "bid_price": "23.59",
+   "ask_price": "23.69"
+  },
+  {
+   "symbol": "LIEN",
+   "bid_price": "9.46",
+   "ask_price": "9.88"
+  },
+  {
+   "symbol": "MSLE",
+   "bid_price": "9.50",
+   "ask_price": "9.80"
+  },
+  {
+   "symbol": "MYN",
+   "bid_price": "9.71",
+   "ask_price": "9.86"
+  },
+  {
+   "symbol": "NHS",
+   "bid_price": "5.99",
+   "ask_price": "6.01"
+  },
+  {
+   "symbol": "NVVE",
+   "bid_price": "1.26",
+   "ask_price": "1.36"
+  },
+  {
+   "symbol": "OIA",
+   "bid_price": "6.08",
+   "ask_price": "6.13"
+  },
+  {
+   "symbol": "OPP",
+   "bid_price": "7.59",
+   "ask_price": "7.68"
+  },
+  {
+   "symbol": "PMM",
+   "bid_price": "6.34",
+   "ask_price": "6.37"
+  },
+  {
+   "symbol": "PMTS",
+   "bid_price": "20.85",
+   "ask_price": "21.22"
+  },
+  {
+   "symbol": "PRS",
+   "bid_price": "21.70",
+   "ask_price": "21.85"
+  },
+  {
+   "symbol": "RICK",
+   "bid_price": "26.55",
+   "ask_price": "26.72"
+  },
+  {
+   "symbol": "ROLR",
+   "bid_price": "5.87",
+   "ask_price": "5.98"
+  },
+  {
+   "symbol": "SSTI",
+   "bid_price": "8.38",
+   "ask_price": "8.40"
+  },
+  {
+   "symbol": "VACI",
+   "bid_price": "10.12",
+   "ask_price": "10.13"
+  },
+  {
+   "symbol": "VXZ",
+   "bid_price": "50.79",
+   "ask_price": "51.07"
+  },
+  {
+   "symbol": "AGNCP",
+   "bid_price": "25.03",
+   "ask_price": "25.06"
+  },
+  {
+   "symbol": "AIB",
+   "bid_price": "1.81",
+   "ask_price": "1.84"
+  },
+  {
+   "symbol": "AIO",
+   "bid_price": "24.83",
+   "ask_price": "25.05"
+  },
+  {
+   "symbol": "AISP",
+   "bid_price": "1.91",
+   "ask_price": "1.92"
+  },
+  {
+   "symbol": "ANNA",
+   "bid_price": "2.85",
+   "ask_price": "2.91"
+  },
+  {
+   "symbol": "ASIC",
+   "bid_price": "25.68",
+   "ask_price": "25.80"
+  },
+  {
+   "symbol": "BGR",
+   "bid_price": "15.90",
+   "ask_price": "15.92"
+  },
+  {
+   "symbol": "BIRD",
+   "bid_price": "2.33",
+   "ask_price": "2.35"
+  },
+  {
+   "symbol": "CII",
+   "bid_price": "23.90",
+   "ask_price": "24.24"
+  },
+  {
+   "symbol": "CNDT",
+   "bid_price": "1.64",
+   "ask_price": "1.65"
+  },
+  {
+   "symbol": "COOK",
+   "bid_price": "57.00",
+   "ask_price": "58.11"
+  },
+  {
+   "symbol": "DSGR",
+   "bid_price": "34.57",
+   "ask_price": "34.58"
+  },
+  {
+   "symbol": "EARN",
+   "bid_price": "4.44",
+   "ask_price": "4.45"
+  },
+  {
+   "symbol": "FBIZ",
+   "bid_price": "69.08",
+   "ask_price": "69.59"
+  },
+  {
+   "symbol": "FFC",
+   "bid_price": "16.06",
+   "ask_price": "16.10"
+  },
+  {
+   "symbol": "GBAB",
+   "bid_price": "13.82",
+   "ask_price": "13.85"
+  },
+  {
+   "symbol": "GBFH",
+   "bid_price": "31.06",
+   "ask_price": "31.33"
+  },
+  {
+   "symbol": "HVT",
+   "bid_price": "25.83",
+   "ask_price": "25.95"
+  },
+  {
+   "symbol": "INTG",
+   "bid_price": "28.78",
+   "ask_price": "29.85"
+  },
+  {
+   "symbol": "KINS",
+   "bid_price": "20.16",
+   "ask_price": "20.32"
+  },
+  {
+   "symbol": "NFJ",
+   "bid_price": "14.94",
+   "ask_price": "15.18"
+  },
+  {
+   "symbol": "NPWR",
+   "bid_price": "1.49",
+   "ask_price": "1.50"
+  },
+  {
+   "symbol": "PAXS",
+   "bid_price": "14.01",
+   "ask_price": "14.04"
+  },
+  {
+   "symbol": "PKBK",
+   "bid_price": "34.11",
+   "ask_price": "34.27"
+  },
+  {
+   "symbol": "SEG",
+   "bid_price": "26.28",
+   "ask_price": "26.47"
+  },
+  {
+   "symbol": "SOJD",
+   "bid_price": "19.05",
+   "ask_price": "19.08"
+  },
+  {
+   "symbol": "SRI",
+   "bid_price": "7.49",
+   "ask_price": "7.51"
+  },
+  {
+   "symbol": "TYGO",
+   "bid_price": "1.55",
+   "ask_price": "1.56"
+  },
+  {
+   "symbol": "WTBA",
+   "bid_price": "28.28",
+   "ask_price": "28.39"
+  },
+  {
+   "symbol": "ADV",
+   "bid_price": "39.95",
+   "ask_price": "40.43"
+  },
+  {
+   "symbol": "AHRT",
+   "bid_price": "7.16",
+   "ask_price": "7.17"
+  },
+  {
+   "symbol": "ASA",
+   "bid_price": "50.02",
+   "ask_price": "50.51"
+  },
+  {
+   "symbol": "ASTI",
+   "bid_price": "2.86",
+   "ask_price": "2.89"
+  },
+  {
+   "symbol": "BCSF",
+   "bid_price": "12.76",
+   "ask_price": "12.82"
+  },
+  {
+   "symbol": "BLND",
+   "bid_price": "1.79",
+   "ask_price": "1.80"
+  },
+  {
+   "symbol": "CBAN",
+   "bid_price": "22.21",
+   "ask_price": "22.23"
+  },
+  {
+   "symbol": "CENT",
+   "bid_price": "44.64",
+   "ask_price": "44.72"
+  },
+  {
+   "symbol": "CLMB",
+   "bid_price": "28.13",
+   "ask_price": "28.29"
+  },
+  {
+   "symbol": "DFDV",
+   "bid_price": "2.65",
+   "ask_price": "2.66"
+  },
+  {
+   "symbol": "FDUS",
+   "bid_price": "19.94",
+   "ask_price": "19.96"
+  },
+  {
+   "symbol": "FISI",
+   "bid_price": "41.86",
+   "ask_price": "41.96"
+  },
+  {
+   "symbol": "FRST",
+   "bid_price": "15.88",
+   "ask_price": "15.90"
+  },
+  {
+   "symbol": "JCAP",
+   "bid_price": "20.74",
+   "ask_price": "20.77"
+  },
+  {
+   "symbol": "MCS",
+   "bid_price": "24.82",
+   "ask_price": "24.86"
+  },
+  {
+   "symbol": "MYI",
+   "bid_price": "10.75",
+   "ask_price": "10.76"
+  },
+  {
+   "symbol": "NGS",
+   "bid_price": "35.55",
+   "ask_price": "35.69"
+  },
+  {
+   "symbol": "NRIM",
+   "bid_price": "27.12",
+   "ask_price": "27.20"
+  },
+  {
+   "symbol": "PANL",
+   "bid_price": "7.53",
+   "ask_price": "7.54"
+  },
+  {
+   "symbol": "PESI",
+   "bid_price": "16.79",
+   "ask_price": "17.05"
+  },
+  {
+   "symbol": "PHI",
+   "bid_price": "19.99",
+   "ask_price": "20.03"
+  },
+  {
+   "symbol": "RELL",
+   "bid_price": "18.86",
+   "ask_price": "18.89"
+  },
+  {
+   "symbol": "RUSHB",
+   "bid_price": "76.48",
+   "ask_price": "77.13"
+  },
+  {
+   "symbol": "SBSI",
+   "bid_price": "32.79",
+   "ask_price": "32.85"
+  },
+  {
+   "symbol": "SHEN",
+   "bid_price": "12.06",
+   "ask_price": "12.08"
+  },
+  {
+   "symbol": "TLS",
+   "bid_price": "4.58",
+   "ask_price": "4.59"
+  },
+  {
+   "symbol": "TWFG",
+   "bid_price": "28.13",
+   "ask_price": "28.23"
+  },
+  {
+   "symbol": "TWI",
+   "bid_price": "8.21",
+   "ask_price": "8.22"
+  },
+  {
+   "symbol": "TWN",
+   "bid_price": "79.37",
+   "ask_price": "82.00"
+  },
+  {
+   "symbol": "XPOF",
+   "bid_price": "6.66",
+   "ask_price": "6.67"
+  },
+  {
+   "symbol": "BCAT",
+   "bid_price": "15.44",
+   "ask_price": "15.45"
+  },
+  {
+   "symbol": "BMBL",
+   "bid_price": "3.03",
+   "ask_price": "3.04"
+  },
+  {
+   "symbol": "BSAC",
+   "bid_price": "34.08",
+   "ask_price": "34.13"
+  },
+  {
+   "symbol": "CAL",
+   "bid_price": "13.18",
+   "ask_price": "13.22"
+  },
+  {
+   "symbol": "CBL",
+   "bid_price": "59.57",
+   "ask_price": "59.67"
+  },
+  {
+   "symbol": "CSR",
+   "bid_price": "56.80",
+   "ask_price": "56.90"
+  },
+  {
+   "symbol": "DAKT",
+   "bid_price": "19.75",
+   "ask_price": "19.78"
+  },
+  {
+   "symbol": "DEC",
+   "bid_price": "12.53",
+   "ask_price": "12.55"
+  },
+  {
+   "symbol": "DLX",
+   "bid_price": "27.57",
+   "ask_price": "27.63"
+  },
+  {
+   "symbol": "EGY",
+   "bid_price": "5.06",
+   "ask_price": "5.07"
+  },
+  {
+   "symbol": "FOXF",
+   "bid_price": "19.32",
+   "ask_price": "19.35"
+  },
+  {
+   "symbol": "FTK",
+   "bid_price": "23.52",
+   "ask_price": "23.63"
+  },
+  {
+   "symbol": "LXU",
+   "bid_price": "11.54",
+   "ask_price": "11.56"
+  },
+  {
+   "symbol": "MBUU",
+   "bid_price": "28.76",
+   "ask_price": "28.84"
+  },
+  {
+   "symbol": "MCHB",
+   "bid_price": "15.71",
+   "ask_price": "15.72"
+  },
+  {
+   "symbol": "MFA",
+   "bid_price": "9.18",
+   "ask_price": "9.19"
+  },
+  {
+   "symbol": "MRLN",
+   "bid_price": "3.53",
+   "ask_price": "3.56"
+  },
+  {
+   "symbol": "MRTN",
+   "bid_price": "15.47",
+   "ask_price": "15.49"
+  },
+  {
+   "symbol": "NMZ",
+   "bid_price": "10.20",
+   "ask_price": "10.21"
+  },
+  {
+   "symbol": "NZF",
+   "bid_price": "12.36",
+   "ask_price": "12.37"
+  },
+  {
+   "symbol": "PSTL",
+   "bid_price": "23.89",
+   "ask_price": "23.92"
+  },
+  {
+   "symbol": "QNST",
+   "bid_price": "16.07",
+   "ask_price": "16.09"
+  },
+  {
+   "symbol": "RES",
+   "bid_price": "5.24",
+   "ask_price": "5.25"
+  },
+  {
+   "symbol": "RRBI",
+   "bid_price": "101.45",
+   "ask_price": "101.99"
+  },
+  {
+   "symbol": "SMBC",
+   "bid_price": "78.74",
+   "ask_price": "78.86"
+  },
+  {
+   "symbol": "SPT",
+   "bid_price": "8.80",
+   "ask_price": "8.81"
+  },
+  {
+   "symbol": "STRF",
+   "bid_price": "96.75",
+   "ask_price": "97.33"
+  },
+  {
+   "symbol": "WLTH",
+   "bid_price": "9.46",
+   "ask_price": "9.48"
+  },
+  {
+   "symbol": "XRX",
+   "bid_price": "2.72",
+   "ask_price": "2.73"
+  },
+  {
+   "symbol": "AGYS",
+   "bid_price": "114.65",
+   "ask_price": "115.00"
+  },
+  {
+   "symbol": "ALG",
+   "bid_price": "164.79",
+   "ask_price": "165.62"
+  },
+  {
+   "symbol": "ALIT",
+   "bid_price": "20.37",
+   "ask_price": "20.63"
+  },
+  {
+   "symbol": "BMA",
+   "bid_price": "90.74",
+   "ask_price": "91.30"
+  },
+  {
+   "symbol": "CNA",
+   "bid_price": "55.19",
+   "ask_price": "55.26"
+  },
+  {
+   "symbol": "CSWC",
+   "bid_price": "23.75",
+   "ask_price": "23.77"
+  },
+  {
+   "symbol": "CTS",
+   "bid_price": "64.83",
+   "ask_price": "65.32"
+  },
+  {
+   "symbol": "CVI",
+   "bid_price": "34.18",
+   "ask_price": "34.23"
+  },
+  {
+   "symbol": "DCH",
+   "bid_price": "5.57",
+   "ask_price": "5.58"
+  },
+  {
+   "symbol": "DV",
+   "bid_price": "11.36",
+   "ask_price": "11.37"
+  },
+  {
+   "symbol": "ENLT",
+   "bid_price": "86.73",
+   "ask_price": "87.38"
+  },
+  {
+   "symbol": "EZPW",
+   "bid_price": "29.73",
+   "ask_price": "29.83"
+  },
+  {
+   "symbol": "FBK",
+   "bid_price": "59.70",
+   "ask_price": "59.77"
+  },
+  {
+   "symbol": "GCT",
+   "bid_price": "39.54",
+   "ask_price": "39.64"
+  },
+  {
+   "symbol": "GRND",
+   "bid_price": "16.51",
+   "ask_price": "16.54"
+  },
+  {
+   "symbol": "HTO",
+   "bid_price": "64.52",
+   "ask_price": "64.64"
+  },
+  {
+   "symbol": "IIPR",
+   "bid_price": "61.29",
+   "ask_price": "61.39"
+  },
+  {
+   "symbol": "JOE",
+   "bid_price": "62.91",
+   "ask_price": "63.01"
+  },
+  {
+   "symbol": "KWR",
+   "bid_price": "156.39",
+   "ask_price": "157.05"
+  },
+  {
+   "symbol": "LGIH",
+   "bid_price": "61.10",
+   "ask_price": "61.55"
+  },
+  {
+   "symbol": "LIND",
+   "bid_price": "28.99",
+   "ask_price": "29.03"
+  },
+  {
+   "symbol": "METC",
+   "bid_price": "9.60",
+   "ask_price": "9.61"
+  },
+  {
+   "symbol": "MQ",
+   "bid_price": "18.25",
+   "ask_price": "18.27"
+  },
+  {
+   "symbol": "NSSC",
+   "bid_price": "37.17",
+   "ask_price": "37.21"
+  },
+  {
+   "symbol": "PUK",
+   "bid_price": "29.08",
+   "ask_price": "29.09"
+  },
+  {
+   "symbol": "RR",
+   "bid_price": "1.41",
+   "ask_price": "1.42"
+  },
+  {
+   "symbol": "RUM",
+   "bid_price": "6.01",
+   "ask_price": "6.02"
+  },
+  {
+   "symbol": "TNET",
+   "bid_price": "67.96",
+   "ask_price": "68.20"
+  },
+  {
+   "symbol": "VIV",
+   "bid_price": "13.24",
+   "ask_price": "13.26"
+  },
+  {
+   "symbol": "WD",
+   "bid_price": "50.71",
+   "ask_price": "50.86"
+  },
+  {
+   "symbol": "ADEA",
+   "bid_price": "24.77",
+   "ask_price": "24.81"
+  },
+  {
+   "symbol": "AM",
+   "bid_price": "21.80",
+   "ask_price": "21.81"
+  },
+  {
+   "symbol": "ARRY",
+   "bid_price": "5.12",
+   "ask_price": "5.13"
+  },
+  {
+   "symbol": "CBRL",
+   "bid_price": "52.27",
+   "ask_price": "52.39"
+  },
+  {
+   "symbol": "CCC",
+   "bid_price": "6.15",
+   "ask_price": "6.16"
+  },
+  {
+   "symbol": "CDP",
+   "bid_price": "38.61",
+   "ask_price": "38.63"
+  },
+  {
+   "symbol": "CNO",
+   "bid_price": "53.73",
+   "ask_price": "53.76"
+  },
+  {
+   "symbol": "DORM",
+   "bid_price": "141.86",
+   "ask_price": "142.24"
+  },
+  {
+   "symbol": "EXPO",
+   "bid_price": "65.82",
+   "ask_price": "65.84"
+  },
+  {
+   "symbol": "GIB",
+   "bid_price": "71.75",
+   "ask_price": "71.81"
+  },
+  {
+   "symbol": "GTM",
+   "bid_price": "3.26",
+   "ask_price": "3.27"
+  },
+  {
+   "symbol": "HTZ",
+   "bid_price": "1.82",
+   "ask_price": "1.83"
+  },
+  {
+   "symbol": "INGM",
+   "bid_price": "29.96",
+   "ask_price": "29.98"
+  },
+  {
+   "symbol": "KMPR",
+   "bid_price": "30.87",
+   "ask_price": "30.90"
+  },
+  {
+   "symbol": "LIF",
+   "bid_price": "55.70",
+   "ask_price": "55.84"
+  },
+  {
+   "symbol": "MRP",
+   "bid_price": "28.60",
+   "ask_price": "28.61"
+  },
+  {
+   "symbol": "NTSK",
+   "bid_price": "12.07",
+   "ask_price": "12.08"
+  },
+  {
+   "symbol": "NWL",
+   "bid_price": "5.24",
+   "ask_price": "5.25"
+  },
+  {
+   "symbol": "OBDC",
+   "bid_price": "10.99",
+   "ask_price": "11.00"
+  },
+  {
+   "symbol": "OII",
+   "bid_price": "47.80",
+   "ask_price": "47.90"
+  },
+  {
+   "symbol": "ORC",
+   "bid_price": "6.53",
+   "ask_price": "6.54"
+  },
+  {
+   "symbol": "PAGP",
+   "bid_price": "26.16",
+   "ask_price": "26.18"
+  },
+  {
+   "symbol": "PII",
+   "bid_price": "73.60",
+   "ask_price": "73.71"
+  },
+  {
+   "symbol": "PZZA",
+   "bid_price": "31.21",
+   "ask_price": "31.25"
+  },
+  {
+   "symbol": "REZI",
+   "bid_price": "36.03",
+   "ask_price": "36.06"
+  },
+  {
+   "symbol": "SLF",
+   "bid_price": "84.25",
+   "ask_price": "84.29"
+  },
+  {
+   "symbol": "SOBO",
+   "bid_price": "37.13",
+   "ask_price": "37.16"
+  },
+  {
+   "symbol": "SPB",
+   "bid_price": "89.09",
+   "ask_price": "89.24"
+  },
+  {
+   "symbol": "TPC",
+   "bid_price": "81.49",
+   "ask_price": "81.81"
+  },
+  {
+   "symbol": "WSFS",
+   "bid_price": "81.74",
+   "ask_price": "81.79"
+  },
+  {
+   "symbol": "ADT",
+   "bid_price": "7.26",
+   "ask_price": "7.27"
+  },
+  {
+   "symbol": "AEO",
+   "bid_price": "17.98",
+   "ask_price": "17.99"
+  },
+  {
+   "symbol": "ASO",
+   "bid_price": "50.69",
+   "ask_price": "50.75"
+  },
+  {
+   "symbol": "BYD",
+   "bid_price": "90.27",
+   "ask_price": "90.39"
+  },
+  {
+   "symbol": "CUBE",
+   "bid_price": "42.77",
+   "ask_price": "42.78"
+  },
+  {
+   "symbol": "DEO",
+   "bid_price": "88.58",
+   "ask_price": "88.62"
+  },
+  {
+   "symbol": "FRPT",
+   "bid_price": "61.76",
+   "ask_price": "61.84"
+  },
+  {
+   "symbol": "GL",
+   "bid_price": "178.12",
+   "ask_price": "178.36"
+  },
+  {
+   "symbol": "KVYO",
+   "bid_price": "18.91",
+   "ask_price": "18.92"
+  },
+  {
+   "symbol": "LAMR",
+   "bid_price": "162.24",
+   "ask_price": "162.35"
+  },
+  {
+   "symbol": "LRN",
+   "bid_price": "94.57",
+   "ask_price": "94.86"
+  },
+  {
+   "symbol": "LWLG",
+   "bid_price": "5.70",
+   "ask_price": "5.71"
+  },
+  {
+   "symbol": "MAC",
+   "bid_price": "26.63",
+   "ask_price": "26.64"
+  },
+  {
+   "symbol": "MPLX",
+   "bid_price": "59.39",
+   "ask_price": "59.41"
+  },
+  {
+   "symbol": "MTRN",
+   "bid_price": "215.62",
+   "ask_price": "218.24"
+  },
+  {
+   "symbol": "NXST",
+   "bid_price": "193.80",
+   "ask_price": "194.39"
+  },
+  {
+   "symbol": "PEGA",
+   "bid_price": "30.04",
+   "ask_price": "30.06"
+  },
+  {
+   "symbol": "PI",
+   "bid_price": "132.47",
+   "ask_price": "132.78"
+  },
+  {
+   "symbol": "POST",
+   "bid_price": "93.66",
+   "ask_price": "93.70"
+  },
+  {
+   "symbol": "SEZL",
+   "bid_price": "153.89",
+   "ask_price": "154.31"
+  },
+  {
+   "symbol": "STWD",
+   "bid_price": "16.70",
+   "ask_price": "16.71"
+  },
+  {
+   "symbol": "THO",
+   "bid_price": "80.28",
+   "ask_price": "80.40"
+  },
+  {
+   "symbol": "UAMY",
+   "bid_price": "5.17",
+   "ask_price": "5.18"
+  },
+  {
+   "symbol": "ULS",
+   "bid_price": "91.13",
+   "ask_price": "91.20"
+  },
+  {
+   "symbol": "UMAC",
+   "bid_price": "19.23",
+   "ask_price": "19.28"
+  },
+  {
+   "symbol": "VGNT",
+   "bid_price": "43.65",
+   "ask_price": "43.71"
+  },
+  {
+   "symbol": "VRNS",
+   "bid_price": "46.06",
+   "ask_price": "46.12"
+  },
+  {
+   "symbol": "WEX",
+   "bid_price": "179.29",
+   "ask_price": "179.62"
+  },
+  {
+   "symbol": "WLK",
+   "bid_price": "72.87",
+   "ask_price": "72.96"
+  },
+  {
+   "symbol": "WRBY",
+   "bid_price": "25.49",
+   "ask_price": "25.57"
+  },
+  {
+   "symbol": "AER",
+   "bid_price": "152.62",
+   "ask_price": "152.87"
+  },
+  {
+   "symbol": "AGNC",
+   "bid_price": "10.97",
+   "ask_price": "10.98"
+  },
+  {
+   "symbol": "APTV",
+   "bid_price": "58.94",
+   "ask_price": "58.98"
+  },
+  {
+   "symbol": "ARW",
+   "bid_price": "208.87",
+   "ask_price": "209.38"
+  },
+  {
+   "symbol": "AYI",
+   "bid_price": "341.68",
+   "ask_price": "342.33"
+  },
+  {
+   "symbol": "BAX",
+   "bid_price": "24.29",
+   "ask_price": "24.30"
+  },
+  {
+   "symbol": "BILL",
+   "bid_price": "47.04",
+   "ask_price": "47.10"
+  },
+  {
+   "symbol": "CAR",
+   "bid_price": "162.12",
+   "ask_price": "162.44"
+  },
+  {
+   "symbol": "COKE",
+   "bid_price": "195.41",
+   "ask_price": "195.95"
+  },
+  {
+   "symbol": "CRL",
+   "bid_price": "236.60",
+   "ask_price": "237.23"
+  },
+  {
+   "symbol": "EXR",
+   "bid_price": "151.81",
+   "ask_price": "151.97"
+  },
+  {
+   "symbol": "FER",
+   "bid_price": "61.95",
+   "ask_price": "61.96"
+  },
+  {
+   "symbol": "GEN",
+   "bid_price": "27.54",
+   "ask_price": "27.55"
+  },
+  {
+   "symbol": "INVH",
+   "bid_price": "30.19",
+   "ask_price": "30.20"
+  },
+  {
+   "symbol": "IVZ",
+   "bid_price": "29.69",
+   "ask_price": "29.71"
+  },
+  {
+   "symbol": "LOGI",
+   "bid_price": "109.34",
+   "ask_price": "109.44"
+  },
+  {
+   "symbol": "NDSN",
+   "bid_price": "301.06",
+   "ask_price": "301.18"
+  },
+  {
+   "symbol": "PNR",
+   "bid_price": "65.06",
+   "ask_price": "65.14"
+  },
+  {
+   "symbol": "RH",
+   "bid_price": "177.53",
+   "ask_price": "177.96"
+  },
+  {
+   "symbol": "RPRX",
+   "bid_price": "59.50",
+   "ask_price": "59.52"
+  },
+  {
+   "symbol": "RRC",
+   "bid_price": "37.96",
+   "ask_price": "37.98"
+  },
+  {
+   "symbol": "RVTY",
+   "bid_price": "110.99",
+   "ask_price": "111.12"
+  },
+  {
+   "symbol": "SFM",
+   "bid_price": "77.88",
+   "ask_price": "78.04"
+  },
+  {
+   "symbol": "SYNA",
+   "bid_price": "110.95",
+   "ask_price": "111.25"
+  },
+  {
+   "symbol": "TRI",
+   "bid_price": "104.63",
+   "ask_price": "104.68"
+  },
+  {
+   "symbol": "TRMB",
+   "bid_price": "58.07",
+   "ask_price": "58.11"
+  },
+  {
+   "symbol": "TXT",
+   "bid_price": "90.37",
+   "ask_price": "90.51"
+  },
+  {
+   "symbol": "VMI",
+   "bid_price": "479.65",
+   "ask_price": "480.94"
+  },
+  {
+   "symbol": "VOYA",
+   "bid_price": "99.62",
+   "ask_price": "99.72"
+  },
+  {
+   "symbol": "WY",
+   "bid_price": "24.41",
+   "ask_price": "24.42"
+  },
+  {
+   "symbol": "BBY",
+   "bid_price": "89.27",
+   "ask_price": "89.35"
+  },
+  {
+   "symbol": "BR",
+   "bid_price": "159.09",
+   "ask_price": "159.24"
+  },
+  {
+   "symbol": "BURL",
+   "bid_price": "372.37",
+   "ask_price": "372.79"
+  },
+  {
+   "symbol": "CBRE",
+   "bid_price": "147.84",
+   "ask_price": "147.92"
+  },
+  {
+   "symbol": "CNQ",
+   "bid_price": "44.37",
+   "ask_price": "44.39"
+  },
+  {
+   "symbol": "FCEL",
+   "bid_price": "19.84",
+   "ask_price": "19.85"
+  },
+  {
+   "symbol": "FIS",
+   "bid_price": "45.05",
+   "ask_price": "45.06"
+  },
+  {
+   "symbol": "FISV",
+   "bid_price": "54.38",
+   "ask_price": "54.40"
+  },
+  {
+   "symbol": "HST",
+   "bid_price": "24.99",
+   "ask_price": "25.00"
+  },
+  {
+   "symbol": "IBN",
+   "bid_price": "30.30",
+   "ask_price": "30.31"
+  },
+  {
+   "symbol": "IOT",
+   "bid_price": "37.73",
+   "ask_price": "37.74"
+  },
+  {
+   "symbol": "IR",
+   "bid_price": "86.48",
+   "ask_price": "86.54"
+  },
+  {
+   "symbol": "JAZZ",
+   "bid_price": "258.56",
+   "ask_price": "259.07"
+  },
+  {
+   "symbol": "KVUE",
+   "bid_price": "19.77",
+   "ask_price": "19.78"
+  },
+  {
+   "symbol": "LSCC",
+   "bid_price": "118.35",
+   "ask_price": "118.58"
+  },
+  {
+   "symbol": "NSC",
+   "bid_price": "342.41",
+   "ask_price": "342.66"
+  },
+  {
+   "symbol": "OKE",
+   "bid_price": "88.45",
+   "ask_price": "88.50"
+  },
+  {
+   "symbol": "PENG",
+   "bid_price": "46.53",
+   "ask_price": "46.67"
+  },
+  {
+   "symbol": "PHM",
+   "bid_price": "133.81",
+   "ask_price": "133.94"
+  },
+  {
+   "symbol": "PTC",
+   "bid_price": "128.83",
+   "ask_price": "128.98"
+  },
+  {
+   "symbol": "QSR",
+   "bid_price": "74.45",
+   "ask_price": "74.51"
+  },
+  {
+   "symbol": "RIO",
+   "bid_price": "91.36",
+   "ask_price": "91.38"
+  },
+  {
+   "symbol": "RL",
+   "bid_price": "382.13",
+   "ask_price": "382.43"
+  },
+  {
+   "symbol": "SRE",
+   "bid_price": "91.35",
+   "ask_price": "91.38"
+  },
+  {
+   "symbol": "TLN",
+   "bid_price": "325.40",
+   "ask_price": "326.00"
+  },
+  {
+   "symbol": "VICR",
+   "bid_price": "188.63",
+   "ask_price": "189.24"
+  },
+  {
+   "symbol": "WAT",
+   "bid_price": "381.27",
+   "ask_price": "381.93"
+  },
+  {
+   "symbol": "WCC",
+   "bid_price": "328.82",
+   "ask_price": "329.49"
+  },
+  {
+   "symbol": "XPO",
+   "bid_price": "206.25",
+   "ask_price": "206.83"
+  },
+  {
+   "symbol": "AJG",
+   "bid_price": "261.35",
+   "ask_price": "261.49"
+  },
+  {
+   "symbol": "AKAM",
+   "bid_price": "111.91",
+   "ask_price": "112.05"
+  },
+  {
+   "symbol": "AXTI",
+   "bid_price": "42.20",
+   "ask_price": "42.30"
+  },
+  {
+   "symbol": "CB",
+   "bid_price": "362.92",
+   "ask_price": "363.11"
+  },
+  {
+   "symbol": "CMCSA",
+   "bid_price": "24.17",
+   "ask_price": "24.18"
+  },
+  {
+   "symbol": "CMG",
+   "bid_price": "33.57",
+   "ask_price": "33.58"
+  },
+  {
+   "symbol": "CRWV",
+   "bid_price": "66.47",
+   "ask_price": "66.50"
+  },
+  {
+   "symbol": "CVX",
+   "bid_price": "188.24",
+   "ask_price": "188.27"
+  },
+  {
+   "symbol": "DOCN",
+   "bid_price": "111.68",
+   "ask_price": "111.90"
+  },
+  {
+   "symbol": "ENTG",
+   "bid_price": "118.05",
+   "ask_price": "118.29"
+  },
+  {
+   "symbol": "EOG",
+   "bid_price": "140.03",
+   "ask_price": "140.15"
+  },
+  {
+   "symbol": "EQIX",
+   "bid_price": "1048.34",
+   "ask_price": "1048.53"
+  },
+  {
+   "symbol": "F",
+   "bid_price": "14.78",
+   "ask_price": "14.79"
+  },
+  {
+   "symbol": "HON",
+   "bid_price": "247.60",
+   "ask_price": "247.71"
+  },
+  {
+   "symbol": "HPQ",
+   "bid_price": "27.79",
+   "ask_price": "27.80"
+  },
+  {
+   "symbol": "JNJ",
+   "bid_price": "267.16",
+   "ask_price": "267.27"
+  },
+  {
+   "symbol": "KLAC",
+   "bid_price": "190.76",
+   "ask_price": "190.86"
+  },
+  {
+   "symbol": "KO",
+   "bid_price": "87.70",
+   "ask_price": "87.74"
+  },
+  {
+   "symbol": "KR",
+   "bid_price": "59.55",
+   "ask_price": "59.59"
+  },
+  {
+   "symbol": "LHX",
+   "bid_price": "303.65",
+   "ask_price": "303.87"
+  },
+  {
+   "symbol": "MPC",
+   "bid_price": "308.62",
+   "ask_price": "309.02"
+  },
+  {
+   "symbol": "NVDA",
+   "bid_price": "196.95",
+   "ask_price": "196.96"
+  },
+  {
+   "symbol": "OKLO",
+   "bid_price": "39.49",
+   "ask_price": "39.58"
+  },
+  {
+   "symbol": "PANW",
+   "bid_price": "320.19",
+   "ask_price": "320.52"
+  },
+  {
+   "symbol": "SNPS",
+   "bid_price": "385.53",
+   "ask_price": "385.88"
+  },
+  {
+   "symbol": "STRL",
+   "bid_price": "538.32",
+   "ask_price": "540.15"
+  },
+  {
+   "symbol": "UBER",
+   "bid_price": "70.20",
+   "ask_price": "70.22"
+  },
+  {
+   "symbol": "XEL",
+   "bid_price": "81.27",
+   "ask_price": "81.28"
+  },
+  {
+   "symbol": "XOM",
+   "bid_price": "152.95",
+   "ask_price": "152.98"
+  },
+  {
+   "symbol": "ZS",
+   "bid_price": "153.22",
+   "ask_price": "153.35"
+  }
+ ]
+}

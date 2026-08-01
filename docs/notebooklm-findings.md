@@ -1,5 +1,18 @@
 # NotebookLM Research Findings — Rule Sets, Tests & Build Backlog
 
+> **Superseded for parameters, 2026-07-30.** A later 75-source pass produced
+> [AGENT-SPEC.md](AGENT-SPEC.md) — the same doctrine as an exact parameter
+> reference (one table per module, plus explicit COVERAGE GAPS and CONFLICTS).
+> Use that file when you need a *value*. Keep reading this one for **what was
+> already built here and how it scored** (Part 1) and for the **options build
+> order** (Part 3.4) — neither is in the spec.
+>
+> Several open questions in Part 7 below are now resolved or formally closed by
+> the spec: the JdK RS-Ratio / RS-Momentum formulas are confirmed **absent** from
+> the sources (`GAP-2.1`), Keltner is specified for the TTM squeeze only
+> (`GAP-3.2`), and purged/embargoed CV and triple-barrier labeling remain
+> uncovered (`GAP-8.5`, `GAP-8.8`).
+
 Source: NotebookLM notebook "Backtesting" (69 sources), queried 2026-07-18.
 Audience: an LLM (or human) implementing these rigorously in Python against this repo's engine.
 
@@ -41,6 +54,14 @@ per rule below. Re-run the same commands on longer SIP history before promoting.
 - Validation so far: residualmomentum IS +0.019 vs +0.012 but OOS +0.026 vs +0.044
   (overfit shape); bollinger pooled OOS −0.057R. 400d only sees ~1.5 regime cycles —
   weak power; longest-history retest is the priority.
+- **Superseded 2026-07-30 — the retest is no longer the priority, it is cancelled.**
+  Zakamulin ran the nearest testable relative (moving-average market timing) over
+  **155 years** with proper rolling and expanding OOS windows and found **no
+  statistically significant outperformance in the second half of the sample**;
+  he also showed the best-known positive result in that literature was
+  look-ahead bias. Weinstein's stage method itself has no peer-reviewed support
+  at all. Our null is not a power problem. Leg stays off; do not spend history
+  on it. See [AGENT-SPEC-VERDICT.md](AGENT-SPEC-VERDICT.md) §1.
 
 ### 1.2 TTM Squeeze release — `squeezeBars`, consolidation
 - Rule: Bollinger(20, 2σ) fully inside Keltner(EMA20 ± 1.5×ATR14) = squeeze ON.
@@ -58,6 +79,14 @@ per rule below. Re-run the same commands on longer SIP history before promoting.
 - Where: already a leg; spec max raised 2.5 → 3.0 so sweeps cover the source range.
 - Validation so far: walk-forward flip-flopped (3.0 → 1.1 across folds), pooled OOS
   flat (PF 1.00). No stable value.
+- **Update 2026-07-30:** the `Research/` briefings give a *third* value —
+  **1.10× the 50-day average** — and one of them argues volume should be
+  de-emphasised entirely as "an inconsistent endorser", replaced by Fair Value
+  Gap + ATR-band interaction. That makes the sweep's flip-flop between 3.0 and
+  1.1 look less like instability in our data and more like the sources never
+  agreeing on the parameter in the first place. See `AGENT-SPEC.md`
+  `CONFLICT-2`. The walk-forward verdict is unchanged: no stable value, leg
+  stays off.
 
 ### 1.4 RRG rotation filter — `rrgMode`, residualmomentum
 - Rule (encoded proxy): RS = close/SPY-close series; RS-Ratio = 100 × RS / SMA(RS, 60).
@@ -136,7 +165,42 @@ The engine stays signal-only; structure selection is a mapping layer.
   data feed (chain IV history) — not derivable from the current bar data.
 
 ### 3.4 Build order for the options module
-1. IV Rank provider (chain snapshots or an IV history feed; cache like `yahoo_cache/`).
+
+> **Steps 1 and 2 are superseded, 2026-07-30.** Step 1 assumed an IV feed
+> exists to be bought or snapshotted. It does not, at this broker, at any
+> latency — see the spike below. Step 2's mapping layer is moot because
+> [AGENT-SPEC-VERDICT.md](AGENT-SPEC-VERDICT.md) §5 rejects both source gates
+> (`CONFLICT-9`): there is no IV-Rank threshold to map to. The revised order is
+> below the spike. Steps 3 and 4 stand as written.
+
+**Data spike, 2026-07-30 (Robinhood), four results:**
+
+| Call | Carries IV? |
+|---|---|
+| `get_option_quotes` | has an `implied_volatility` field — it returns **null**. So do delta/gamma/theta/vega/rho |
+| `get_option_historicals` | daily OHLC per contract. No IV, no greeks, and no volume either |
+| `get_option_instruments state='expired'` | resolves 2026-07-17, **not** 2026-06-19 — old contracts fall out of the listing after weeks |
+| historicals on an expired contract | **full contract life retrievable** given the UUID (verified 2026-06-15 → expiry) |
+
+Read together those four decide the build. IV cannot be fetched, so it must be
+**derived** from the option price by inverting Black-Scholes — which is now
+built and tested (`rhengine/market_data_options.py`, 17 tests). Price history is
+retroactive, so none of it requires waiting. **The only perishable asset is the
+ability to enumerate old contracts.** So the standing job that has to start
+early is a registry of contract UUIDs, not a daily IV snapshot — far cheaper
+than this section originally assumed.
+
+**Revised order:**
+1. ~~IV Rank provider~~ → **contract-UUID registry**: sweep the chains of
+   RMX-B's ~96 holdings on a slow cadence and record `id` / strike / expiry /
+   type. Nothing else needs to be captured live. **Not built** — it is a
+   scheduled job and wants a cadence decision first.
+2. ~~Mapping layer to structure/strike/expiry~~ → **VRP measurement**: invert
+   IV at entry, compare against realised vol over the contract's *actual* life,
+   from bid and from ask separately so the answer is a band net of the options
+   spread and never a midpoint. The arithmetic exists; it needs step 1's data.
+3. Options backtest — unchanged, and gated on step 2 showing a premium at all.
+4. Wire into `portfolio.py` risk framework — unchanged.
 2. Mapping layer: setup dict → structure/strike/expiry per 3.1–3.2 (pure function, unit-testable).
 3. Options backtest: reuse `backtest.py` trade timing; approximate P&L with delta
    exposure + theta decay first, full repricing later. Validate the premium-stop rule

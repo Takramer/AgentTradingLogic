@@ -10,6 +10,8 @@ from .indicators import (  # noqa: F401
     classify_spy_regime,
     estimate_vix_regime,
     select_strategy_for_regime,
+    strategy_status,
+    autonomous_strategies,
     resolve_thresholds,
     load_spec,
     spec_defaults,
