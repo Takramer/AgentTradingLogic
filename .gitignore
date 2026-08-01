@@ -33,3 +33,11 @@ research_data/external/*/*.csv
 research_data/external/*/*.zip
 research_data/external/*/*.xlsx
 !research_data/external/*/_manifest.json
+
+# Vendored clone of the i-have-adhd skill upstream. It carries its own .git,
+# so committing it would add a gitlink rather than the files. The INSTALLED
+# copy at .claude/skills/i-have-adhd/ is the one this repo uses.
+/i-have-adhd/
+
+# Throwaway backups taken before a --force refresh.
+research_data/*.bak-*

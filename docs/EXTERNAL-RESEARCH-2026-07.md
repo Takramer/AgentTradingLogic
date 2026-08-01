@@ -203,6 +203,11 @@ only one relevant to a large-cap account. Replications exist
    — the strategy catalogue with per-strategy Python in `static/strategies/`.
    Take: the ranked shortlist and the paper citations, not the backtests.
 
+Teaching material — technique, not evidence — is catalogued separately in
+[REFERENCE-LIBRARIES.md](REFERENCE-LIBRARIES.md) (ML4T chapter map,
+awesome-quant, cantaro86, Grzelak, Quant-Guild), with the per-repo licence
+terms. Item 4 above is expanded there.
+
 Runners-up worth knowing: [tidy-finance/py-tidyfinance](https://github.com/tidy-finance/py-tidyfinance)
 (clean reference implementations of portfolio sorts, beta estimation, FF
 regressions — the textbook version of what `rhengine/alpha/` does);

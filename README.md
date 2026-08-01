@@ -27,6 +27,11 @@
 > significance. The demonstration is French's 63 years. Expect to trail the
 > index in roughly 4 years out of 10.
 
+> **Working in this repo (human or agent)?** `CLAUDE.md` is the operating guide —
+> environment, hard rules, and the evidence contract — with
+> `docs/CLAUDE-RESEARCH-RULES.md`, `docs/CLAUDE-CODEMAP.md`,
+> `docs/CLAUDE-WORKFLOWS.md` and `docs/CLAUDE-PITFALLS.md` behind it.
+
 Single source of truth for the 6-strategy signal engine shared by
 **RobinhoodAgent** (autonomous Python app) and **Nydex** (client-side React app).
 Engine-only: no order planning, no autonomous orchestration, no meta-labeling ML —
@@ -90,6 +95,10 @@ py scripts/rmxqt_power.py              # why no 8-year test can prove it
 | `rhengine/strategies.json` | **Canonical spec** — per-strategy legs, threshold defaults/ranges, exits, regime routing. Threshold defaults are the walk-forward-tuned values |
 | `fixtures/` | Golden vectors: deterministic bar series + expected `score_ticker` output. The cross-runtime drift guard |
 | `gen_fixtures.py` | Regenerates the golden vectors (only after a deliberate engine change) |
+| `docs/AGENT-SPEC.md` | **Parameter reference for the technical/tactical layer** — Weinstein stages, RRG/dual momentum, entry setups, ATR sizing, exits, options overlay, execution gates, validation thresholds. One table per module, every number sourced (75-source NotebookLM pass + the three `Research/` briefings), plus explicit COVERAGE GAPS and CONFLICTS lists. A spec, **not evidence** — nothing in it has been through `alpha/book.py`, and the GLD/SPY backtest figures it records are quarantined as unquotable |
+| `docs/AGENT-SPEC-VERDICT.md` | **The answer to "should we build it"** — external evidence audit of every module in the spec. Verdict: build nothing from Modules 1–5. Weinstein stage analysis has no peer-reviewed support and MA timing fails over 155 years; FVG has no academic literature; ORB assumes zero bid-ask spread. Survivors: the spread gate, and measuring the volatility risk premium |
+| `Research/` | The three practitioner briefings behind the R1/R2/R3 citations in the spec. Raw input, not a result |
+| `docs/notebooklm-findings.md` | The earlier 69-source pass the spec supersedes, and the record of which of those rules were built and how they scored |
 
 ## Consuming
 
@@ -101,6 +110,15 @@ JS (Nydex): import the spec — `import spec from '../engine/rhengine/strategies
 and test `indicators.js` against `fixtures/` with vitest (sync pass deferred).
 
 ## Simulation & backtesting (standalone, no API keys)
+
+> **Pre-audit section.** The tools below still run and are still the right tools;
+> the *numbers* they once produced were withdrawn on 2026-07-24 (zero costs,
+> uncapitalised R-sums, IID statistics on overlapping trades, a
+> survivorship-biased universe). Nothing here has been re-established. Treat
+> output as diagnostic, never as a performance claim — those come only from
+> `rhengine/alpha/book.py`. Costs now resolve from `config.json`
+> (`costs.round_trip_bps`, 30 bps) rather than each CLI's own default.
+> See `CLAUDE.md` and `docs/CLAUDE-RESEARCH-RULES.md`.
 
 The repo ships its own `config.json` with `data_source: "massive"` and
 `watchlist: "all"` so every tool below runs from this directory against the
@@ -114,7 +132,7 @@ explicit watchlist, not "all") or `alpaca` (instant but IEX-only volume,
 
 ```bash
 # 1. Signal-level backtest (R-multiples, by score tier / strategy / exit)
-py -m rhengine.backtest --lookback-days 400 --cost-bps 5 --csv backtest_trades.csv
+py -m rhengine.backtest --lookback-days 400 --csv backtest_trades.csv
 
 # 2. Account-level simulation (sizing + capacity constraints -> equity curve)
 py -m rhengine.portfolio --risk-pct 1 --max-positions 5 --equity-csv equity_curve.csv
@@ -136,11 +154,13 @@ produce the exact bar shape `run_backtest_on` consumes.
 
 Five more tools stress a configuration before it touches the live account. Each
 prints a verdict line and (via the notebooks) charts the distribution behind it.
-Always `--cost-bps 5`; cap the universe with `--max-tickers` while iterating.
+Omit `--cost-bps` — it resolves from `config.json` (`costs.round_trip_bps`, 30,
+measured) via `rhengine/costs.py`; pass it only to run a cost sweep. Cap the
+universe with `--max-tickers` while iterating.
 
 ```bash
 # Ablation — which legs carry the edge, which are drag (cut candidates)?
-py -m rhengine.ablate --strategy residualmomentum --cost-bps 5
+py -m rhengine.ablate --strategy residualmomentum
 py -m rhengine.ablate --strategy bollinger --regime choppy   # routed → ablate in-slot
 
 # Information Coefficient + t-stats — does a higher score rank a better outcome?

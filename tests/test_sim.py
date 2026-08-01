@@ -447,5 +447,76 @@ class TestCsvLoader(unittest.TestCase):
         self.assertLess(bars[0]["time"], bars[1]["time"])
 
 
+class TestCapitalRateCheck(unittest.TestCase):
+    """sanity.check_capital_rate — the gate that notices R-sums are not returns.
+
+    The failure it exists to catch is a book with excellent R-space statistics
+    whose capital earns less than simply holding the index. That happened to
+    every strategy in the repo on 2026-07-31 (docs/AUTOSTRAT-2026-07-31.md §9),
+    and none of the other ten checks noticed.
+    """
+
+    @staticmethod
+    def _trades(r, stop_pct, held, n=200):
+        entry = 100.0
+        return [{"r_multiple": r, "entry": entry,
+                 "stop": entry * (1.0 - stop_pct), "sessions_held": held}
+                for _ in range(n)]
+
+    def test_identity_matches_hpr_definition(self):
+        """The reported rate must equal sum(R*stop_pct)/sum(days) exactly.
+
+        This is an identity, not an approximation: portfolio.py sizes
+        notional = risk/stop_pct, so P&L/notional = R*stop_pct. If this drifts,
+        the check is measuring something that is not a return on capital.
+        """
+        from rhengine.sanity import check_capital_rate
+        r, stop_pct, held = 0.25, 0.05, 10
+        _, _, value, _ = check_capital_rate(self._trades(r, stop_pct, held))
+        self.assertAlmostEqual(float(value.split()[0]),
+                               1e4 * (r * stop_pct) / held, places=6)
+
+    def test_grades_against_passive_drift(self):
+        """PASS above passive, WARN positive-but-below, FAIL at a loss."""
+        from rhengine.sanity import PASSIVE_BP_PER_DAY, check_capital_rate
+        # 0.25R on a 5% stop over 10 sessions = 12.5 bp/day, well above passive
+        self.assertEqual(check_capital_rate(self._trades(0.25, 0.05, 10))[1],
+                         "PASS")
+        # positive but starved: same edge stretched over 200 sessions
+        self.assertEqual(check_capital_rate(self._trades(0.25, 0.05, 200))[1],
+                         "WARN")
+        self.assertEqual(check_capital_rate(self._trades(-0.10, 0.05, 10))[1],
+                         "FAIL")
+        self.assertGreater(PASSIVE_BP_PER_DAY, 0)
+
+    def test_high_meanR_can_still_fail(self):
+        """The whole point: a big mean R with a tight stop and a long hold is
+        NOT a good rate. +0.50R sounds excellent; on a 1% stop held 250
+        sessions it earns 0.2 bp/day, a twentieth of passive drift."""
+        from rhengine.sanity import _t_stat, check_capital_rate
+        # jittered so the R series has variance and t_stat is meaningful —
+        # a constant series has zero variance and t_stat returns 0 by design
+        trades = self._trades(0.50, 0.01, 250)
+        for i, t in enumerate(trades):
+            t["r_multiple"] = 0.50 + (0.05 if i % 2 else -0.05)
+        self.assertEqual(check_capital_rate(trades)[1], "WARN")
+        # and R-space is perfectly happy with it: a huge, highly significant t
+        self.assertGreater(_t_stat([t["r_multiple"] for t in trades]), 20)
+
+    def test_skips_without_holding_length(self):
+        """R-space-only CSVs must SKIP, never silently score as zero."""
+        from rhengine.sanity import check_capital_rate
+        trades = [{"r_multiple": 0.2, "entry": 100.0, "stop": 95.0}
+                  for _ in range(200)]
+        self.assertEqual(check_capital_rate(trades)[1], "SKIP")
+
+    def test_wired_into_the_battery(self):
+        """A check that is not in CHECKS gates nothing."""
+        from rhengine.sanity import CHECKS, check_capital_rate, run_battery
+        self.assertIn(check_capital_rate, CHECKS)
+        names = [row[0] for row in run_battery(self._trades(0.25, 0.05, 10))]
+        self.assertIn("capital_rate", names)
+
+
 if __name__ == "__main__":
     unittest.main()

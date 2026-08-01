@@ -101,9 +101,24 @@ def june_ends(panel: Panel, lo: str | None = None,
     return pd.DatetimeIndex([d for d in me if d.month == QUALITY_MONTH])
 
 
+def quarter_ends(panel: Panel, lo: str | None = None,
+                 hi: str | None = None) -> pd.DatetimeIndex:
+    """Last trading session of March, June, September and December.
+
+    A turnover control, not a signal change. OSAP's `Mom12m` record is a MONTHLY
+    rebalance, so a sleeve run on this calendar has deviated from the record it
+    was screened on and the deviation has to be measured, not assumed harmless:
+    momentum decays inside a quarter, so gross return falls. Whether NET return
+    rises is the whole question — see `--momentum-calendar` in blend.py.
+    """
+    me = panel.month_ends(lo, hi)
+    return pd.DatetimeIndex([d for d in me if d.month in (3, 6, 9, 12)])
+
+
 CALENDARS: dict[str, Callable[..., pd.DatetimeIndex]] = {
     "weekly": week_ends,
     "monthly": lambda p, lo, hi: p.month_ends(lo, hi),
+    "quarterly": quarter_ends,
     "annual": june_ends,
 }
 
@@ -416,6 +431,17 @@ class Sleeve:
     top_fraction: float = TOP_FRACTION
     max_weight: float = MAX_WEIGHT
     hold_between_rebalances: bool = True
+    # No-trade band. A name enters on reaching the top `top_fraction` and is only
+    # sold once it falls out of the top `exit_fraction`. Equal to top_fraction
+    # means no band, which is the strict-quintile default.
+    exit_fraction: float = TOP_FRACTION
+
+    def __post_init__(self):
+        if self.exit_fraction < self.top_fraction:
+            raise ValueError(
+                f"{self.name}: exit_fraction {self.exit_fraction} is tighter "
+                f"than top_fraction {self.top_fraction}, which would sell names "
+                f"that still qualify to enter and churn every rebalance")
 
 
 REGISTRY: dict[str, Sleeve] = {
@@ -462,11 +488,25 @@ def build_sleeve(panel: Panel, fund: Fundamentals, sleeve: Sleeve,
     not merely the eligible set — the benchmark has to see the same population
     as the book or the comparison silently measures coverage instead of skill
     (audit FC-4).
+
+    **This function is stateful across rebalance dates** when the sleeve has a
+    no-trade band (`exit_fraction > top_fraction`): what it holds depends on what
+    it held last time. That is the point — a strict quintile sells a name the
+    moment it slips to rank 21% and buys it back when it returns, which is pure
+    churn against a signal that has barely moved. With a band, a name enters on
+    reaching the top `top_fraction` and leaves only on falling out of the top
+    `exit_fraction`, so the held count floats between the two.
+
+    The band does NOT change the signal or the covered universe, so the
+    benchmark and the published analogue both stay valid. It only changes when a
+    decision is acted on.
     """
     cfg = _Cfg(sleeve.max_weight)
     dates = CALENDARS[sleeve.calendar](panel, lo, hi)
     targets: dict[pd.Timestamp, pd.Series] = {}
     covered: dict[pd.Timestamp, pd.Index] = {}
+    banded = sleeve.exit_fraction > sleeve.top_fraction
+    held: pd.Index = pd.Index([])
     diag = []
     for d in dates:
         names = panel.eligible(d)
@@ -481,13 +521,22 @@ def build_sleeve(panel: Panel, fund: Fundamentals, sleeve: Sleeve,
             continue
         k = max(int(len(v) * sleeve.top_fraction), 10)
         pick = v.nlargest(k).index
+        n_new = len(pick)
+        if banded and len(held):
+            k_exit = max(int(len(v) * sleeve.exit_fraction), k)
+            # a name already held survives while it is still inside the wider
+            # band AND still has a usable signal this period
+            survivor = v.nlargest(k_exit).index.intersection(held)
+            pick = pick.union(survivor)
         w = _weights(cap_all.reindex(pick).dropna(), cfg)
         if w.empty or w.sum() <= 0:
             continue
         targets[d] = w / w.sum()
         covered[d] = v.index
+        held = w.index
         diag.append({"date": str(d.date()), "eligible": len(names),
                      "covered": len(v), "picked": len(pick),
+                     "fresh": n_new, "held_over": len(pick) - n_new,
                      "max_weight": float(targets[d].max())})
     return targets, covered, pd.DataFrame(diag)
 

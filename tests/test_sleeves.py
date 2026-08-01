@@ -57,6 +57,10 @@ class _FakePanel:
                 f *= ratio
         return f
 
+    def eligible(self, date):
+        """Every priced name. The universe floors are Panel's job, not a stub's."""
+        return self.adj.columns
+
     def month_ends(self, lo=None, hi=None):
         idx = self.adj.index
         if hi is not None:
@@ -405,6 +409,77 @@ class TestVolScaling(unittest.TestCase):
         self.assertLessEqual(float(k.max()), 1.5 + 1e-12)
         self.assertGreater(float(k.iloc[210]), float(k.iloc[-1]))
         self.assertTrue(np.isfinite(k).all())
+
+
+class TestNoTradeBand(unittest.TestCase):
+    """A held name must survive a slip past the entry rank but inside the band.
+
+    Without the band a strict quintile sells a name the moment it slips to rank
+    21% and buys it back when it returns, which is churn against a signal that
+    barely moved. With it, `build_sleeve` becomes stateful across rebalances, so
+    the invariants worth pinning are: the band never sells a name that still
+    qualifies to ENTER, it does sell one that leaves the wider band, and a
+    tighter exit than entry is rejected outright rather than silently churning.
+    """
+
+    def test_exit_tighter_than_entry_is_rejected(self):
+        with self.assertRaises(ValueError):
+            S.Sleeve("bad", S.momentum_12_1, "monthly", "momentum", "Mom12m",
+                     top_fraction=0.20, exit_fraction=0.10)
+
+    def test_default_registry_has_no_band(self):
+        """The shipped sleeves are strict quintiles; the band is opt-in."""
+        for name in S.DEFAULT_SLEEVES:
+            s = S.REGISTRY[name]
+            self.assertEqual(s.exit_fraction, s.top_fraction, name)
+
+    def test_band_retains_a_slipping_name_and_drops_a_falling_one(self):
+        """Rank 25 of 100 survives a 0.20/0.40 band; rank 55 does not."""
+        n = 100
+        names = pd.Index([f"T{i:03d}" for i in range(n)])
+
+        # signal ranks T000 best .. T099 worst on the first date; on the second,
+        # the incumbent T000 slips to rank 25 and T001 slips to rank 55
+        seq = [list(names), None]
+        after = [f"T{i:03d}" for i in range(2, n)]
+        after.insert(24, "T000")            # -> rank 25 of 100, inside 0.40
+        after.insert(54, "T001")            # -> rank 55 of 100, outside 0.40
+        seq[1] = after
+
+        calls = {"i": 0}
+
+        def signal(panel, fund, date, universe):
+            order = seq[min(calls["i"], 1)]
+            calls["i"] += 1
+            return pd.Series(np.linspace(1.0, 0.0, n),
+                             index=pd.Index(order), dtype=float)
+
+        sleeve = S.Sleeve("banded", signal, "monthly", "test", "None",
+                          top_fraction=0.20, exit_fraction=0.40)
+        panel = _FakePanel(n=60)
+        panel.adj = pd.DataFrame(
+            {t: np.linspace(100.0, 110.0, 60) for t in names},
+            index=panel.adj.index)
+        panel.close = panel.adj.copy()
+        fund = _FakeFund(_fund_table({t: {"equity": 1.0} for t in names[:1]}))
+
+        real = S.market_cap
+        S.market_cap = lambda p, f, d, u: pd.Series(1e9, index=names)
+        try:
+            targets, _, diag = S.build_sleeve(panel, fund, sleeve,
+                                              None, None, min_names=40)
+        finally:
+            S.market_cap = real
+
+        self.assertGreaterEqual(len(targets), 2)
+        second = targets[sorted(targets)[1]]
+        self.assertIn("T000", second.index,
+                      "rank 25 of 100 is inside the 0.40 band and was held")
+        self.assertNotIn("T001", second.index,
+                         "rank 55 of 100 is outside the 0.40 band and must go")
+        # and the band must actually have held something over, or the fixture
+        # is not exercising the code path at all
+        self.assertGreater(int(diag.iloc[1]["held_over"]), 0)
 
 
 class TestRegistry(unittest.TestCase):
