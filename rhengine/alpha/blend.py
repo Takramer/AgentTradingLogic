@@ -1,4 +1,4 @@
-"""blend.py — RMX-C, the multi-sleeve blend, and the ablation harness for it.
+"""blend.py -- RMX-C, the multi-sleeve blend, and the ablation harness for it.
 
 RMX-B blended two sleeves and reached alpha t = +2.54 on French's 63 years
 because their excess returns correlated only +0.18. This generalises that to N
@@ -27,8 +27,9 @@ target vector per rebalance date and `run_book` sees one portfolio.
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 import numpy as np
 import pandas as pd
@@ -38,8 +39,8 @@ from .fundamentals import Fundamentals
 from .panel import Panel
 from .rmx import load_panel
 from .rmxq import _weights, market_cap
-from .sleeves import (DEFAULT_SLEEVES, REGISTRY, Sleeve, _Cfg, build_sleeve,
-                      scale_by_own_vol)
+from .sleeves import (CALENDARS, DEFAULT_SLEEVES, REGISTRY, Sleeve, _Cfg,
+                      build_sleeve, scale_by_own_vol)
 from .stats import Perf, alpha_beta, monthly, perf
 
 DEFAULT_COST_BPS = 10.0
@@ -53,11 +54,31 @@ class BlendConfig:
     vol_cap: float = 1.5
     max_weight: float = 0.10                     # cap on the COMBINED name weight
     min_names: int = 40
+    # Turnover controls. Both are OFF by default: they change the shipped
+    # strategy, and the published analogues are a strict quintile on the
+    # signal's own calendar. See `--band` / `--momentum-calendar`.
+    exit_fraction: float | None = None           # no-trade band, e.g. 0.30
+    calendars: dict[str, str] | None = None      # per-sleeve calendar override
 
     def sleeve_weight(self, name: str) -> float:
         if self.weights:
             return float(self.weights.get(name, 0.0))
         return 1.0 / len(self.sleeves)
+
+    def resolve(self, name: str) -> Sleeve:
+        """The registry sleeve with this config's turnover overrides applied."""
+        s = REGISTRY[name]
+        changes = {}
+        if self.exit_fraction is not None \
+                and self.exit_fraction > s.top_fraction:
+            changes["exit_fraction"] = float(self.exit_fraction)
+        if self.calendars and name in self.calendars:
+            cal = self.calendars[name]
+            if cal not in CALENDARS:
+                raise KeyError(f"unknown calendar {cal!r} for sleeve {name!r}; "
+                               f"have {sorted(CALENDARS)}")
+            changes["calendar"] = cal
+        return replace(s, **changes) if changes else s
 
 
 # ------------------------------------------------------------------- machinery
@@ -87,10 +108,10 @@ def build(panel: Panel, fund: Fundamentals, cfg: BlendConfig, lo: str, hi: str,
     """Per-sleeve targets, the vol-scaling series, and the combined targets."""
     per_sleeve, per_covered, per_diag = {}, {}, {}
     for name in cfg.sleeves:
-        sleeve: Sleeve = REGISTRY[name]
+        sleeve: Sleeve = cfg.resolve(name)
         t, c, d = build_sleeve(panel, fund, sleeve, lo, hi, cfg.min_names)
         if not t:
-            print(f"  sleeve {name}: no rebalances produced — skipped")
+            print(f"  sleeve {name}: no rebalances produced -- skipped")
             continue
         per_sleeve[name], per_covered[name], per_diag[name] = t, c, d
 
@@ -318,32 +339,115 @@ def ablate(cfg: BlendConfig, lo: str, hi: str, cost_bps: float) -> pd.DataFrame:
     return df
 
 
+def turnover_sweep(base: BlendConfig, lo: str, hi: str) -> pd.DataFrame:
+    """Grid the two turnover controls against the cost that actually applies.
+
+    Turnover only matters through cost, so the sweep is run at BOTH 10 bps (the
+    research default) and 30 bps (config.json's modelled cost for this
+    universe). A control that helps at 10 and hurts at 30, or the reverse, is
+    the whole point of running both — a single cost assumption cannot tell you
+    whether a turnover reduction paid for the gross return it gave up.
+
+    Both controls are construction changes measured on a SPENT window, so this
+    is a cost/turnover diagnostic and not evidence of edge. What it can settle
+    is the mechanical question: does the band or the calendar buy back more in
+    cost than it loses in signal?
+    """
+    panel, fund = load_panel(), Fundamentals.load()
+    variants = [
+        ("baseline (strict quintile, monthly mom)", None, None),
+        ("band 0.25", 0.25, None),
+        ("band 0.30", 0.30, None),
+        ("band 0.40", 0.40, None),
+        ("quarterly momentum", None, "quarterly"),
+        ("band 0.30 + quarterly momentum", 0.30, "quarterly"),
+    ]
+    rows = []
+    for label, band, cal in variants:
+        cfg = BlendConfig(sleeves=base.sleeves, vol_scale=base.vol_scale,
+                          vol_cap=base.vol_cap, max_weight=base.max_weight,
+                          min_names=base.min_names, exit_fraction=band,
+                          calendars={"momentum": cal} if cal else None)
+        row = {"config": label}
+        for bps in (10.0, 30.0):
+            try:
+                r = report(cfg, lo, hi, bps, panel, fund, quiet=True)
+            except Exception as exc:                  # noqa: BLE001
+                row[f"err@{bps:.0f}"] = str(exc)[:40]
+                continue
+            row[f"turn@{bps:.0f}"] = r["turnover_ann"] * 100
+            row[f"cagr@{bps:.0f}"] = r["perf"]["cagr_pct"]
+            row[f"alpha@{bps:.0f}"] = r["vs"]["CW universe"]["alpha_ann"] * 100
+            row[f"t@{bps:.0f}"] = r["vs"]["CW universe"]["alpha_t"]
+            row[f"held@{bps:.0f}"] = r["mean_held"]
+        rows.append(row)
+    df = pd.DataFrame(rows).set_index("config")
+    print(f"\n=== turnover controls  {lo} .. {hi}  vs the CW covered universe ===")
+    print(df.to_string(float_format=lambda v: f"{v:,.2f}"))
+    print("\nturn = one-way turnover %/yr | alpha = %/yr vs the CW universe")
+    print("A control earns its place only if it raises alpha AT 30 BPS, the cost")
+    print("this universe is actually modelled at. Improvements at 10 bps alone")
+    print("are an artefact of understating cost.")
+    return df
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--lo", default="2010-07-01")
-    ap.add_argument("--hi", default="2018-12-31")
+    # see rmxb.main: --holdings wants today, a backtest wants the in-sample
+    # window, and sharing one default breaks --holdings silently.
+    ap.add_argument("--hi", default=None)
     ap.add_argument("--cost-bps", type=float, default=DEFAULT_COST_BPS)
     ap.add_argument("--sleeves", nargs="*", default=list(DEFAULT_SLEEVES),
                     choices=sorted(REGISTRY))
     ap.add_argument("--vol-scale", nargs="*", default=["momentum"],
-                    help="sleeves to scale by their own realised vol (Barroso)")
+                    help="sleeves to scale by their own realised vol (Barroso). "
+                         "DEFAULTS TO THE MOMENTUM LEG -- unlike rmxb.py, where "
+                         "vol-scaling is off. Every RMX-C number in docs/RMX-C.md "
+                         "was produced with this on. Pass a bare --vol-scale to "
+                         "turn it off.")
     ap.add_argument("--vol-cap", type=float, default=1.5)
+    ap.add_argument("--band", type=float, default=None, metavar="EXIT_FRACTION",
+                    help="no-trade band: enter on the top 20%%, sell only on "
+                         "falling out of the top EXIT_FRACTION (e.g. 0.30). "
+                         "Cuts churn without changing the signal.")
+    ap.add_argument("--momentum-calendar", default=None,
+                    choices=sorted(CALENDARS),
+                    help="rebalance the momentum leg on this calendar instead "
+                         "of monthly. DEVIATES from Mom12m's published record.")
+    ap.add_argument("--turnover-sweep", action="store_true",
+                    help="grid the two turnover controls at 10 and 30 bps")
     ap.add_argument("--ablate", action="store_true",
                     help="leave-one-out over the chosen sleeves")
     ap.add_argument("--holdings", action="store_true")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args()
+    if args.hi is None:
+        args.hi = (dt.date.today().isoformat() if args.holdings
+                   else "2018-12-31")
 
     cfg = BlendConfig(sleeves=tuple(args.sleeves),
-                      vol_scale=tuple(args.vol_scale), vol_cap=args.vol_cap)
+                      vol_scale=tuple(args.vol_scale), vol_cap=args.vol_cap,
+                      exit_fraction=args.band,
+                      calendars=({"momentum": args.momentum_calendar}
+                                 if args.momentum_calendar else None))
+
+    if args.turnover_sweep:
+        turnover_sweep(cfg, args.lo, args.hi)
+        return
 
     if args.holdings:
         panel, fund = load_panel(), Fundamentals.load()
         built = build(panel, fund, cfg, "2023-01-01", args.hi, args.cost_bps)
+        if not built["targets"]:
+            raise SystemExit(
+                f"no rebalance formed in 2023-01-01..{args.hi} -- the panel "
+                f"probably does not reach that far. Check `py -m "
+                f"rhengine.alpha.panel`.")
         last = max(built["targets"])
         w = built["targets"][last]
         w = w[w > 1e-6].sort_values(ascending=False)
-        print(f"RMX-C book formed {last.date()} — {len(w)} names")
+        print(f"RMX-C book formed {last.date()} -- {len(w)} names")
         for k, v in w.head(30).items():
             print(f"    {k:<8} {v * 100:5.2f}%")
         return

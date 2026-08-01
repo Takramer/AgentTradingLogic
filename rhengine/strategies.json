@@ -14,6 +14,123 @@
     "choppy": null,
     "_note": "LIVE as of 2026-07-24 \u2014 previously this block was unread and indicators.py carried a hardcoded duplicate that could silently disagree (audit FC-20). Targets must have status 'autonomous' or they are refused at routing time. All three regimes are currently unrouted; see the determination in docs/AUDIT-2026-07-24.md section 12f."
   },
+  "books": {
+    "_note": "Research-stack PORTFOLIO books, added 2026-08-01. Deliberately a separate namespace from `strategies`: these are cross-sectional rank-and-hold books with weights, no legMask, no thresholds, no per-trade R-multiples and no stops. Putting them in `strategies` would hand a schema with none of their fields to every existing reader. Consumed via rhengine.alpha.live.emit(); the same four deployment tiers apply and are enforced there, exactly as indicators.select_strategy_for_regime enforces them for sleeves. Additive and backward-compatible \u2014 _spec_version stays 1 because no existing key changed meaning.",
+    "rmxb": {
+      "id": "rmxb",
+      "name": "RMX-B \u2014 cap-weighted quality + 12-1 momentum",
+      "description": "50/50 blend of two cap-weighted large-cap sleeves over the point-in-time S&P 500. Quality leg: top operating-profitability (OP/BE) quintile, re-formed each June, held 12 months. Momentum leg: top 12-1 return quintile (months -12..-2, skipping the reversal month), re-formed monthly. 10% name cap, ~96-126 names, executed at the close of the session AFTER the decision.",
+      "module": "rhengine.alpha.rmxb",
+      "status": "manual",
+      "_status_note": "NOT autonomous. G1 is 0 of 10 (docs/AUDIT-2026-07-24.md section 10) and docs/HOLDOUT.md gates paper promotion on 125 W3 sessions under a config frozen before 2026-07-24; as of 2026-08-01 W3 holds ~8. Setting this to 'autonomous' overrides both gates and is the account owner's decision, not a validation result. rhengine.alpha.live.emit() writes that override into every payload it produces.",
+      "cadence": {
+        "momentum_leg": "monthly, at the month-end rebalance",
+        "quality_leg": "annually, June",
+        "execution_lag_sessions": 1
+      },
+      "constraints": {
+        "max_name_weight": 0.1,
+        "long_only": true,
+        "leverage_permitted": false,
+        "shortable": false
+      },
+      "evidence": {
+        "source": "Ken French portfolios 1963-2026, survivorship-free, nothing in this project fitted to them",
+        "cagr": 0.1255,
+        "market_cagr": 0.109,
+        "alpha_ann": 0.0178,
+        "alpha_t": 2.54,
+        "sharpe": 0.55,
+        "market_sharpe": 0.47,
+        "beta": 0.97,
+        "eras_beaten": "4/4",
+        "leg_correlation": 0.18,
+        "local_alpha_t": 0.33,
+        "_bound": "The 63-year record is the demonstration. This project's 8-year S&P 500 panel checks the implementation for CONSISTENCY and can never check it for significance: +1.78%/yr against 5.5%/yr tracking error needs ~39 years to reach t=2. Expect to trail the index roughly 4 years in 10.",
+        "_trailing_12m_caveat": "2025-07-31..2026-07-24 the book returned +25.3% against SPY's +18.2% at 30 bps \u2014 but beta vs its own cap-weighted covered universe was 1.39 and alpha against it was -0.69%/yr. That year's excess was risk, not skill. Descriptive only; logged in docs/HOLDOUT.md 2026-07-31."
+      },
+      "cost_profile": {
+        "modelled_bps": 30,
+        "annual_one_way_turnover": 1.95,
+        "cost_drag_pct_per_yr": 0.58,
+        "source": "config.json costs.round_trip_bps via rhengine/costs.py; 296 stratified live Robinhood quotes reweighted to the real book gave 29.1 bps, range 5.5-98.1 across ADV deciles"
+      },
+      "gates": {
+        "G1_met": 0,
+        "G1_total": 10,
+        "w3_sessions_required": 125,
+        "blocking": [
+          "G1-2 net alpha t >= 2.0 vs SPY at 30 bps \u2014 not established and not establishable on this panel",
+          "G1-3 >= 500 distinct sessions and >= 3 regime episodes",
+          "G1-10 final holdout viewed exactly once, after all of the above"
+        ]
+      },
+      "kill_switches": {
+        "_source": "docs/AUDIT-2026-07-24.md section 10, G4",
+        "halve_size_if": "trailing 60-day net return below the Monte Carlo p5 path",
+        "flat_and_revalidate_if": "trailing 60-day net return below the p1 path",
+        "flat_immediately_if": "realized round-trip cost exceeds 1.5x modelled for 20 consecutive trading days",
+        "max_staleness_days": 5
+      }
+    },
+    "rmxc": {
+      "id": "rmxc",
+      "name": "RMX-C \u2014 five-block cap-weighted blend",
+      "description": "RMX-B's two blocks plus investment (asset growth), issuance (5-year share count) and payout (Boudoukh et al. PayoutYield). Each block ranks the PIT eligible universe and holds the top quintile cap-weighted with a 10% name cap, executed next close, no stops. The momentum block is vol-scaled by default (Barroso & Santa-Clara) \u2014 see docs/RMX-C.md, this differs from RMX-B.",
+      "module": "rhengine.alpha.blend",
+      "status": "user_configurable",
+      "_status_note": "Nydex ships this for a USER to configure and leave running. Confers NO agent-routing permission. It has not passed G1 and its 5-block form has no survivorship-free multi-decade demonstration \u2014 only its constituent published records.",
+      "cadence": {
+        "quality_leg": "annually, June",
+        "momentum_leg": "monthly",
+        "investment_issuance_payout": "annually",
+        "execution_lag_sessions": 1
+      },
+      "constraints": {
+        "max_name_weight": 0.1,
+        "long_only": true,
+        "leverage_permitted": false,
+        "shortable": false
+      },
+      "evidence": {
+        "source": "OSAP / JKP / AQR / Ken French published records in research_data/external",
+        "long_only_ex_market_bp_per_month": {
+          "1970-2024": 20.1,
+          "2010-2018": -5.7,
+          "2015-2024": 2.6
+        },
+        "long_only_t": {
+          "1970-2024": 5.2,
+          "2010-2018": -1.01,
+          "2015-2024": 0.35
+        },
+        "mean_pairwise_leg_correlation": 0.107,
+        "_bound": "The 55-year result is real and is the reason to run this. THE LAST DECADE PAID NOTHING, long-only. Published large-cap anomalies pay ~7 bp/month post-2005 with median |t| 0.45. The blend works through near-zero correlation between blocks, not through any block being strong.",
+        "_trailing_12m_caveat": "2025-07-31..2026-07-24 returned +48.2% against SPY's +18.2% at 30 bps at BETA 1.53 and 22.8% volatility, alpha t=+1.03 on 13 months. That is a high-beta momentum book in a momentum year, not evidence."
+      },
+      "cost_profile": {
+        "modelled_bps": 30,
+        "annual_one_way_turnover": 1.75,
+        "cost_drag_pct_per_yr": 0.53,
+        "source": "config.json costs.round_trip_bps; docs/RMX-C.md measures cost at about twice the size-adjusted modern edge"
+      },
+      "gates": {
+        "G1_met": 0,
+        "G1_total": 10,
+        "w3_sessions_required": 125,
+        "blocking": [
+          "Same as rmxb, plus: no survivorship-free demonstration exists for the 5-block construction itself"
+        ]
+      },
+      "kill_switches": {
+        "_source": "docs/AUDIT-2026-07-24.md section 10, G4",
+        "halve_size_if": "trailing 60-day net return below the Monte Carlo p5 path",
+        "flat_and_revalidate_if": "trailing 60-day net return below the p1 path",
+        "flat_immediately_if": "realized round-trip cost exceeds 1.5x modelled for 20 consecutive trading days",
+        "max_staleness_days": 5
+      }
+    }
+  },
   "external_legs": {
     "_note": "Adapter-derived gating legs evaluated OUTSIDE score_ticker \u2014 indicators.py stays a pure OHLCV scorer and the golden vectors never move. gates.GateBook applies them in the backtest loop per config.json external_gates (annotate/filter modes); apps use the same scorers at scan time. Scorers: market_data_kalshi.score_prob_shift, market_data_polymarket.score_implied_prob, market_data_av.sue_gate. Additive to the spec \u2014 not part of any strategy's legMask bit-width.",
     "kalshi_prob_shift": {
@@ -198,7 +315,12 @@
         "measured": "2026-07-27T13:45 ET, mid-session",
         "caveat": "mid-session quoted spread; the engine fills at the OPEN, which is wider - this is the optimistic bound. Excludes market impact; excludes PFOF price improvement, which cuts the other way.",
         "universe": "3,309 names, min_dollar_vol $500k/day, ETF+ADR excluded; 119,875 trades, 730d",
-        "source": "tests/results/rh_quotes_midsession_2026-07-27.json"
+        "source": "tests/results/rh_quotes_midsession_2026-07-27.json",
+        "measurements_bps_round_trip": {
+          "2026-07-27T13:45 ET mid-session": 29.1,
+          "2026-07-28T13:46 ET mid-session": 24.6,
+          "_note": "~15% swing between consecutive days at the same clock time. Headline stays at the conservative 29.1; a single lower reading is not grounds to assume a cheaper book. The OPENING spread \u2014 what the engine actually fills at, and the widest of the day \u2014 remains unmeasured on two failed attempts."
+        }
       }
     },
     "bollinger": {
@@ -294,7 +416,12 @@
         "measured": "2026-07-27T13:45 ET, mid-session",
         "caveat": "mid-session quoted spread; the engine fills at the OPEN, which is wider - this is the optimistic bound. Excludes market impact; excludes PFOF price improvement, which cuts the other way.",
         "universe": "3,309 names, min_dollar_vol $500k/day, ETF+ADR excluded; 119,875 trades, 730d",
-        "source": "tests/results/rh_quotes_midsession_2026-07-27.json"
+        "source": "tests/results/rh_quotes_midsession_2026-07-27.json",
+        "measurements_bps_round_trip": {
+          "2026-07-27T13:45 ET mid-session": 29.1,
+          "2026-07-28T13:46 ET mid-session": 24.6,
+          "_note": "~15% swing between consecutive days at the same clock time. Headline stays at the conservative 29.1; a single lower reading is not grounds to assume a cheaper book. The OPENING spread \u2014 what the engine actually fills at, and the widest of the day \u2014 remains unmeasured on two failed attempts."
+        }
       }
     },
     "macd": {
@@ -390,7 +517,12 @@
         "measured": "2026-07-27T13:45 ET, mid-session",
         "caveat": "mid-session quoted spread; the engine fills at the OPEN, which is wider - this is the optimistic bound. Excludes market impact; excludes PFOF price improvement, which cuts the other way.",
         "universe": "3,309 names, min_dollar_vol $500k/day, ETF+ADR excluded; 119,875 trades, 730d",
-        "source": "tests/results/rh_quotes_midsession_2026-07-27.json"
+        "source": "tests/results/rh_quotes_midsession_2026-07-27.json",
+        "measurements_bps_round_trip": {
+          "2026-07-27T13:45 ET mid-session": 29.1,
+          "2026-07-28T13:46 ET mid-session": 24.6,
+          "_note": "~15% swing between consecutive days at the same clock time. Headline stays at the conservative 29.1; a single lower reading is not grounds to assume a cheaper book. The OPENING spread \u2014 what the engine actually fills at, and the widest of the day \u2014 remains unmeasured on two failed attempts."
+        }
       }
     },
     "consolidation": {
@@ -596,7 +728,12 @@
         "measured": "2026-07-27T13:45 ET, mid-session",
         "caveat": "mid-session quoted spread; the engine fills at the OPEN, which is wider - this is the optimistic bound. Excludes market impact; excludes PFOF price improvement, which cuts the other way.",
         "universe": "3,309 names, min_dollar_vol $500k/day, ETF+ADR excluded; 119,875 trades, 730d",
-        "source": "tests/results/rh_quotes_midsession_2026-07-27.json"
+        "source": "tests/results/rh_quotes_midsession_2026-07-27.json",
+        "measurements_bps_round_trip": {
+          "2026-07-27T13:45 ET mid-session": 29.1,
+          "2026-07-28T13:46 ET mid-session": 24.6,
+          "_note": "~15% swing between consecutive days at the same clock time. Headline stays at the conservative 29.1; a single lower reading is not grounds to assume a cheaper book. The OPENING spread \u2014 what the engine actually fills at, and the widest of the day \u2014 remains unmeasured on two failed attempts."
+        }
       }
     },
     "pead": {
@@ -699,7 +836,12 @@
         "measured": "2026-07-27T13:45 ET, mid-session",
         "caveat": "mid-session quoted spread; the engine fills at the OPEN, which is wider - this is the optimistic bound. Excludes market impact; excludes PFOF price improvement, which cuts the other way.",
         "universe": "3,309 names, min_dollar_vol $500k/day, ETF+ADR excluded; 119,875 trades, 730d",
-        "source": "tests/results/rh_quotes_midsession_2026-07-27.json"
+        "source": "tests/results/rh_quotes_midsession_2026-07-27.json",
+        "measurements_bps_round_trip": {
+          "2026-07-27T13:45 ET mid-session": 29.1,
+          "2026-07-28T13:46 ET mid-session": 24.6,
+          "_note": "~15% swing between consecutive days at the same clock time. Headline stays at the conservative 29.1; a single lower reading is not grounds to assume a cheaper book. The OPENING spread \u2014 what the engine actually fills at, and the widest of the day \u2014 remains unmeasured on two failed attempts."
+        }
       }
     }
   }
