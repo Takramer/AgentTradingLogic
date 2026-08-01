@@ -202,6 +202,10 @@ index in roughly 4 years out of 10. If that is not acceptable, hold SPY.
 ```bash
 # 1. data (once; ~45 min for the Yahoo bulk fetch)
 py scripts/fetch_history.py                 # 1,213 ever-S&P500 tickers, full history
+# NB (2026-08-01): without --force this SKIPS every ticker already on disk and
+# refreshes nothing (measured: ok=2 miss=428 skip=783, exit 0). It back-fills
+# missing names only. To bring an existing cache up to date you need
+# `--force`. See docs/GOLIVE-RUNBOOK.md.
 py scripts/fetch_sec_fundamentals.py        # SEC XBRL, 2009-2025, point-in-time
 
 # 2. integrity checks

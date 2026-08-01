@@ -203,9 +203,26 @@ paper's 0.53 → 0.97 for two deliberate reasons: monthly rather than daily
 observations for the vol estimate, and the multiplier capped at 1.5 because a
 retail account does not borrow at the T-bill rate.
 
-**Default is OFF.** RMX-B as documented in RMX-RESULTS is the 50/50 blend with
-the 63-year record; silently changing the shipped strategy would make the docs
-describe something that is no longer running.
+**Default is OFF in `rmxb.py`.** RMX-B as documented in RMX-RESULTS is the 50/50
+blend with the 63-year record; silently changing the shipped strategy would make
+the docs describe something that is no longer running.
+
+> **Correction, 2026-08-01.** That sentence was read for ten months as covering
+> RMX-C too, and it does not. `blend.py` defaults `--vol-scale` to
+> `["momentum"]` — **on**. CLAUDE.md asserted the opposite, so the doc and the
+> code disagreed about what RMX-C *is*.
+>
+> Resolved in favour of the code, because the code is what produced the
+> published numbers. At 10 bps over 2010-07..2018-12 the 5-block row reproduces
+> **exactly** with vol-scaling on (13.15% CAGR, 15.39% vol, Sharpe 0.86,
+> maxDD −21.19%) and gives **13.03%** with it off. Turning it "back" off would
+> have made every table below unreproducible — the exact failure research rules
+> §9 forbids.
+>
+> So: **RMX-C's momentum leg is vol-scaled by default; RMX-B's is not.** The
+> `--vol-scale` help text now says so, and a bare `--vol-scale` disables it.
+> (One residual mismatch, unexplained and small: the table below records 170%
+> turnover where the current code reports 175% on with / 167% off.)
 
 ## Where the 2015 cutoff actually belongs
 
@@ -278,6 +295,60 @@ sleeve tried — so the published record and the panel rejected it together. The
 code is kept, out of `DEFAULT_SLEEVES`, because the rejection is worth being able
 to reproduce. **The rule that failed was not "check the record", it was "check
 the record for the construction you are actually building."**
+
+## Turnover controls: both implemented, both a wash, both off by default
+
+The blend turns over 175%/yr one-way. At the 30 bps this universe is modelled at
+(`config.json`) that is ~0.53%/yr of cost against a size-adjusted modern edge of
++0.26%/yr — cost is about twice the edge. So reducing turnover looked like the
+one lever with a certain payoff. It is not.
+
+Two controls were built (`--band`, `--momentum-calendar`, `--turnover-sweep`):
+
+| config | turnover | alpha @10bps | t | alpha @30bps | t |
+|---|---|---|---|---|---|
+| baseline (strict quintile, monthly mom) | 175% | +0.16% | +0.19 | −0.14% | −0.17 |
+| band 0.25 | 144% | −0.08% | −0.10 | −0.31% | −0.41 |
+| band 0.30 | 129% | +0.02% | +0.03 | −0.18% | −0.25 |
+| **band 0.40** | **107%** | **+0.70%** | **+1.01** | **+0.54%** | **+0.79** |
+| quarterly momentum | 101% | +0.03% | +0.04 | −0.13% | −0.15 |
+| band 0.30 + quarterly momentum | 84% | −0.07% | −0.08 | −0.20% | −0.25 |
+
+Band 0.40 appears to win by +0.68%/yr at 30 bps. **It does not, and the table
+contains its own refutation:** the pattern is non-monotone — 0.25 and 0.30 are
+both WORSE than baseline. A cost mechanism cannot do that. Trading less always
+saves cost monotonically, so a middle that loses means the differences are
+dominated by which names happened to be held in this window.
+
+The arithmetic confirms it. Widening the hold band to the top 40% held 181 names
+against 154 fresh, so 15% of the book sits in the band. On the published VW
+quintiles the rank-4 bucket earns 13.9 bp/month less than rank-5 (1970-2024) and
+12.8 bp/month less (2015-2024), consistently across all five sleeves. So:
+
+    gross given up   15% x 13.9 bp/mo   =  -0.25 pp/yr   (-0.23 pp/yr since 2015)
+    cost saved       68 pp turnover x 30 bps  =  +0.20 pp/yr   (+0.07 at 10 bps)
+
+**The two are the same size.** The band is a wash at 30 bps and a net loser at
+10. The local +0.68%/yr was noise, exactly as the non-monotone pattern implied.
+
+Quarterly momentum is the same story with a bigger turnover cut (175% -> 101%,
+saving ~0.22 pp/yr) and no measurable local effect. Its gross cost cannot be
+measured on data held here — OSAP's `Mom12m` is a monthly rebalance and no
+quarterly analogue is on disk — but Jegadeesh & Titman's own tables show the
+12-1 premium falling materially at a three-month holding period, which is very
+likely larger than 0.22 pp/yr. It is not adopted on that basis.
+
+**Both stay OFF by default.** `--band 0.40` and `--momentum-calendar quarterly`
+exist so the measurement is reproducible, and because the band is genuinely
+attractive if real execution cost turns out to be well above 30 bps: the wash
+tips in its favour at roughly 40 bps and above. Measuring actual fill cost is
+therefore worth more than either control.
+
+**What this rules out.** The signal decays at about the rate the cost is saved,
+so the strategy is already near the efficient frontier of its own construction.
+There is no free lunch in trading less, and construction tweaks cannot
+manufacture a modern edge — this is the second consecutive negative result after
+equal-weighting and beta-targeting (`scripts/ff_largecap_blend.py`).
 
 ## The units bug
 

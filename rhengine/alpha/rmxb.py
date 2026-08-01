@@ -1,4 +1,4 @@
-"""rmxb.py — RMX-B, the blended sleeve. The strategy this project ships.
+"""rmxb.py -- RMX-B, the blended sleeve. The strategy this project ships.
 
 Two long-only, cap-weighted large-cap sleeves, held 50/50:
 
@@ -44,6 +44,7 @@ roughly 4 years out of 10.
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 from dataclasses import dataclass
 
 import numpy as np
@@ -244,7 +245,10 @@ def run(panel: Panel, fund: Fundamentals, cfg: RMXBConfig, lo: str, hi: str,
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--lo", default="2010-07-01")
-    ap.add_argument("--hi", default="2018-12-31")
+    # --hi carries two different natural defaults. A backtest defaults to the
+    # in-sample window; --holdings wants TODAY, and inheriting 2018-12-31 there
+    # gives an empty target dict and an IndexError instead of a book.
+    ap.add_argument("--hi", default=None)
     ap.add_argument("--cost-bps", type=float, default=DEFAULT_COST_BPS)
     ap.add_argument("--top-fraction", type=float, default=TOP_FRACTION)
     ap.add_argument("--holdings", action="store_true",
@@ -254,6 +258,9 @@ def main() -> None:
                          "inverse of its own 6-month realised volatility")
     ap.add_argument("--vol-cap", type=float, default=1.5)
     args = ap.parse_args()
+    if args.hi is None:
+        args.hi = (dt.date.today().isoformat() if args.holdings
+                   else "2018-12-31")
 
     panel, fund = load_panel(), Fundamentals.load()
     cfg = RMXBConfig(top_fraction=args.top_fraction,
@@ -262,6 +269,11 @@ def main() -> None:
 
     if args.holdings:
         t, _, d, _ = build_targets(panel, fund, cfg, "2024-01-01", args.hi)
+        if not t:
+            raise SystemExit(
+                f"no rebalance formed in 2024-01-01..{args.hi} -- the panel "
+                f"probably does not reach that far. Check `py -m "
+                f"rhengine.alpha.panel`.")
         last = sorted(t)[-1]
         w = t[last].sort_values(ascending=False)
         w = w[w > 1e-6]
