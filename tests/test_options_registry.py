@@ -29,8 +29,8 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from rhengine.options_registry import (  # noqa: E402
-    coverage, due_for_vrp, ingest, load_quotes, normalise, plan_expirations,
-    plan_strikes, validate,
+    STRIKE_STEP, coverage, due_for_vrp, ingest, load_quotes, normalise,
+    plan_delta_strikes, plan_expirations, plan_strikes, validate,
 )
 
 
@@ -156,6 +156,65 @@ class TestIngest(unittest.TestCase):
         due = due_for_vrp("2026-08-10", self.c)
         self.assertEqual(len(due), 1)
         self.assertEqual(due[0]["instrument_id"], "abc-123")
+
+
+class TestPlanCoversWhatIsTraded(unittest.TestCase):
+    """The 2026-08-01 planning change, and the silent gaps it closed.
+
+    None of these failures would ever raise. Each one produces a registry that
+    looks healthy for months and then cannot answer the question it was built
+    for, by which time the discovery window has shut.
+    """
+
+    def test_zero_dte_is_in_the_default_tenors(self):
+        """Four of the seven sources in docs/OPTIONS-SOURCES-2026-08-01.md are
+        about 0DTE. The old default (7, 30, 60) captured no same-day contract,
+        so that question was unanswerable no matter how long the job ran."""
+        exps = ["2026-08-03", "2026-08-10", "2026-09-02", "2026-10-02"]
+        picked = plan_expirations(exps, "2026-08-03")
+        self.assertIn("2026-08-03", picked)
+
+    def test_today_is_kept_not_filtered_as_past(self):
+        """A >= 0 boundary error here would drop 0DTE on every single run."""
+        self.assertEqual(plan_expirations(["2026-08-03"], "2026-08-03"),
+                         ["2026-08-03"])
+
+    def test_strike_grid_matches_the_listed_grid(self):
+        """A $5 ladder on a $1-grid name asks for strikes that do not exist;
+        the request does not error, it just returns fewer contracts."""
+        self.assertEqual(STRIKE_STEP["SPY"], 1.0)
+        self.assertEqual(STRIKE_STEP["SPX"], 5.0)
+        self.assertEqual(STRIKE_STEP["XSP"], 1.0)
+
+    def test_delta_bands_reach_where_the_dollar_ladder_cannot(self):
+        """At 60 DTE the +/-$4 SPY ladder sits inside ~0.35-0.65 delta. Every
+        premium-selling source in the corpus sells 0.10-0.15. Before this
+        change those contracts were never captured at any tenor."""
+        ladder = set(plan_strikes(746.81, 4, 1.0))
+        bands = set(plan_delta_strikes(746.81, 0.16, 60, (0.10, 0.15), 1.0))
+        self.assertTrue(bands)
+        self.assertFalse(ladder & bands)
+
+    def test_delta_bands_are_symmetric_in_type(self):
+        """Calls and puts both, so the sample can still answer an unconditional
+        question. Asking only for puts would make it a skew sample."""
+        ks = plan_delta_strikes(746.81, 0.16, 30, (0.10,), 1.0)
+        self.assertEqual(len(ks), 2)
+        self.assertLess(ks[0], 746.81)
+        self.assertGreater(ks[1], 746.81)
+
+    def test_unknown_iv_falls_back_rather_than_guessing(self):
+        """An invented IV would put the delta bands at invented strikes, and
+        the registry would record them as though they had been chosen."""
+        self.assertEqual(plan_delta_strikes(746.81, None, 30), [])
+        self.assertEqual(plan_delta_strikes(746.81, 0.0, 30), [])
+        self.assertEqual(plan_delta_strikes(746.81, 0.16, 0), [])
+
+    def test_strike_ladder_is_still_unconditional(self):
+        """The delta bands must not have made the ladder signal-dependent: the
+        same spot still yields the same strikes, with no other input."""
+        self.assertEqual(plan_strikes(746.81, 4, 1.0),
+                         plan_strikes(746.81, 4, 1.0))
 
 
 if __name__ == "__main__":
