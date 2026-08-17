@@ -89,6 +89,7 @@ py scripts/rmxqt_power.py              # why no 8-year test can prove it
 | `rhengine/sanity.py` | Ten-check **sanity battery** on a trade list (sample size, t-stat, outlier/cost/concentration/degenerate-R/monotonicity/exit-mix). PASS/WARN/FAIL with a nonzero exit code for CI/agent gating (`py -m rhengine.sanity --trades-csv …`) |
 | `rhengine/nulltest.py` | Random-entry permutation test: does the ENTRY signal beat luck, or is the edge just exit engine + drift? (`py -m rhengine.nulltest`) |
 | `rhengine/mc_refined.py` | Trade harvest + vectorized Monte Carlo for the ablation-refined strategy set (full path matrix for fan charts) |
+| `rhengine/mc_books.py` | Monte Carlo for the **research-stack books** (RMX-B, RMX-C). They have no trades and no R-multiples, so this bootstraps their daily mark-to-market returns in stationary blocks over sessions — fully invested, no sizing dial — with SPY resampled on the same block indices so `P(< SPY)` is against a market that co-moves (`py -m rhengine.mc_books`) |
 | `rhengine/charts.py` | Dependency-free ASCII charts (equity curve, drawdown, histograms) — auto-shown by portfolio/montecarlo, or standalone: `py -m rhengine.charts --equity-csv equity_curve.csv --trades-csv backtest_trades.csv` |
 | `rhengine/viz.py` | Matplotlib chart helpers (fan/hist/IC series/signed & paired bars/sweep/IS-OOS scatter/heatmap/equity-drawdown/check-table) shared by the notebooks — one validated palette so every lab reads as one system |
 | `notebooks/` | Five validation labs (below): open in Jupyter to *see* what the CLIs print — distributions, fans, per-fold bars |
@@ -182,7 +183,11 @@ py -m rhengine.nulltest --strategy bollinger --max-tickers 300
 `walkforward` (IS/OOS + forward-walk progressive tuning), `ic_tstats`,
 `crossval_sanity`, `montecarlo_refined`. Each caches its trades CSV under
 `tests/results/` and only recomputes when its `REFRESH` flag is `True`; all draw
-through `rhengine/viz.py`. Run one headless (UTF-8 guard per the Windows notes):
+through `rhengine/viz.py`. `montecarlo_refined` covers **both** systems —
+§1–6 the legacy sleeves in trade space, §7–9 RMX-B and RMX-C in returns space
+(`BOOK_REFRESH` / `BOOK_CSV`), with §9 putting them in one table behind an
+explicit `unit` column because the equity multiples are not comparable.
+Run one headless (UTF-8 guard per the Windows notes):
 
 ```powershell
 $env:PYTHONUTF8='1'; py -m jupyter execute --inplace notebooks/ablation.ipynb

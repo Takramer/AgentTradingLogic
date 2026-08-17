@@ -130,6 +130,103 @@ book cannot collect it.
 - Measuring real fill cost is worth more than any turnover-reduction tweak
   (see §7).
 
+### 6a. The flat 30 bps is the LEGACY universe's number. Do not apply it to a book.
+
+Added 2026-08-01, and it corrects a claim this file's own §6 invites.
+
+30 bps is calibrated on `universe_filters.min_dollar_volume = $500k/day` — the
+legacy engine's scan universe, which is mostly small and micro caps. The
+research-stack books are a different population: **RMX-C's weight is 92.3%
+mega/large-cap, median holding $18.6bn**, measured by
+`scripts/cap_cost_profile.py`. Charging it 30 bps is not conservatism, it is
+the wrong tier's number, and it is wrong by about an order of magnitude.
+
+Per-name cap-tiered spreads (`costs.CAP_TIERS`, applied through
+`costs.bps_for_caps` and `book.run_book`'s per-name path):
+
+| tier | cap | round-trip bps | RMX-C weight |
+|---|---|---|---|
+| mega/large | $10bn+ | 1–5 | **92.3%** |
+| mid | $2–10bn | 5–20 | 5.7% |
+| small | $0.3–2bn | 20–100 | 0.1% |
+| micro | <$300m | 100–600 | 0.0% |
+
+RMX-C's effective cost, turnover-weighted: **2.76 bps** (bracket 1.27–6.03).
+
+| cost model | eff bps | CAGR | alpha vs CW | t |
+|---|---|---|---|---|
+| flat 30 bps | 30.00 | 12.79% | **−0.09%** | −0.11 |
+| flat 10 bps (published) | 10.00 | 13.18% | +0.21% | +0.26 |
+| **tier point** | **2.76** | **13.33%** | **+0.32%** | +0.39 |
+
+So the flat 30 was charging the book **0.54 pp/yr it does not pay** — more than
+twice its whole measured alpha — and was the single largest reason RMX looked
+marginal. **Cost is not the binding constraint on the research books.** It
+remains the binding constraint on the legacy engine, where 30 bps is the right
+tier and ~33 bps erases the gross edge entirely.
+
+Rules:
+- Books get `--cost-model tier-point`, bracketed with `tier-lo` / `tier-hi`.
+  A conclusion that needs `tier-lo` has not survived.
+- The benchmark must be re-costed under the **same** model. Charging the
+  strategy a new cost and leaving the cap-weighted universe on the old one
+  manufactures alpha out of bookkeeping, and since the benchmark trades far
+  less it is the direction that flatters.
+- `CAP_TIERS` is a published **prior**, not your fills. It agrees with what
+  this repo has measured (SPY 0.7, INTC 1.5, BABA 3.0 bps round trip; 5.5 bps
+  in the most liquid ADV decile), but the **opening** spread — what the engine
+  actually fills at, and the widest of the day — is still unmeasured.
+
+## 5b. The universe is not the constraint — settled 2026-08-01
+
+The 7 bp/month post-2005 figure in §5 is for the **top 90% of market cap**,
+against 19 bp for all stocks, and that gap reads like an argument for trading
+smaller names. It is not.
+
+Benchmark each size quintile's signal portfolio against **that bucket's own
+cap-weighted return** — French 5×5 size × signal, survivorship-free, 1963–2026
+— and the blend excess is flat across the whole ladder: ME1 +3.01, ME2 +2.66,
+ME3 +3.05, ME4 +2.02, **ME5 BIG +2.24** %/yr. The 7-vs-19 gap is the size
+premium plus microcap effects, not signal strength, and the size premium is a
+free risk factor rather than an edge.
+
+Post-2005 every bucket decays together; momentum's famous small-cap gradient
+(+10.20%/yr in ME1 pre-2005) is **gone**; and quality's gradient now runs
+*backwards*, working best in BIG. Full account and cost sweep in
+[SIZE-LADDER-2026-08-01.md](SIZE-LADDER-2026-08-01.md).
+
+**Consequence:** "the edge is small because we only trade the S&P 500" is a
+rejected hypothesis. Do not fund mid/small-cap data acquisition on it, and do
+not benchmark a small-cap book against the total market — that measures SMB.
+
+## 6b. Data provenance — stamp the panel, not just the cost
+
+A number is defined by three things: the **window**, the **cost**, and the
+**data**. Sections 3 and 6 govern the first two. The third went unstamped until
+2026-08-01, and it cost a published result.
+
+- `research_data/_panel_cache.pkl` is 150 MB, gitignored, mutable and rebuilt
+  **in place**. There is no history and no snapshot. A refresh silently
+  invalidates every figure computed against the old cache.
+- That is not hypothetical. docs/RMX-C.md published RMX-C at 13.15% CAGR and
+  later asserted it "reproduces exactly" — while admitting turnover came out
+  175% against the table's 170%, which cannot both be true. The current panel
+  gives 13.18%. The RMX-C code path is byte-identical across the whole period,
+  so the drift is data; the panel was rebuilt on 2026-08-01 00:37 and **the
+  old one no longer exists, so it can never be attributed further.**
+- **Quote `panel_fp` with any number you report.** `Panel.fingerprint(lo, hi)`
+  is a window-scoped digest of the `adj` and `close` matrices the backtest can
+  see. `rmxb`, `blend` and `mc_books` print it; `live.emit()` carries it in the
+  payload; `mc_books` writes it to a `.meta.json` beside every returns CSV.
+- It is **window-scoped on purpose**: the ordinary weekly append must not move
+  the stamp on a 2010-2018 result, or readers learn to ignore it. A changed
+  stamp always means a changed backtest.
+- A table without a stamp predates the fix. It is **historical, not
+  reproducible** — re-measure before quoting it, and say which panel you got.
+- `panel_last_bar` is not a substitute. It says how *fresh* the data is; the
+  fingerprint says *which* data it is, and a refetch can revise history
+  without moving the last bar.
+
 ## 7. In-sample ablation may confirm, never select
 
 `py -m rhengine.alpha.blend --ablate` exists to check *construction* choices —
