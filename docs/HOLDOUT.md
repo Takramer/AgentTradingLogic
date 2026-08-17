@@ -139,3 +139,64 @@ Ken French's factor table showing profitability stayed positive through it. So
 this look is a *replication check on a tradeable universe*, not independent
 evidence. The independent evidence is French's 1963–2026 record (excess
 t = +2.88), which was gathered before the S&P 500 implementation existed.
+
+---
+
+## Wealth illustration entry — logged 2026-08-01, BEFORE execution
+
+| Field | Value |
+|---|---|
+| Windows | **2025-08-01 → 2026-07-31** (1y), **2024-08-01 →** (2y), **2021-08-01 →** (5y) |
+| Books | RMX-B and RMX-C at their shipped specs, vs SPY |
+| Cost | per-name cap tier (`costs.CAP_TIERS`), `tier-point`, bracketed `tier-hi` |
+| config hash | `763d4c417b4d459f` |
+| Panel | full `082bcad4e9351707`; per window `3ddcb436b72c7ebb` / `8a7a16cadcd19567` / `cdfd3db68d949d93` |
+| Question asked | "what would $10,000 invested 1/2/5 years ago be worth now" |
+
+**This is not a test and it has no kill criterion.** It is a *wealth
+illustration* requested by the account owner. It lands inside the W2/W3 holdout
+(2019-2026), which is already SPENT twice over — RMX-D and RMX-Q were both
+measured on it — so there is no further information to destroy. It is logged
+because rule 7 says every holdout look is logged, not because this one carries
+evidential weight.
+
+**Binding conditions, fixed before running:**
+
+1. **No parameter of RMX-B or RMX-C may be changed in response to this output.**
+   If any of these windows looks bad, that is a fact about the tape, not a
+   reason to touch a sleeve.
+2. The result may **not** be quoted as evidence of edge, out-of-sample
+   validation, or a forward expectation. One to five years is far below the
+   ~39 years a +1.78%/yr alpha against 5.5%/yr tracking error needs to reach
+   t = 2.
+3. Every figure is reported **alongside SPY over the identical window**, because
+   an absolute dollar figure for a beta-1 equity book is a statement about the
+   stock market, not about the strategy.
+4. Three windows are three looks. Whichever looks best is the one to distrust.
+
+### Extension, logged 2026-08-01 BEFORE execution — same entry, two more looks
+
+The account owner asked for (a) a **10-year** window added to the table above
+and (b) the Monte Carlo re-run over a **wider sample and longer horizons**.
+Both extend the same illustration and both inherit every binding condition
+above unchanged — no parameter may move in response, and nothing here may be
+quoted as evidence.
+
+| Field | Value |
+|---|---|
+| Added window | **2016-08-01 → 2026-07-31** (10y), panel `b51734a56da710f4` |
+| MC sample widened | 2010-07-01 → 2026-07-31 (was 2010-07 → 2018-12), panel `78a966578ba50e40` |
+| MC horizons | 252 / 756 / 1260 / 2520 sessions (1 / 3 / 5 / 10 years) |
+| config hash | `763d4c417b4d459f` |
+
+**Why widening the MC sample is the right call and what it costs.** The
+previous bootstrap drew only from 2010-2018, so the last five years — the ones
+in which both books actually trailed SPY — were not in the resampled
+population at all. A 61% win rate drawn from a window that excludes the losing
+years is not a useful number. Widening it to the full panel fixes that.
+
+**The price, stated up front:** the widened sample is the in-sample window plus
+the spent holdout glued together. It is not out-of-sample anything. And at the
+2520-session horizon each path reuses most of a ~4,000-session sample, so long
+horizon paths overlap heavily and their spread is **understated** — the 10-year
+fan is narrower than reality, not wider.

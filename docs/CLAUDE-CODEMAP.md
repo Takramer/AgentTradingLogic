@@ -38,18 +38,22 @@ audit and have **not** been re-established.
 | `indicators.py` | **Do not edit without an explicit ask.** Pure scoring: `calc_*`/`score_*` (vwap, bollinger, macd, consolidation, residualmomentum, pead), regime/VIX classifiers, `score_ticker`/`score_all_tickers`, `resolve_thresholds`, `strategy_status`, `autonomous_strategies`, `select_strategy_for_regime` |
 | `strategies.json` | **Canonical spec.** Per-strategy legs, threshold default/min/max/step, exits, `regime_routing`, `status`, measured cost blocks. Read by Python *and* the Nydex UI |
 | `scan.py` | Live scan. Auto-routing returns only `status: autonomous` strategies; no cleared strategy ⇒ stands flat. `--strategy` is the manual bypass; `--all` covers every non-retired one |
-| `costs.py` | Single source of truth for transaction costs — resolves `config.json` `costs.round_trip_bps` |
+| `costs.py` | Single source of truth for transaction costs — resolves `config.json` `costs.round_trip_bps`, and holds `CAP_TIERS` / `bps_for_caps` / `book_effective_bps`, the **per-name** cap-tiered model. The flat 30 is the LEGACY scan universe's number; a cap-weighted S&P 500 book pays ~2.8 bps. See research rules §6a |
+| `alpha/book.py` | `run_book`'s `round_trip_bps` takes a float **or** a per-name Series; each name then pays its own spread on its own traded notional. `BookResult.effective_bps` reports what was actually paid, turnover-weighted |
 | `execution.py` | Module 7 execution gates: spread gate, order type, block routing. **Live path only** — daily bars have no bid/ask, so it changes no backtest number |
 | `market_data_options.py` | VRP measurement kit: Black-Scholes inversion for implied vol, realised vol, `vrp()`. Arithmetic only — no strategy, no data provider (IV is not fetchable; it is derived) |
 | `backtest.py` | Walk-forward signal backtest → trade list with R-multiples |
 | `portfolio.py` | Account-level sim: fixed-fractional sizing, position caps, per-day entry limits → equity curve, CAGR, maxDD, Sharpe |
 | `montecarlo.py` / `mc_refined.py` | Bootstrap over trade R-multiples → outcome/drawdown distributions, P(loss), P(ruin) |
+| `mc_books.py` | The **research-stack** Monte Carlo — RMX-B/RMX-C daily book returns, stationary-block bootstrap over SESSIONS, SPY resampled on the same indices → P(underperform SPY). Different unit from `mc_refined.py`; do not mix the two on one axis. Feeds §7–9 of `notebooks/montecarlo_refined.ipynb` |
 | `optimize.py` | Threshold sweeps (OAT/grid), IS/OOS split, expanding-window walk-forward |
 | `ablate.py` / `ablate_vbt.py` | Leg ablation; VectorBT full-matrix version ranked by profit factor |
 | `ic.py` | Cross-sectional rank-IC + overlap-adjusted t, IC IR, score-tier monotonicity |
 | `crossval.py` | Blocked CV with purge/embargo; `--by-regime` for the macro-defense test |
 | `sanity.py` | Ten mechanical lie-detectors on a trade list. Nonzero exit code gates CI |
-| `nulltest.py` | Random-entry permutation test — does the ENTRY beat luck? |
+| `nulltest.py` | Random-entry permutation test — does the ENTRY beat luck? Permutes entries against REAL price paths, so drift and vol clustering survive |
+| `barperm.py` | Bar-permutation null — does the WHOLE SYSTEM beat structureless data? Permutes the DATA (synchronized across tickers and SPY, so the market factor survives), re-runs signal generation and all. The only test of the three that can catch an "edge" that is really drift or vol clustering |
+| `trials.py` | Append-only experiment ledger (`research_data/trials.jsonl`) + the multiple-testing bar. `expected_max_t` / `sidak_t` / `family_wise_p` — does the RESULT beat the search that found it? |
 | `gates.py` | External-gate seam: annotates trades with `sue`/`sue_pct`/`macro_risk_on`, or hard-filters in live-representative mode |
 | `backfill.py` | Resumable AlphaVantage earnings backfill, most-liquid-first, budget-aware |
 | `universe_hygiene.py` | ETF/ADR/biotech exclusion. **The single biggest scan-quality win** — ETF blocklist from the Nasdaq directory |
@@ -82,11 +86,14 @@ audit and have **not** been re-established.
 | `ff_largecap_quality.py` | The 63-year quality-leg evidence |
 | `ff_blend.py` | The blend: alpha t=+2.54, 4/4 eras |
 | `ff_largecap_blend.py` | Does any construction of this family beat the market inside the largest size quintile? EW vs VW inside the bucket |
+| `cap_cost_profile.py` | Labels a book's holdings by market-cap tier and re-costs it per name. Prints the tier weights, the effective bps, and CAGR/alpha under flat vs `tier-lo/point/hi`. Run before quoting any cost-sensitive number for a book |
+| `ff_size_ladder.py` | The same question down the WHOLE size ladder, each bucket benchmarked against its own cap-weighted return so the size premium is netted out. **Answered and rejected 2026-08-01** — no gradient over 63 years, momentum's gradient decayed to nothing, quality now best in BIG. See [SIZE-LADDER-2026-08-01.md](SIZE-LADDER-2026-08-01.md); do not re-litigate without reading it |
 | `rmxqt_power.py` | Why no 8-year test can prove it |
 | `verify_vol_scaling.py` | Barroso & Santa-Clara replicated on French momentum |
 | `rh_spreads.py` | Measured Robinhood quoted spreads → real cost in bps |
 | `measure_pit_cost.py` / `cost_crossover.py` | Where cost overtakes the edge |
 | `strategy_scorecard.py` | Cross-strategy summary |
+| `fetch_video_titles.py` | Video/course intake. Takes any mix of video and playlist URLs, emits a TSV of id/channel/title. **Titles and channels only — transcripts are unreachable and no `yt-dlp` here.** Playlist items are `lockupViewModel` now, not `playlistVideoRenderer`; continuations are followed |
 | `register_backfill_task.ps1` | Windows Scheduled Task for the daily AV backfill |
 
 ## D. Data on disk

@@ -213,16 +213,43 @@ the docs describe something that is no longer running.
 > code disagreed about what RMX-C *is*.
 >
 > Resolved in favour of the code, because the code is what produced the
-> published numbers. At 10 bps over 2010-07..2018-12 the 5-block row reproduces
-> **exactly** with vol-scaling on (13.15% CAGR, 15.39% vol, Sharpe 0.86,
-> maxDD −21.19%) and gives **13.03%** with it off. Turning it "back" off would
-> have made every table below unreproducible — the exact failure research rules
-> §9 forbids.
+> published numbers: with vol-scaling on the 5-block row lands on the table
+> below, and with it off it gives **13.03%**. Turning it "back" off would have
+> made every table below unreproducible — the exact failure research rules §9
+> forbids.
 >
 > So: **RMX-C's momentum leg is vol-scaled by default; RMX-B's is not.** The
 > `--vol-scale` help text now says so, and a bare `--vol-scale` disables it.
-> (One residual mismatch, unexplained and small: the table below records 170%
-> turnover where the current code reports 175% on with / 167% off.)
+
+> **Retraction of the reproduction claim, 2026-08-01 (later the same day).**
+> The paragraph above originally said the 5-block row reproduced **exactly**
+> (13.15% CAGR, 15.39% vol, Sharpe 0.86, maxDD −21.19%), while admitting in the
+> same breath that turnover came out 175%/yr against the table's 170%. Those two
+> statements cannot both be true: if turnover moved, the book moved, so the CAGR
+> could not have been identical. The row was checked by eye, not reproduced.
+>
+> The current panel gives **13.18% / −21.13% / 176%** — deterministic across
+> repeated runs. Forensics: the RMX-C code path is byte-identical from `fb5d356`
+> (2026-07-25, which published the table) through HEAD — the two intervening
+> commits add only `--band` and `--momentum-calendar`, both no-ops at default,
+> and the cost-fix commit `e753c64` touched nothing under `rhengine/alpha/`. The
+> single change on record is the **panel rebuild at 2026-08-01 00:37**: 755
+> tickers refetched, history extended 2026-07-24 → 07-31, SPY and IWM added to
+> coverage, `_panel_cache.pkl` rewritten in place.
+>
+> **The drift cannot be attributed any more precisely than that, and it never
+> will be, because no snapshot of the pre-rebuild panel exists.** That — not the
+> 0.03 pp — is the finding. Every figure in this repo was stamped with a cost
+> and a window and with *nothing identifying the data*, over a 150 MB gitignored
+> mutable cache. Same class as audit FC-2.
+>
+> Fixed by `Panel.fingerprint` (2026-08-01): a window-scoped digest of the
+> `adj`/`close` matrices a backtest can see, printed by `rmxb`, `blend` and
+> `mc_books`, carried in the `live.emit()` payload as `panel_fp`, and asserted
+> in `tests/test_mc_books.py::TestPanelFingerprint`. It is blind to the ordinary
+> weekly append and sensitive to a one-bar revision of one part in 10,000. Every
+> table below now carries the panel it was computed on. A row without a stamp
+> predates the fix and is **not** reproducible — treat it as historical.
 
 ## Where the 2015 cutoff actually belongs
 
@@ -450,14 +477,25 @@ py -m pytest tests/test_sleeves.py -q                        # 29 tests
 
 All figures below are **after** both share-count fixes (see "The units bug").
 
+**Panel `92820307618b8303`** (`Panel.fingerprint("2010-07-01", "2018-12-31")`),
+re-measured 2026-08-01 after the retraction above. Reproduce with
+`py -m rhengine.alpha.blend --lo 2010-07-01 --hi 2018-12-31`; if the stamp it
+prints differs from this one, the panel has been rebuilt and the numbers below
+are the *old* panel's — re-run before quoting them.
+
 | config | CAGR | Sharpe | maxDD | turnover | alpha vs CW | t |
 |---|---|---|---|---|---|---|
 | SPY | 12.50% | 0.87 | −19.4% | — | — | — |
-| CW covered universe | 12.44% | 0.86 | −19.5% | — | — | — |
-| RMX-B (2 sleeves, shipped) | 13.22% | 0.86 | −22.2% | 189% | +0.44%/yr | +0.33 |
-| **RMX-C, 5 blocks (quality/momentum/investment/issuance/payout)** | **13.15%** | **0.86** | **−21.2%** | **170%** | **+0.16%/yr** | **+0.19** |
-| RMX-C, 4 blocks (no payout) | 13.31% | 0.87 | −20.6% | 198% | +0.56%/yr | +0.59 |
-| RMX-C, 5 blocks with `value` (EBM) instead | 12.85% | 0.83 | −21.8% | 168% | −0.58%/yr | −0.66 |
+| CW covered universe | 12.43% | 0.86 | −19.5% | — | — | — |
+| RMX-B (2 sleeves, shipped, vol-scaled) | 13.08% | 0.85 | −22.1% | 206% | +0.41%/yr | +0.30 |
+| **RMX-C, 5 blocks (quality/momentum/investment/issuance/payout)** | **13.18%** | **0.86** | **−21.1%** | **176%** | **+0.21%/yr** | **+0.26** |
+| RMX-C, 4 blocks (no payout) | 13.36% | 0.87 | −20.6% | 198% | — | — |
+
+Superseded rows, pre-fingerprint and **not reproducible** — kept because the
+prose below reasons from them: 5-block 13.15% / −21.2% / 170%, 4-block 13.31%,
+RMX-B 13.22% / 189%, and `value` (EBM) instead of payout 12.85% / 0.83 / −21.8%
+/ 168% / −0.58%/yr / t −0.66. The directions are unchanged; the third decimals
+are not the same panel.
 
 Leg excess-return correlation vs the CW universe, mean pairwise **+0.107** on 5
 blocks against +0.157 on 4 — `payout` correlates +0.12 / +0.11 / −0.19 / +0.08
