@@ -54,7 +54,7 @@ from .book import buy_and_hold, run_book
 from .fundamentals import Fundamentals
 from .panel import Panel
 from .rmx import load_panel
-from .rmxq import _weights, market_cap
+from .rmxq import _weights, cost_vector, market_cap
 from .stats import Perf, alpha_beta, monthly, perf
 
 FORM_MONTHS = 12       # 12-1 momentum: 11 months of return, skipping the last
@@ -257,6 +257,11 @@ def main() -> None:
                     help="Barroso & Santa-Clara: weight the momentum leg by the "
                          "inverse of its own 6-month realised volatility")
     ap.add_argument("--vol-cap", type=float, default=1.5)
+    ap.add_argument("--cost-model", default="flat",
+                    choices=("flat", "tier-lo", "tier-point", "tier-hi"),
+                    help="'flat' charges --cost-bps to every name. 'tier-*' "
+                         "charges each name its market-cap tier's spread "
+                         "(costs.CAP_TIERS); run lo and hi as a bracket")
     args = ap.parse_args()
     if args.hi is None:
         args.hi = (dt.date.today().isoformat() if args.holdings
@@ -282,15 +287,28 @@ def main() -> None:
             print(f"    {k:<8} {v * 100:5.2f}%")
         return
 
-    res = run(panel, fund, cfg, args.lo, args.hi, args.cost_bps)
+    cost = args.cost_bps
+    if args.cost_model != "flat":
+        # The targets have to exist before the cost vector can be built from
+        # their caps, so this is a cheap second pass over build_targets rather
+        # than a restructure of run().
+        t, _, _, _ = build_targets(panel, fund, cfg, args.lo, args.hi)
+        cost = cost_vector(panel, fund, t,
+                           mode=args.cost_model.split("-", 1)[1])
+
+    res = run(panel, fund, cfg, args.lo, args.hi, cost)
     bk = res["book"]
     r = bk.daily_return
     spy = res["benchmarks"]["SPY (cap-weight)"]
     cw = res["benchmarks"]["CW covered universe"]
 
     tag = " [momentum vol-scaled]" if cfg.vol_scale_momentum else ""
+    # The panel stamp travels with the number. Without it a published CAGR is
+    # unverifiable the moment the cache is rebuilt — see Panel.fingerprint.
+    cost_label = (f"{args.cost_bps:.0f} bps" if args.cost_model == "flat"
+                  else f"{args.cost_model} ({bk.effective_bps:.2f} bps eff)")
     print(f"RMX-B{tag}  {r.index[0].date()} .. {r.index[-1].date()}  @ "
-          f"{args.cost_bps:.0f} bps")
+          f"{cost_label}  panel {panel.fingerprint(args.lo, args.hi)}")
     if res["mom_vol_scale"] is not None:
         k = res["mom_vol_scale"]
         print(f"momentum scale: mean {k.mean():.2f}  min {k.min():.2f}  "

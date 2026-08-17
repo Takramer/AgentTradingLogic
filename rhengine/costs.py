@@ -57,6 +57,9 @@ See docs/AUDIT-2026-07-24.md sections O-2 and Phase 1.
 import json
 import os
 
+import numpy as np
+import pandas as pd
+
 from ._paths import app_path
 
 # Round-trip (in + out) transaction cost in basis points of notional.
@@ -87,6 +90,129 @@ def default_cost_bps(cfg=_MISSING):
         return float(costs.get("round_trip_bps", DEFAULT_ROUND_TRIP_BPS))
     except (TypeError, ValueError):
         return DEFAULT_ROUND_TRIP_BPS
+
+
+# ------------------------------------------------------- cap-tiered spreads
+# The per-name model the LIMITATION note above says is missing. Corwin-Schultz
+# was the intended route and was rejected (see estimate_round_trip_bps, ~37x
+# too high); this is the other route — a published market-cap → spread prior,
+# applied per name, with the repo's own measurements used as the cross-check.
+#
+# UNITS, and this is the one that costs 2x if you get it wrong. These are
+# QUOTED SPREADS as a fraction of mid, in bps. A quoted spread IS the round
+# trip: you cross the half-spread going in and the half-spread coming out.
+# So the numbers below are ROUND TRIP bps directly — NO factor of 2. Same
+# convention as config.json `execution._units_note`. `cost_in_r` and
+# `backtest._cost_r` both silently doubled this until 2026-07-27.
+#
+# Source: literature ranges supplied 2026-08-01 (Oxford academic / Stern /
+# CMC). They are ranges, not point estimates, because spread varies by float,
+# volume and volatility inside every bucket. `point` is the GEOMETRIC mean of
+# the range, which is the right centre for a band spanning an order of
+# magnitude — the arithmetic mean of 100-600 is 350 and would put the typical
+# microcap near the worst case.
+#
+# CROSS-CHECK against what this repo has measured itself, and the two agree:
+#   * `estimate_round_trip_bps`'s validation table records true round trips of
+#     SPY 0.7, INTC 1.5, BABA 3.0 bps — inside or below the 1-5 mega/large band.
+#   * 296 live Robinhood quotes (2026-07-27) over the legacy engine's
+#     min-$500k/day universe gave 5.5 bps in the most liquid ADV decile and
+#     98.1 in the least — 5.5 sits in the large-cap band, 98.1 at the top of
+#     the small-cap band. Trade-weighted the same capture gave 29.1 bps, BELOW
+#     this table's small-cap point estimate of 44.7, which is expected:
+#     Robinhood's tradeable set is more liquid than the full small-cap
+#     population and PFOF buys some price improvement.
+#
+# So treat `point` as a mildly conservative central case and use `lo`/`hi` for
+# the bracket. It is still a prior, not a measurement of YOUR fills.
+CAP_TIERS = (
+    # name,          min_cap,   max_cap,      lo,    hi
+    ("mega_large",    10e9,     float("inf"),  1.0,    5.0),
+    ("mid",            2e9,     10e9,          5.0,   20.0),
+    ("small",        300e6,     2e9,          20.0,  100.0),
+    ("micro",          0.0,     300e6,       100.0,  600.0),
+)
+
+TIER_NAMES = tuple(t[0] for t in CAP_TIERS)
+
+
+def cap_tier(market_cap):
+    """Label one market cap (in dollars) with its liquidity tier.
+
+    Returns None for a missing or non-positive cap rather than guessing. A
+    name with no cap must not silently be treated as mega-cap — that is the
+    direction that flatters the book.
+    """
+    try:
+        cap = float(market_cap)
+    except (TypeError, ValueError):
+        return None
+    if not np.isfinite(cap) or cap <= 0:
+        return None
+    for name, lo_cap, hi_cap, _lo, _hi in CAP_TIERS:
+        if lo_cap <= cap < hi_cap:
+            return name
+    return None
+
+
+def round_trip_bps_for_cap(market_cap, mode="point", unknown_bps=None):
+    """Round-trip cost in bps for one name, from its market cap.
+
+    `mode` is "point" (geometric mean of the tier's range), "lo" (optimistic
+    edge) or "hi" (pessimistic edge). Run the two edges as a bracket; a result
+    that only survives at `lo` has not survived.
+
+    An unclassifiable cap falls back to `unknown_bps`, defaulting to the
+    config's flat round trip — deliberately NOT to the mega-cap 1-5 bps, since
+    "we could not price this name" must never make it look cheap.
+    """
+    tier = cap_tier(market_cap)
+    if tier is None:
+        return float(default_cost_bps() if unknown_bps is None else unknown_bps)
+    for name, _lo_cap, _hi_cap, lo, hi in CAP_TIERS:
+        if name == tier:
+            if mode == "lo":
+                return float(lo)
+            if mode == "hi":
+                return float(hi)
+            return float(np.sqrt(lo * hi))
+    raise KeyError(tier)                                   # unreachable
+
+
+def bps_for_caps(caps, mode="point", unknown_bps=None):
+    """Per-name round-trip bps for a Series of market caps (index: ticker)."""
+    caps = pd.Series(caps, dtype=float)
+    return caps.map(lambda c: round_trip_bps_for_cap(c, mode, unknown_bps))
+
+
+def tier_of_caps(caps):
+    """Per-name tier label for a Series of market caps. `None` -> 'unknown'."""
+    caps = pd.Series(caps, dtype=float)
+    return caps.map(lambda c: cap_tier(c) or "unknown")
+
+
+def book_effective_bps(weights, caps, mode="point", unknown_bps=None):
+    """The weight-average round-trip bps a book actually faces.
+
+    This is the number to quote instead of a flat scalar. A cap-weighted S&P
+    500 book is ~all mega-cap, so its effective cost is a few bps — applying
+    the legacy engine's 30, calibrated on a min-$500k/day microcap scan
+    universe, overstates it by an order of magnitude.
+
+    NOTE this weights by POSITION size, which answers "what does holding this
+    book cost per unit of turnover". It assumes turnover is spread across names
+    in proportion to weight. Where it is not — a book that churns its small
+    names and holds its large ones — the honest figure is turnover-weighted,
+    which `alpha/book.py::run_book` computes exactly by charging each name's
+    own bps against its own |Δw|.
+    """
+    w = pd.Series(weights, dtype=float)
+    w = w[w > 0]
+    if w.empty:
+        return float("nan")
+    b = bps_for_caps(pd.Series(caps, dtype=float).reindex(w.index),
+                     mode, unknown_bps)
+    return float((w * b).sum() / w.sum())
 
 
 def resolve_cost_bps(arg_value, cfg=_MISSING):

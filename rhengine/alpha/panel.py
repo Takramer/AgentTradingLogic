@@ -13,6 +13,7 @@ was audit finding FC-9, which corrupted beta for 18% of the old universe.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from dataclasses import dataclass, field
@@ -240,6 +241,60 @@ class Panel:
         """Simple monthly total returns on the month-end grid."""
         px = self.adj.reindex(month_ends)
         return px.pct_change()
+
+    def fingerprint(self, lo: str | None = None,
+                    hi: str | None = None) -> str:
+        """A digest of the data a backtest over [lo, hi] can actually see.
+
+        Why this exists (2026-08-01). Every number this project publishes is
+        stamped with a cost assumption and a window, and `costs.py` exists so
+        the cost cannot drift silently. **The data was not stamped at all.**
+        `_panel_cache.pkl` is 150 MB, gitignored, mutable, and rebuilt in
+        place; a refresh invalidates every published figure and nothing
+        detects it. That is how docs/RMX-C.md came to claim a 13.15% CAGR row
+        "reproduces exactly" while the current panel gives 13.18% - the panel
+        was rebuilt on 2026-08-01 00:37 and no snapshot of the old one exists,
+        so the difference can never now be attributed. Same failure class as
+        audit FC-2, where the headline artifact was generated at 0 bps while
+        the docs said 5.
+
+        The one property that makes this useful: **it is window-scoped.**
+        Appending future sessions - the normal weekly refresh - must NOT
+        change the stamp on a 2010-2018 result, or the stamp is noise and
+        everyone learns to ignore it. Only data inside [lo, hi] is hashed, so
+        a changed stamp means a changed backtest, every time.
+
+        Hashed: the session index, the sorted ticker list, and the `adj` and
+        `close` matrices (`close` separately because market caps are built
+        from raw split-adjusted prices, not the total-return series, so a
+        split revision moves caps without moving `adj` returns). NaNs are
+        normalised to the canonical quiet-NaN pattern first, so a missing
+        price hashes identically across numpy versions and platforms.
+
+        Not hashed: `member`, `dollar_vol`, `splits`, `rf`, `mkt`. They are
+        derived from files with their own mtimes and would make the digest
+        change for reasons a reader cannot act on. This answers "did the
+        prices move", which is the question that actually bit.
+        """
+        idx = self.adj.index
+        if lo is not None:
+            idx = idx[idx >= pd.Timestamp(lo)]
+        if hi is not None:
+            idx = idx[idx <= pd.Timestamp(hi)]
+        cols = sorted(self.adj.columns)
+        h = hashlib.blake2b(digest_size=8)
+        h.update(b"panel-fp-v1")
+        h.update(np.asarray(idx.view("int64"), dtype="<i8").tobytes())
+        h.update("\n".join(map(str, cols)).encode())
+        for frame in (self.adj, self.close):
+            # copy=True is load-bearing: `to_numpy` hands back a read-only view
+            # when reindex was a no-op, and the NaN normalisation below writes.
+            v = np.ascontiguousarray(
+                frame.reindex(index=idx, columns=cols)
+                .to_numpy(dtype="<f8", copy=True))
+            v[np.isnan(v)] = np.nan          # canonical NaN bit pattern
+            h.update(v.tobytes())
+        return h.hexdigest()
 
     def summary(self) -> str:
         first, last = self.adj.index[0].date(), self.adj.index[-1].date()

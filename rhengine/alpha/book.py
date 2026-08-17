@@ -13,6 +13,10 @@ Conventions, all deliberately pessimistic:
 * **Cost.** `one_way_turnover * round_trip_bps`, charged on the execution day.
   One-way turnover is `0.5 * sum|w_new - w_drifted|`; a name rotated fully out
   and another fully in therefore pays one complete round trip between them.
+  `round_trip_bps` may instead be a **per-name Series** (`costs.bps_for_caps`),
+  in which case every name pays its own spread on its own traded notional and
+  the scalar case is recovered exactly. A cap-weighted S&P 500 book is almost
+  entirely mega-cap and costs a few bps, not the legacy scan universe's 30.
 * **Delisting.** A held name whose price series ends while it is still an index
   member is booked at **-30%** on its last session and moved to cash (Shumway
   1997, https://doi.org/10.1111/j.1540-6261.1997.tb03818.x). Silently dropping
@@ -50,6 +54,18 @@ class BookResult:
     def total_cost_pct(self) -> float:
         return float(self.cost_drag.sum() * 100.0)
 
+    @property
+    def effective_bps(self) -> float:
+        """Round-trip bps the book actually paid, turnover-weighted.
+
+        Equals the scalar it was given when cost was a scalar. With a per-name
+        cost vector it is the number to quote — and it is turnover-weighted,
+        not weight-weighted, so a book that churns its cheap names and holds
+        its dear ones reports honestly.
+        """
+        t = float(self.turnover.sum())
+        return float(self.cost_drag.sum() / t * 1e4) if t > 0 else float("nan")
+
 
 def _delist_map(adj: pd.DataFrame) -> pd.Series:
     """Last session on which each ticker has a price."""
@@ -59,7 +75,7 @@ def _delist_map(adj: pd.DataFrame) -> pd.Series:
 def run_book(adj: pd.DataFrame,
              targets: dict[pd.Timestamp, pd.Series],
              rf: pd.Series,
-             round_trip_bps: float,
+             round_trip_bps: float | pd.Series,
              start: pd.Timestamp | None = None,
              end: pd.Timestamp | None = None,
              exposure: dict[pd.Timestamp, float] | None = None,
@@ -111,6 +127,20 @@ def run_book(adj: pd.DataFrame,
     ret_np = ret.to_numpy(dtype=float)
     last_np = is_last.to_numpy()
     col_pos = {c: j for j, c in enumerate(cols)}
+
+    # Cost may be a scalar (the historical behaviour, bit-for-bit unchanged) or
+    # a per-name Series of round-trip bps — see costs.bps_for_caps. Per name is
+    # the honest model: a cap-weighted S&P 500 book trades mega-caps at a few
+    # bps, and charging it the legacy scan universe's flat 30 overstates cost by
+    # an order of magnitude. A name missing from the Series is charged the
+    # series' own MAXIMUM, never its mean: an unpriced name is an illiquid name
+    # until shown otherwise, and the alternative rounds silently in the book's
+    # favour.
+    if isinstance(round_trip_bps, pd.Series):
+        fill = float(round_trip_bps.max()) if len(round_trip_bps) else 0.0
+        bps_np = round_trip_bps.reindex(cols).fillna(fill).to_numpy(dtype=float)
+    else:
+        bps_np = np.full(len(cols), float(round_trip_bps))
     rf_np = rf.reindex(idx).fillna(0.0).to_numpy(dtype=float)
     borrow_daily = borrow_spread_bps / 1e4 / 252.0
 
@@ -161,8 +191,11 @@ def run_book(adj: pd.DataFrame,
             s2 = tgt.sum()
             if s2 > max_gross:
                 tgt = tgt / s2 * max_gross
-            one_way = 0.5 * float(np.abs(tgt - w).sum())
-            c = one_way * round_trip_bps / 1e4
+            traded = np.abs(tgt - w)
+            one_way = 0.5 * float(traded.sum())
+            # Each name pays its OWN spread on its OWN traded notional. With a
+            # scalar this is algebraically identical to one_way * bps / 1e4.
+            c = 0.5 * float((traded * bps_np).sum()) / 1e4
             turn[t] = one_way
             costs[t] = c
             w = tgt

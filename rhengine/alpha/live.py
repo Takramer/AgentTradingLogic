@@ -350,6 +350,12 @@ def emit(name: str = "rmxb", positions: dict | None = None,
         "decided_on": str(formed.date()),
         "panel_last_bar": str(last_bar.date()),
         "panel_age_days": int(age),
+        # Which data this book was formed from. `panel_last_bar` says how FRESH
+        # the panel is; this says WHICH panel it was, and the two are different
+        # questions — a refetch can revise history without moving the last bar.
+        # Window-scoped to the formation window, so the ordinary weekly append
+        # does not churn it. See Panel.fingerprint.
+        "panel_fp": panel.fingerprint(hi=str(last_bar.date())),
         "execute_after": str(formed.date()),
         "execution_rule": (
             "Execute at the CLOSE of the first session that opens strictly "

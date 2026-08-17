@@ -285,6 +285,38 @@ def market_cap(panel: Panel, fund: Fundamentals, date: pd.Timestamp,
     return cap[cap > 0]
 
 
+def cost_vector(panel: Panel, fund: Fundamentals,
+                targets: dict[pd.Timestamp, pd.Series],
+                mode: str = "point") -> pd.Series:
+    """Per-name round-trip bps for a set of book targets, from market cap.
+
+    Feeds `book.run_book`'s per-name cost path. The flat 30 bps in
+    `config.json` is calibrated on the legacy engine's min-$500k/day scan
+    universe; a cap-weighted S&P 500 book is ~92% mega-cap and pays a few bps,
+    so charging it 30 overstates cost by an order of magnitude and costs the
+    measured alpha more than the alpha is worth (scripts/cap_cost_profile.py).
+
+    Each name is priced from its MEDIAN cap over the window. Caps move and a
+    name can cross a tier boundary mid-sample; that approximation is acceptable
+    while holdings sit deep inside a tier rather than near its edge, which
+    `cap_cost_profile` prints so it can be checked rather than assumed.
+
+    `mode` is "lo" / "point" / "hi" — run the edges as a bracket. The tiers are
+    a published prior (`costs.CAP_TIERS`), not a measurement of your fills.
+    """
+    from ..costs import bps_for_caps
+
+    caps: dict[str, list[float]] = {}
+    for d, w in targets.items():
+        held = w[w > 1e-9].index
+        for tk, v in market_cap(panel, fund, d, held).items():
+            caps.setdefault(tk, []).append(float(v))
+    if not caps:
+        return pd.Series(dtype=float)
+    med = pd.Series({tk: float(np.median(v)) for tk, v in caps.items()})
+    return bps_for_caps(med, mode=mode)
+
+
 def _weights(cap: pd.Series, cfg: RMXQConfig) -> pd.Series:
     if cfg.weighting == "equal" or cap.empty:
         return pd.Series(1.0 / max(len(cap), 1), index=cap.index)
