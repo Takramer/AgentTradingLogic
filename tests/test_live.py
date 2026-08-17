@@ -37,8 +37,13 @@ def _fake_targets(last_bar="2026-07-31", formed="2026-07-31",
     """Stand in for the real construction: a panel calendar and one book."""
     weights = _book() if weights is None else weights
     cal = pd.bdate_range(end=pd.Timestamp(last_bar), periods=30)
+    # `fingerprint` is part of the panel contract as of 2026-08-01: every
+    # payload records WHICH data formed the book, not only how fresh it is.
+    # A stub without it would let `emit` regress to an unstamped payload
+    # without any test noticing.
     panel = SimpleNamespace(
-        adj=pd.DataFrame(index=cal, columns=list(weights)))
+        adj=pd.DataFrame(index=cal, columns=list(weights)),
+        fingerprint=lambda lo=None, hi=None: "fake0000fake0000")
     targets = {pd.Timestamp(formed): pd.Series(weights)}
     return panel, targets, cap
 
@@ -187,6 +192,18 @@ class PayloadContract(unittest.TestCase):
         self.assertEqual(c["order_type"], "limit")
         self.assertTrue(c["long_only"])
         self.assertFalse(c["leverage_permitted"])
+
+    def test_payload_records_which_panel_formed_the_book(self):
+        """`panel_last_bar` says how FRESH the data is; `panel_fp` says WHICH
+        data it was. They are different questions — a refetch can revise
+        history without moving the last bar, and that is exactly how a
+        published RMX-C row stopped reproducing (docs/RMX-C.md, 2026-08-01).
+        An unstamped payload cannot be tied back to a backtest."""
+        with mock.patch.object(live, "_targets",
+                               return_value=_fake_targets()):
+            p = live.emit("rmxb", asof="2026-07-31")
+        self.assertEqual(p["panel_fp"], "fake0000fake0000")
+        self.assertEqual(p["panel_last_bar"], "2026-07-31")
 
     def test_executor_is_told_to_recheck_spreads_itself(self):
         with mock.patch.object(live, "_targets",

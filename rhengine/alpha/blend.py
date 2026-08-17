@@ -38,7 +38,7 @@ from .book import buy_and_hold, run_book
 from .fundamentals import Fundamentals
 from .panel import Panel
 from .rmx import load_panel
-from .rmxq import _weights, market_cap
+from .rmxq import _weights, cost_vector, market_cap
 from .sleeves import (CALENDARS, DEFAULT_SLEEVES, REGISTRY, Sleeve, _Cfg,
                       build_sleeve, scale_by_own_vol)
 from .stats import Perf, alpha_beta, monthly, perf
@@ -233,7 +233,12 @@ def report(cfg: BlendConfig, lo: str, hi: str, cost_bps: float,
     spy = res["benchmarks"]["SPY (cap-weight)"]
     cw = res["benchmarks"]["CW covered universe"]
 
-    out = {"sleeves": list(res["per_sleeve"]), "cost_bps": cost_bps,
+    out = {"sleeves": list(res["per_sleeve"]), "cost_bps": (float(cost_bps) if not isinstance(cost_bps, pd.Series)
+                        else "per-name tier"),
+           # The data stamp. A result is only reproducible against the panel it
+           # was computed on, and the panel is a mutable 150 MB cache — see
+           # Panel.fingerprint. Quote this next to any number taken from here.
+           "panel_fp": panel.fingerprint(lo, hi),
            "start": str(r.index[0].date()), "end": str(r.index[-1].date()),
            "n_rebalances": len(res["targets"]),
            "mean_held": float(res["diag"]["held"].mean()),
@@ -250,7 +255,10 @@ def report(cfg: BlendConfig, lo: str, hi: str, cost_bps: float,
                    "skew": p.skew, "kurtosis": p.kurtosis}
 
     if not quiet:
-        print(f"\n=== RMX-C  {out['start']} .. {out['end']}  @ {cost_bps:.0f} bps ===")
+        label = (f"{cost_bps:.0f} bps" if not isinstance(cost_bps, pd.Series)
+                 else f"per-name tier ({bk.effective_bps:.2f} bps eff)")
+        print(f"\n=== RMX-C  {out['start']} .. {out['end']}  @ {label}"
+              f"  panel {out['panel_fp']} ===")
         print(f"sleeves: {', '.join(res['per_sleeve'])}"
               + (f"  | vol-scaled: {', '.join(cfg.vol_scale)}"
                  if cfg.vol_scale else ""))
@@ -407,6 +415,13 @@ def main() -> None:
                          "was produced with this on. Pass a bare --vol-scale to "
                          "turn it off.")
     ap.add_argument("--vol-cap", type=float, default=1.5)
+    ap.add_argument("--cost-model", default="flat",
+                    choices=("flat", "tier-lo", "tier-point", "tier-hi"),
+                    help="'flat' charges --cost-bps to every name. 'tier-*' "
+                         "charges each name its market-cap tier's spread "
+                         "(costs.CAP_TIERS); run lo and hi as a bracket. This "
+                         "book is ~92%% mega-cap, so flat 30 overstates it "
+                         "~10x -- see scripts/cap_cost_profile.py")
     ap.add_argument("--band", type=float, default=None, metavar="EXIT_FRACTION",
                     help="no-trade band: enter on the top 20%%, sell only on "
                          "falling out of the top EXIT_FRACTION (e.g. 0.30). "
@@ -461,7 +476,16 @@ def main() -> None:
         print("Swings below ~0.5 t are noise on this sample length.")
         return
 
-    out = report(cfg, args.lo, args.hi, args.cost_bps)
+    cost = args.cost_bps
+    if args.cost_model != "flat":
+        # Targets must exist before their caps can price them, so this is a
+        # cheap extra `build` rather than a restructure of report().
+        panel, fund = load_panel(), Fundamentals.load()
+        built = build(panel, fund, cfg, args.lo, args.hi, args.cost_bps)
+        cost = cost_vector(panel, fund, built["targets"],
+                           mode=args.cost_model.split("-", 1)[1])
+
+    out = report(cfg, args.lo, args.hi, cost)
     if args.json:
         print(json.dumps({k: v for k, v in out.items()
                           if not k.startswith("_")}, indent=2, default=float))

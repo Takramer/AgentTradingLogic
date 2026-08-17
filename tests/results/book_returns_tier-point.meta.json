@@ -1,0 +1,20 @@
+{
+  "panel_fp": "78a966578ba50e40",
+  "window": [
+    "2010-07-01",
+    "2026-07-31"
+  ],
+  "cost_model": "tier-point",
+  "cost_bps": 10.0,
+  "effective_bps": {
+    "RMX-B": 2.408703368335289,
+    "RMX-C": 2.487562223237727
+  },
+  "vol_scale_momentum": false,
+  "sessions": 4025,
+  "turnover_ann": {
+    "RMX-B": 1.9074570473503063,
+    "RMX-C": 1.5422591644811183
+  },
+  "harvested_at": "2026-08-01T07:07:57.933132+00:00"
+}
