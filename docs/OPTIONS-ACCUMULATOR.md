@@ -26,8 +26,8 @@ The engine has no MCP access, so capture is a two-step handoff — the same
 pattern `scripts/rh_spreads.py report quotes.json` already uses.
 
 ```bash
-# 1. what to capture (offline)
-py -m rhengine.options_registry plan --symbol SPY --spot 746.81
+# 1. what to capture (offline). --iv adds the delta bands; see below.
+py -m rhengine.options_registry plan --symbol SPY --spot 746.81 --iv 0.16
 
 # 2. an AGENT runs the MCP calls the plan prints, and saves one file:
 #    {captured_at, underlying, spot, instruments:[...], quotes:[...]}
@@ -77,12 +77,37 @@ damage only surfaces months later when the window has closed.
 ## Sampling is deliberately unconditional
 
 `plan_strikes` emits a **symmetric mechanical ladder** on the strike grid, and
-`plan_expirations` picks the expirations nearest 7 / 30 / 60 DTE. Neither
+`plan_expirations` picks the expirations nearest 0 / 7 / 30 / 60 DTE. Neither
 consults any signal. Selecting strikes by a signal would make the accumulated
 sample conditional on that signal, and a conditional sample cannot answer an
 unconditional question like *"is there a premium"*. Spanning tenors matters
 because VRP is a term-structure phenomenon: a sample of only weeklies cannot
 distinguish "a premium exists" from "a premium exists at one tenor".
+
+### Widened 2026-08-01 — and what that costs
+
+Three changes, from [OPTIONS-SOURCES-2026-08-01.md](OPTIONS-SOURCES-2026-08-01.md):
+
+- **0 DTE added to the default tenors.** The old default captured no same-day
+  contract at all, so the 0DTE question was unanswerable from this registry no
+  matter how long the job ran. SPY, QQQ and SPXW all list M–F expirations.
+- **`STRIKE_STEP` per underlying** ($1 for SPY/QQQ/XSP, $5 for SPX, $10 for
+  NDX). The old flat `step=5.0` asked for strikes that do not exist on a
+  $1-grid name — which does not error, it silently returns fewer contracts.
+- **`plan_delta_strikes` at 0.10 / 0.15 / 0.30**, via `--iv`. A ±$4 SPY dollar
+  ladder sits between roughly 0.35 and 0.65 delta at 60 DTE, so the short
+  strikes every premium-selling source trades were **never being captured, at
+  any tenor**. The two strike sets are provably disjoint.
+
+Delta here is inverted Black–Scholes moneyness — spot, IV and time only, no
+price history and no indicator — so it changes *which contracts are seen*, never
+*which days are sampled*, and calls and puts are always taken symmetrically. The
+discipline above is intact.
+
+**The cost, stated rather than buried:** the sample's tenor composition differs
+before and after 2026-08-01. Any term-structure comparison drawn from this
+registry must condition on capture date, or it will read the change in sampling
+as a change in the market.
 
 ## What this unblocks, and what it does not
 

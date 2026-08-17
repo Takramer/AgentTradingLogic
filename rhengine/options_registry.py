@@ -84,12 +84,66 @@ def plan_strikes(spot, n_each_side=4, step=5.0):
             for i in range(-n_each_side, n_each_side + 1)]
 
 
-def plan_expirations(available, asof, targets=(7, 30, 60)):
+# Strike grids as the exchange actually lists them, verified 2026-08-01 against
+# the Robinhood chains. The old default of 5.0 for everything spans +/-$20 on
+# SPY at four strikes a side — under 3% — which is fine for 60 DTE and far too
+# NARROW in strike-count terms for a $1-grid name. Getting this wrong does not
+# error; it silently captures contracts that do not exist.
+STRIKE_STEP = {"SPY": 1.0, "QQQ": 1.0, "XSP": 1.0, "SPX": 5.0, "SPXW": 5.0,
+               "NDX": 10.0, "IWM": 1.0}
+
+
+def plan_delta_strikes(spot, iv, dte_days, deltas=(0.10, 0.15, 0.30),
+                       step=1.0, r=0.04):
+    """Strikes at the deltas the 0DTE/wheel corpus actually trades.
+
+    ADDED 2026-08-01, and the reason is a real gap rather than a preference.
+    `plan_strikes` walks a fixed DOLLAR ladder around ATM. At 0-7 DTE that
+    ladder covers the whole live delta range, but at 30 and 60 DTE a +/-$20 SPY
+    ladder sits entirely between roughly 0.35 and 0.65 delta — so the 0.10-0.15
+    delta short strikes that every premium-selling source in
+    docs/OPTIONS-SOURCES-2026-08-01.md sells were NEVER BEING CAPTURED, at any
+    tenor, and no amount of waiting would have produced them.
+
+    This stays unconditional in the sense the module cares about: delta here is
+    inverted Black-Scholes moneyness (options_spec.strike_for_delta), a function
+    of spot, IV and time only. It consults no price history, no indicator and no
+    signal, so it does not make the sample conditional on anything a strategy
+    could later be selected on. It widens WHICH CONTRACTS are seen; it does not
+    choose WHEN to look.
+
+    Returns [] when `iv` is unknown or the tenor has no time left — the caller
+    falls back to the mechanical ladder rather than guessing an IV.
+    """
+    if not iv or iv <= 0 or dte_days <= 0:
+        return []
+    from rhengine.options_spec import strike_for_delta
+    out = []
+    for d in deltas:
+        for ty in ("call", "put"):
+            k = strike_for_delta(spot, iv, dte_days, d, ty, r=r, step=step)
+            if k is not None and k > 0 and k not in out:
+                out.append(k)
+    return sorted(out)
+
+
+def plan_expirations(available, asof, targets=(0, 7, 30, 60)):
     """Pick the expiration nearest each target DTE.
 
     Spanning tenors matters: VRP is a term-structure phenomenon, and a sample of
     only weeklies cannot distinguish "premium exists" from "premium exists at
     one tenor". Returns [] when `available` is empty rather than inventing dates.
+
+    TARGET 0 ADDED 2026-08-01. The previous default (7, 30, 60) captured no
+    same-day contract at all, so the entire 0DTE question — which is what four
+    of the seven sources in docs/OPTIONS-SOURCES-2026-08-01.md are about — was
+    unanswerable from this sample no matter how long it ran. SPY, QQQ and SPXW
+    all list M-F expirations, so a 0 target resolves every trading day.
+
+    THE COST OF THE CHANGE, STATED: the sample's tenor composition differs
+    before and after 2026-08-01. Any term-structure comparison drawn from this
+    registry must condition on capture date, or it will read the change in
+    sampling as a change in the market.
     """
     a = date.fromisoformat(str(asof)[:10])
     dated = sorted((date.fromisoformat(e), e) for e in available)
@@ -282,20 +336,43 @@ def at_risk(asof, window_days=21, contracts_path=CONTRACTS):
 # ----------------------------------------------------------------------- cli
 
 def _cmd_plan(args):
-    strikes = plan_strikes(args.spot, args.strikes, args.step)
-    print(f"CAPTURE PLAN — {args.symbol} @ {args.spot:.2f}\n")
+    step = args.step if args.step else STRIKE_STEP.get(args.symbol.upper(), 5.0)
+    ladder = plan_strikes(args.spot, args.strikes, step)
+    print(f"CAPTURE PLAN — {args.symbol} @ {args.spot:.2f}  (strike grid ${step:g})\n")
     print("1. get_option_chains(underlying_symbol='%s')" % args.symbol)
     print("2. pick expirations nearest %s DTE from chain.expiration_dates"
           % ",".join(str(t) for t in args.targets))
     print("3. get_option_instruments(chain_id=..., expiration_dates=<those>,")
-    print("     type='call'|'put') and keep ONLY these strikes:")
-    print("     " + ", ".join(f"{s:g}" for s in strikes))
+    print("     type='call'|'put') and keep these strikes:")
+    print("   a. mechanical ladder, EVERY expiration:")
+    print("      " + ", ".join(f"{s:g}" for s in ladder))
+    if args.iv:
+        print("   b. delta bands, PER expiration (needs that tenor's own DTE):")
+        for t in args.targets:
+            ks = plan_delta_strikes(args.spot, args.iv, max(t, 0.25),
+                                    args.deltas, step)
+            if ks:
+                print(f"      {t:>3}d: " + ", ".join(f"{k:g}" for k in ks))
+        print(f"      (from IV {args.iv:.0%}; deltas "
+              + ", ".join(f"{d:g}" for d in args.deltas) + ")")
+    else:
+        print("   b. delta bands: SKIPPED — pass --iv <ATM IV> to include them.")
+        print("      Without them the 0.10-0.15 delta strikes every premium-")
+        print("      selling source trades are never captured at 30/60 DTE.")
+    n_k = len(ladder) + (len(args.deltas) * 2 if args.iv else 0)
+    n_c = n_k * 2 * len(args.targets)
     print("4. get_option_quotes(instrument_ids=[...])  (<=20 per call)")
+    print(f"     ~{n_c} contracts across {len(args.targets)} tenors "
+          f"=> ~{-(-n_c // 20)} quote calls. Budget the daily job for this;")
+    print("     a plan too large to finish mid-session is a plan that samples")
+    print("     the wide end of the day, which is the bias the cadence avoids.")
     print("5. save {captured_at, underlying, spot, instruments:[...], "
           "quotes:[...]} and run:")
     print("     py -m rhengine.options_registry ingest capture.json\n")
-    print("Strikes are a symmetric mechanical ladder ON PURPOSE: selecting them")
-    print("by any signal would make the sample conditional on that signal.")
+    print("The ladder is symmetric and mechanical ON PURPOSE: selecting strikes")
+    print("by any signal would make the sample conditional on that signal. The")
+    print("delta bands are inverted moneyness, not a signal — they change which")
+    print("contracts are seen, never which days are sampled.")
 
 
 def _cmd_ingest(args):
@@ -353,8 +430,14 @@ def main():
     p.add_argument("--spot", type=float, required=True)
     p.add_argument("--strikes", type=int, default=4,
                    help="strikes each side of ATM")
-    p.add_argument("--step", type=float, default=5.0)
-    p.add_argument("--targets", type=int, nargs="+", default=[7, 30, 60])
+    p.add_argument("--step", type=float, default=None,
+                   help="strike grid; defaults to the symbol's listed grid")
+    p.add_argument("--targets", type=int, nargs="+", default=[0, 7, 30, 60])
+    p.add_argument("--iv", type=float, default=None,
+                   help="ATM implied vol, to add delta-targeted strikes")
+    p.add_argument("--deltas", type=float, nargs="+",
+                   default=[0.10, 0.15, 0.30],
+                   help="delta magnitudes to capture (corpus: 0.10/0.15/0.30)")
     p.set_defaults(fn=_cmd_plan)
 
     p = sub.add_parser("ingest")
