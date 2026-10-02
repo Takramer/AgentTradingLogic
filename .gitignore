@@ -13,3 +13,7 @@ polymarket_cache/
 fred_cache/
 av_cache/
 finnhub_cache/
+
+# Regenerable lab artifacts under tests/results (CSVs already ignored via *.csv)
+tests/results/*
+!tests/results/.gitkeep
