@@ -195,6 +195,31 @@ Nor should anyone expect RMX-QT to visibly beat SPY over any particular year or
 even decade. A +1.2 pp/yr alpha with 4.1 pp/yr tracking error will trail the
 index in roughly 4 years out of 10. If that is not acceptable, hold SPY.
 
+Item 3 above (go to small and mid caps) was measured and **rejected** on
+2026-08-01. See `docs/SIZE-LADDER-2026-08-01.md`. Do not fund that data.
+
+## 2026-10-02 — three pre-registered looks, nothing adopted
+
+Logged in `research_data/trials.jsonl` before any return was read. Details and
+the August print are in `docs/HOLDOUT.md`.
+
+Fresh Ken French vintage (CRSP **202608**, through 2026-08). The frozen 50/50
+blend is CAGR 12.51% vs the market's 10.89%, alpha **+1.75%/yr, t = +2.53**,
+4/4 eras. Sharpe 0.55, 95% CI **+0.29 to +0.81**; the market is 0.47, CI
+**+0.21 to +0.72**. The intervals overlap. Against the `rmx` ledger (20 trials)
+the family-wise p on t = +2.53 is **0.205**. Required t is 3.02. It already
+missed the 6-trial Šidák bar of 2.63 (p = 0.067). It does not clear.
+
+| look | gate | result |
+|---|---|---|
+| Months after 2026-07 | report only; do not tune | **2026-08 only.** Blend +2.04%, market +2.85%, excess **−0.81 pp**. No change. |
+| Vol-scale the momentum leg | t ≥ 2 and a less-severe worst month and 2016–2026 excess within 1 pp of unscaled | t = +2.57, worst month **−24.00% vs −23.73%**. **Left off.** |
+| Add Accruals, Beta, Leverage, or RD | long-only `d_t` > 0 in 1970–2024, 2010–2018, and 2015–2024 | **None did.** Not built. |
+
+`BIG HiOP LoINV` is still the higher t-stat on this file (t = +2.81) and is
+still not the strategy. Promoting it after seeing the table was forbidden when
+it was first scored.
+
 ---
 
 ## Reproducing all of it

@@ -200,3 +200,37 @@ the spent holdout glued together. It is not out-of-sample anything. And at the
 2520-session horizon each path reuses most of a ~4,000-session sample, so long
 horizon paths overlap heavily and their spread is **understated** — the 10-year
 fan is narrower than reality, not wider.
+
+---
+
+## French forward months — logged 2026-10-02, BEFORE execution
+
+| Field | Value |
+|---|---|
+| Window | Ken French monthly portfolios, months **strictly after 2026-07**. These months did not exist when RMX-B was accepted. This is not the legacy W2/W3 cache; the same rule applies. |
+| Spec | Frozen `scripts/ff_blend.py`: 50/50 `BIG HiOP` + `BIG HiPRIOR`, value-weighted, 20 bps round trip on 33%/yr and 200%/yr one-way turnover. Config hash `a400666fe62f9eb2` (sha256 of that file). |
+| What is not in this look | The local PIT panel. `research_data/sp500_pit_raw.csv`, `yahoo_long/` and `_panel_cache.pkl` are gitignored and are not in this checkout, so `alpha/book.py` cannot be run here. |
+| Question | What did the frozen construction do in the months after the freeze, versus the market, one month at a time? |
+
+**Binding conditions, fixed before running:**
+
+1. **No parameter of RMX-B or RMX-C may be changed because of this window.** A good month is not a promotion. A bad month is not a reason to touch a sleeve.
+2. The result may not be quoted as evidence of edge. A handful of months against a ~5.5%/yr tracking error resolves nothing.
+3. A separate, already-logged trial may evaluate vol-scaling the momentum leg on the **full** 1963–2026 sample. That decision does not use these forward months.
+4. If the freshly downloaded file has no month after 2026-07, the look is empty and that fact is the result.
+
+### Result, appended 2026-10-02 after the run
+
+Vintage: Ken French files created from the **202608** CRSP database. Last month on file **2026-08-31**. One forward month.
+
+| month | frozen 50/50 blend | market | excess |
+|---|---|---|---|
+| 2026-08 | +2.04% | +2.85% | **−0.81 pp** |
+
+No parameter was changed. One month against a ~5.5%/yr tracking error is not evidence in either direction.
+
+The same download reproduces the frozen full-sample blend at CAGR 12.51% vs the market's 10.89%, alpha **+1.75%/yr, t = +2.53**, 4/4 eras, excess correlation of the legs **+0.174**. That is the same construction as the published 12.55% / 10.90% / t = +2.54 row; the third decimal moved because the file now runs through August 2026. Sharpe 0.55, 95% CI **+0.29 to +0.81**, against the market's 0.47, CI **+0.21 to +0.72**. The intervals overlap.
+
+`BIG HiOP LoINV` still scores higher (alpha t = +2.81 on this vintage). It stays unpromoted. The pre-registration said choosing it after seeing the table is the selection this project exists to avoid.
+
+Vol-scale trial, same day, full sample, not this window: **left off**. Alpha t stayed at +2.57, and the worst month went from −23.73% to −24.00%. The pre-registered gate required the worst month to improve.
