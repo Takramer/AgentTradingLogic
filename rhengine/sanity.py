@@ -1,7 +1,7 @@
 """
 sanity.py — mechanical sanity battery for a backtest's trade list.
 
-Ten cheap checks that catch the classic ways a backtest lies BEFORE anyone
+Eleven cheap checks that catch the classic ways a backtest lies BEFORE anyone
 spends hours on walk-forwards. Runs on a trades CSV (seconds, no data fetch)
 or on a fresh backtest. Each check returns PASS / WARN / FAIL / SKIP with the
 number that triggered it; the process exit code is 1 if anything FAILs
@@ -18,6 +18,7 @@ Checks:
   degenerate_r      no absurd R-multiples (stop-distance pathology)
   score_monotonicity    higher score tiers earn more (else the legs don't rank)
   exit_mix          stops/targets actually fire (time-stop-dominated = geometry mismatch)
+  capital_rate      return per dollar-day beats passive drift (R-sums are not returns)
 
 Usage:
     py -m rhengine.sanity --trades-csv backtest_trades.csv
@@ -30,6 +31,8 @@ import csv
 import json
 import math
 from collections import defaultdict
+
+from .costs import resolve_cost_bps
 
 
 def _avg(rs):
@@ -46,12 +49,17 @@ def _t_stat(rs):
 
 
 def _extra_cost_r(trade, extra_bps):
-    """Additional cost in R for extra_bps more round-trip cost, from the
-    trade's own entry/stop geometry."""
+    """Additional cost in R for extra_bps more ROUND-TRIP cost, from the
+    trade's own entry/stop geometry.
+
+    Must stay identical to costs.cost_in_r / backtest._cost_r — this had the
+    same 2x double-count they did and was fixed with them on 2026-07-27. It
+    made the battery's cost-stress check twice as punitive as advertised.
+    """
     entry, stop = trade.get("entry"), trade.get("stop")
     if entry is None or stop is None or entry <= 0 or entry <= stop:
         return None
-    return 2.0 * (extra_bps / 10000.0) / ((entry - stop) / entry)
+    return (extra_bps / 10000.0) / ((entry - stop) / entry)
 
 
 # ----------------------------------------------------------------- checks --
@@ -186,6 +194,53 @@ def check_score_monotonicity(trades):
             "higher tiers should earn more, else extra legs don't rank")
 
 
+# Long-run US equity drift, ~10.9%/yr (the market leg RMX-B is measured
+# against in CLAUDE.md), expressed per session: (1.109)^(1/252) - 1.
+PASSIVE_BP_PER_DAY = 4.10
+
+
+def check_capital_rate(trades):
+    """R-multiples are not returns (CLAUDE.md rule 2), and this is the cheapest
+    check that notices.
+
+    `portfolio.py` sizes `notional = risk_dollars / stop_pct`, so a trade's
+    return on the capital it actually ties up is an identity:
+
+        hpr = r_multiple * stop_pct
+
+    Divide the book's total by its total dollar-days and you get a rate directly
+    comparable to holding the index instead. A sleeve can post a large mean R,
+    a day-clustered t above 4 and a Monte Carlo p50 near 1.8 while this rate
+    sits below passive drift — that is exactly what happened across all five
+    strategies on 2026-07-31 (docs/AUTOSTRAT-2026-07-31.md §9).
+
+    CLEARING THIS IS NECESSARY, NOT SUFFICIENT. The hurdle here is the
+    UNCONDITIONAL drift, which is the easy version. A book chooses which days it
+    is invested, so the honest hurdle is the index's return over the book's own
+    entry..exit windows — and a sleeve that enters on weakness faces a hurdle
+    well above average. Use scripts/autostrat_dollarday.py for that; it needs
+    price data, which this battery deliberately does not fetch.
+    """
+    rows = [t for t in trades
+            if t.get("sessions_held") and t.get("entry") and t.get("stop")
+            and t["entry"] > 0 and t["entry"] > t["stop"]]
+    if len(rows) < max(30, len(trades) // 2):
+        return ("capital_rate", "SKIP", "need sessions_held + entry/stop",
+                "R-space only; capital rate not checkable from this CSV")
+    tot_ret = sum(t["r_multiple"] * ((t["entry"] - t["stop"]) / t["entry"])
+                  for t in rows)
+    tot_days = sum(t["sessions_held"] for t in rows)
+    if tot_days <= 0:
+        return ("capital_rate", "SKIP", "zero holding days", "")
+    bp = 1e4 * tot_ret / tot_days
+    status = ("PASS" if bp >= PASSIVE_BP_PER_DAY
+              else "WARN" if bp > 0 else "FAIL")
+    return ("capital_rate", status,
+            f"{bp:+.2f} bp/day vs {PASSIVE_BP_PER_DAY:.2f} passive",
+            "below passive drift: the capital would earn more in the index, "
+            "whatever the R-space stats say")
+
+
 def check_exit_mix(trades):
     if any("exit_reason" not in t for t in trades):
         return ("exit_mix", "SKIP", "no exit_reason column", "")
@@ -203,7 +258,7 @@ def check_exit_mix(trades):
 CHECKS = [check_sample_size, check_t_stat, check_outlier_dependence,
           check_cost_stress, check_is_oos_split, check_ticker_concentration,
           check_month_concentration, check_degenerate_r,
-          check_score_monotonicity, check_exit_mix]
+          check_score_monotonicity, check_exit_mix, check_capital_rate]
 
 
 def run_battery(trades):
@@ -233,6 +288,9 @@ def load_trades_csv(path):
             t["signal_date"] = (row.get("signal_date") or
                                 (row.get("entry_date") or "")[:10] or None)
             t["score"] = int(float(row["score"])) if row.get("score") else None
+            # capital_rate needs the holding length to form dollar-days
+            t["sessions_held"] = (int(float(row["sessions_held"]))
+                                  if row.get("sessions_held") else None)
             out.append(t)
     return out
 
@@ -267,13 +325,18 @@ def main():
     ap.add_argument("--lookback-days", type=int, default=400)
     ap.add_argument("--min-score", type=int, default=3)
     ap.add_argument("--strategy", default=None)
-    ap.add_argument("--cost-bps", type=float, default=5.0)
+    ap.add_argument("--cost-bps", type=float, default=None)
     ap.add_argument("--max-tickers", type=int, default=0)
     ap.add_argument("--json", action="store_true",
                     help="emit machine-readable results on stdout")
     ap.add_argument("--strict", action="store_true",
                     help="exit 1 on WARN as well as FAIL")
     args = ap.parse_args()
+    # Single source of truth for the cost assumption (costs.py / config.json
+    # "costs.round_trip_bps"). Audit FC-2: these defaults used to be 0.0 or 5.0
+    # per-CLI and the headline artifact was generated at 0 bps.
+    args.cost_bps = resolve_cost_bps(args.cost_bps,
+                                     getattr(args, "config", None))
 
     if args.trades_csv:
         trades = load_trades_csv(args.trades_csv)

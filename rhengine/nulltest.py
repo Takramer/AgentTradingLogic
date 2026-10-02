@@ -31,6 +31,8 @@ import argparse
 import json
 import random
 
+from .costs import resolve_cost_bps
+
 from .backtest import (
     load_bars, run_backtest_on, simulate_long, _cost_r, _stats,
     _iso_date, _max_hold, WARMUP_BARS,
@@ -210,12 +212,17 @@ def main():
     ap.add_argument("--paths", type=int, default=1000)
     ap.add_argument("--mode", choices=("both", "tickers", "dates"),
                     default="both")
-    ap.add_argument("--cost-bps", type=float, default=0.0)
+    ap.add_argument("--cost-bps", type=float, default=None)
     ap.add_argument("--seed", type=int, default=1337)
     ap.add_argument("--max-tickers", type=int, default=0,
                     help="cap the universe for a faster run (0 = all); the "
                          "event-loop backtest is slow at full-market scale")
     args = ap.parse_args()
+    # Single source of truth for the cost assumption (costs.py / config.json
+    # "costs.round_trip_bps"). Audit FC-2: these defaults used to be 0.0 or 5.0
+    # per-CLI and the headline artifact was generated at 0 bps.
+    args.cost_bps = resolve_cost_bps(args.cost_bps,
+                                     getattr(args, "config", None))
 
     with open(args.config) as f:
         cfg = json.load(f)

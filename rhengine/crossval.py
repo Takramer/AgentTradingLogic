@@ -38,6 +38,8 @@ import argparse
 import json
 from datetime import date, timedelta
 
+from .costs import resolve_cost_bps
+
 from .backtest import run_backtest_on, _stats, _iso_date, WARMUP_BARS
 from .optimize import _spec_values, _evaluate, _fmt, _rank_key, _HDR
 
@@ -201,7 +203,7 @@ def main():
     ap.add_argument("--min-score", type=int, default=3)
     ap.add_argument("--strategy", default=None,
                     help="force one strategy (required for --select)")
-    ap.add_argument("--cost-bps", type=float, default=5.0)
+    ap.add_argument("--cost-bps", type=float, default=None)
     ap.add_argument("--embargo-days", type=int, default=15,
                     help="calendar-day purge margin at block borders "
                          "(~max_hold_sessions in trading days; default 15)")
@@ -217,6 +219,11 @@ def main():
     ap.add_argument("--max-tickers", type=int, default=0,
                     help="cap the universe for a faster run (0 = all)")
     args = ap.parse_args()
+    # Single source of truth for the cost assumption (costs.py / config.json
+    # "costs.round_trip_bps"). Audit FC-2: these defaults used to be 0.0 or 5.0
+    # per-CLI and the headline artifact was generated at 0 bps.
+    args.cost_bps = resolve_cost_bps(args.cost_bps,
+                                     getattr(args, "config", None))
 
     with open(args.config) as f:
         cfg = json.load(f)

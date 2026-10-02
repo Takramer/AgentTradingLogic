@@ -33,6 +33,17 @@
       "minShift": 0.0
     }
   },
+  "costs": {
+    "_note": "SINGLE SOURCE OF TRUTH for transaction costs (rhengine/costs.py). Every CLI's --cost-bps now defaults to None and resolves here; passing --cost-bps still overrides. Set 2026-07-24 by audit FC-2: the eleven CLIs previously carried their own defaults (0.0 in backtest/portfolio/optimize/nulltest/montecarlo/ic, 5.0 elsewhere) and tests/results/current_full.csv was forensically confirmed generated at 0 bps.",
+    "_calibration_note": "30 bps, NOT 5. universe_filters.min_dollar_volume is 500,000, i.e. names trading $500k/day, where round-trip half-spread x2 + impact is routinely 30-100+ bps. 5 bps is a mega-cap number applied to a microcap universe. Measured breakeven on current_full.csv is 11.2 bps incremental: at +5 bps mean R falls +0.0572 -> +0.0316, at +10 bps -> +0.0061, at +20 bps -> -0.0450. Lower this only with executed-fill evidence.",
+    "round_trip_bps": 30.0
+  },
+  "execution": {
+    "_note": "Module 7 execution gates (rhengine/execution.py), adopted 2026-07-30 from docs/AGENT-SPEC.md. LIVE PATH ONLY — daily bars carry no bid/ask, so this gate cannot be applied retrospectively and changes NO recorded backtest result. Do not synthesise a spread to make it apply: Corwin-Schultz was validated 2026-07-25 and rejected at ~37x too high (costs.estimate_round_trip_bps).",
+    "_units_note": "spread_gate_pct is the quoted spread as a fraction of mid, which IS the ROUND-TRIP cost (each crossing pays a half-spread, twice = one spread). Round-trip bps = pct x 10000, NO factor of 2. So 0.01 admits 100 bps round trip in spread alone — ~3x the 33 bps that erases the gross edge, and almost exactly the worst measured ADV decile (98.1 bps). 0.01 is the SOURCE default, kept because this repo does not silently retune source parameters.",
+    "_binds_note": "MEASURED 2026-07-30 against both stratified quote captures: this gate rejects ~48% of the least-liquid ADV decile (14/29 names on both days), part of deciles 1-2, and nothing above ~$6M/day. universe_filters.min_dollar_volume = 500,000 does NOT imply a sub-1% spread. Reproduce with: py scripts/rh_spreads.py gate",
+    "spread_gate_pct": 0.01
+  },
   "spy_ticker": "SPY",
   "watchlist": "all",
   "strategy": {
@@ -54,6 +65,7 @@
     "_thresholds_note": "Ablation cuts 2026-07-18 (docs/notebooklm-findings.md 4.1): residualmomentum trades its primary RA-RES leg alone (confirmations are OOS drag, t=-3.5 for the full set vs +8.9 primary-only); macd reduced to CROSS+SUB-0 (OOS PF 1.37). Spec defaults stay legMask=0 for Nydex JS compatibility; the cut lives in this config. Bollinger keeps all 4 legs (only OOS-positive config in choppy)."
   },
   "exits": {
+    "_DEAD_KEYS_note": "stop_atr_mult and target_atr_mult below are READ BY NOTHING (verified 2026-07-31 by grep across rhengine/ and scripts/; only tests/test_sim.py mentions them, in a fixture it builds itself). The live stop/target multiples come from the SETUP, i.e. rhengine/strategies.json thresholds stopAtrMult/targetAtrMult, overridable per strategy through config.json strategy.thresholds.<strategy>. Editing the two keys below looks like retuning the exit and silently does nothing — that is why an exit sweep appeared to show 'no effect' until 2026-07-31. Left in place rather than deleted so this note has something to point at; the keys that DO bind in this block are trail_trigger_mult, chandelier_atr_mult, max_hold_sessions, min_stop_pct and winsor_r_cap.",
     "stop_atr_mult": 1.5,
     "target_atr_mult": 2.0,
     "trail_trigger_mult": 1.5,

@@ -19,6 +19,7 @@ from .indicators import (
     resolve_thresholds,
     score_all_tickers,
     select_strategy_for_regime,
+    autonomous_strategies,
     load_spec,
 )
 
@@ -43,9 +44,20 @@ def main():
         strategies = [k for k, v in load_spec()["strategies"].items()
                       if not v.get("retired")]
     elif args.strategy:
+        # Explicit selection = manual/Nydex path. Any non-retired strategy is
+        # allowed here; the autonomous restriction applies only to auto-routing.
         strategies = [args.strategy]
     else:
-        strategies = [select_strategy_for_regime(regime)]
+        auto = select_strategy_for_regime(regime)
+        if auto is None:
+            print("\nNo strategy is cleared for autonomous trading in the "
+                  "'{}' regime — nothing to scan.".format(regime))
+            print("Autonomous set: {}".format(
+                ", ".join(autonomous_strategies()) or "(empty)"))
+            print("Pick one explicitly with --strategy to scan manually, "
+                  "or --all for every non-retired strategy.")
+            return
+        strategies = [auto]
 
     results = []
     for strat in strategies:

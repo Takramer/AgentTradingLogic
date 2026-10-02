@@ -1,0 +1,36 @@
+{
+  "source": "jkpfactors.com (updated through 2025-12)",
+  "note": "Jensen, Kelly & Pedersen, Journal of Finance 2023. 153 factors in 13 themes. CC BY-NC 4.0 \u2014 non-commercial use. Themes: accruals, debt_issuance, investment, low_leverage, low_risk, momentum, profit_growth, profitability, quality, seasonality, short_term_reversal, size, value",
+  "fetched_utc": "2026-07-25T15:07:45Z",
+  "files": [
+    {
+      "file": "usa_all_factors_monthly_vw_cap.zip",
+      "url": "https://jkpfactors-data.s3.amazonaws.com/public/%5Busa%5D_%5Ball_factors%5D_%5Bmonthly%5D_%5Bvw_cap%5D.zip",
+      "bytes": 2674337,
+      "cached": true,
+      "sha256_16": "f766aa2c7db1f975"
+    },
+    {
+      "file": "usa_all_themes_monthly_vw_cap.zip",
+      "url": "https://jkpfactors-data.s3.amazonaws.com/public/%5Busa%5D_%5Ball_themes%5D_%5Bmonthly%5D_%5Bvw_cap%5D.zip",
+      "bytes": 204444,
+      "cached": true,
+      "sha256_16": "9cf3bfa2a2941846"
+    },
+    {
+      "file": "usa_all_factors_monthly_ew.zip",
+      "url": "https://jkpfactors-data.s3.amazonaws.com/public/%5Busa%5D_%5Ball_factors%5D_%5Bmonthly%5D_%5Bew%5D.zip",
+      "bytes": 2659718,
+      "cached": false,
+      "seconds": 0.6,
+      "sha256_16": "e1ec7105624e7b52"
+    },
+    {
+      "file": "nyse_cutoffs.csv",
+      "url": "https://jkpfactors-data.s3.amazonaws.com/public/other/nyse_cutoffs.csv",
+      "bytes": 73693,
+      "cached": true,
+      "sha256_16": "78770869ef25a3d7"
+    }
+  ]
+}

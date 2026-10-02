@@ -35,6 +35,8 @@ import argparse
 import json
 from collections import defaultdict
 
+from .costs import resolve_cost_bps
+
 from .market_data import fetch_bars, fetch_bars_batch_massive, _data_source
 from .indicators import (
     score_ticker,
@@ -155,21 +157,42 @@ def load_bars(cfg, lookback_days=400, verbose=True):
 
 
 def _cost_r(entry, stop, cost_bps):
-    """Round-trip transaction cost expressed in R (risk units). A market order in
-    and out costs ~2 * cost_bps of notional; dividing by the stop distance converts
-    that to R. At a +0.1R edge, a few bps each way is not negligible — modeling it
-    keeps the backtest honest about NET performance."""
+    """Transaction cost expressed in R (risk units).
+
+    `cost_bps` is the ROUND TRIP cost — in and out, total. Dividing by the stop
+    distance converts notional bps to R, because R is normalized by that stop.
+    At a +0.1R edge with a ~4% stop, cost is not negligible: every 1 bp is
+    ~0.0025 R, so modeling it is the difference between a NET and a gross
+    result.
+
+    UNITS — FIXED 2026-07-27. This function used to return
+    `2.0 * (cost_bps / 10000.0) / stop_pct`, i.e. it treated `cost_bps` as a
+    PER-SIDE figure and doubled it. But its only caller resolves the value from
+    config.json `costs.round_trip_bps`, which is documented and calibrated as a
+    round-trip number. Feeding a round-trip value into a per-side slot charged
+    every backtest 2x: config said 30 bps, the engine took 60.
+
+    That was not academic. Live Robinhood quotes on 2026-07-27 measured the real
+    trade-weighted cost of this universe at 29.1 bps round trip — so the config
+    value was well calibrated and the arithmetic was not. At 60 bps the whole
+    refined set reported mean R -0.065 and looked dead; at the measured cost it
+    reports +0.009. (Neither is an edge — day-clustered t is -0.39 — but the
+    reported magnitude was wrong by a factor of two for months.)
+
+    Do not reintroduce the 2x. If you need a per-side number, name the variable
+    per_side_bps and double it at the call site, not here.
+    """
     if not cost_bps or entry <= 0:
         return 0.0
     stop_pct = (entry - stop) / entry
     if stop_pct <= 0:
         return 0.0
-    return 2.0 * (cost_bps / 10000.0) / stop_pct
+    return (cost_bps / 10000.0) / stop_pct
 
 
 def run_backtest_on(cfg, bars_map, spy_bars, min_score=3, forced_strategy=None,
                     date_lo=None, date_hi=None, regime_only=None, cost_bps=0.0,
-                    gates=None):
+                    gates=None, universe=None, signal_dates=None):
     """Score + simulate over pre-fetched bars. Pure/in-memory so a sweep can call
     it many times without re-hitting the API. `date_lo`/`date_hi` (ISO strings)
     restrict signals to [date_lo, date_hi) for in-sample / out-of-sample splits.
@@ -182,8 +205,85 @@ def run_backtest_on(cfg, bars_map, spy_bars, min_score=3, forced_strategy=None,
     bear_only = set(cfg.get("bear_regime_only", []))
     regime_set = ({regime_only} if isinstance(regime_only, str)
                   else set(regime_only) if regime_only else None)
+    _min_price = float(cfg.get("universe_filters", {}).get("min_price", 1.0))
+    # PEAD always-on pooling: when enabled (config strategy.pead_always_on) and not
+    # ablating a single forced strategy, the earnings-drift sleeve is scored every
+    # bar ALONGSIDE the regime strategy. Additive with REGIME PRECEDENCE per bar —
+    # a pead trade fires only when the regime sleeve took nothing for that
+    # ticker/bar (same earnings gap => one entry). Adds pead's incremental signals
+    # where the regime sleeve is silent without disturbing the validated regime
+    # book. Tune pead to its EVENT+DRIFT form via config thresholds legMask=3.
+    pead_on = bool(cfg["strategy"].get("pead_always_on", False)) and not forced_strategy
+    # Optional upside-only R winsorization: cap a trade's recorded gain (not its
+    # loss) so a rare gap-through-target windfall (+20-36R filled far above target)
+    # can't flatter expectancy/Monte Carlo. Downside tail stays honest.
+    _winsor = cfg.get("exits", {}).get("winsor_r_cap")
+    _winsor = float(_winsor) if _winsor else None
 
     trades = []
+
+    def _emit_setups(ticker, bars, t, regime, spy_hist, strat):
+        """Score `strat` at bar t, append qualifying long trades, return True if
+        any bull trade was emitted (drives pead pooling precedence)."""
+        th = resolve_thresholds(cfg, strat)
+        setups = score_ticker(ticker, bars[: t + 1], strat, th, spy_hist)
+        if not setups:
+            return False
+        emitted = False
+        for s in setups:
+            if s["direction"] != "bull":
+                continue  # live system is long-only
+            if s["score"] < min_score:
+                continue
+            # Per-trade price floor: the universe filter screens on RECENT median
+            # price, but a name that reverse-split up (e.g. OPI now >$1) still has
+            # historical sub-dollar bars in the 400d window. Those penny prints
+            # produce fictional fills and degenerate R (OPI $0.34->$27.9 = +184R).
+            # Enforce the floor at the actual fill price, not just recent median.
+            if bars[t + 1]["open"] < _min_price:
+                continue
+            sim = simulate_long(bars, t, s["stop"], s["target"],
+                                _max_hold(strat, ticker, cfg),
+                                atr=s.get("atr"),
+                                exits_cfg=cfg.get("exits", {}))
+            if sim is None:
+                continue
+            reason, exit_price, r, held = sim
+            r_net = r - _cost_r(bars[t + 1]["open"], s["stop"], cost_bps)
+            if _winsor is not None and r_net > _winsor:
+                r_net = _winsor
+            trade = {
+                "ticker": ticker,
+                # Leg pass-mask ("1101" = legs 1,2,4 passed) — lets ablate.py
+                # re-evaluate leg subsets over one backtest's trade list.
+                # raw_pass first: under a legMask the gate rewrites "pass" to
+                # True on bypassed legs, which would record "1111" everywhere
+                # and leave the ablation with nothing to discriminate on
+                # (indicators.py legMask gate). raw_pass is the real evaluation.
+                "legs": "".join("1" if l.get("raw_pass", l.get("pass")) else "0"
+                                for l in s.get("legs", [])),
+                "strategy": strat,
+                "regime": regime,
+                "vix_regime": estimate_vix_regime(spy_hist),
+                "signal_date": _iso_date(bars[t]["time"]),
+                "score": s["score"],
+                "weighted_score": s.get("weighted_score", s["score"]),
+                "entry": round(bars[t + 1]["open"], 4),
+                "stop": s["stop"],
+                "target": s["target"],
+                "exit_reason": reason,
+                "exit_price": round(exit_price, 4),
+                "r_multiple": round(r_net, 4),
+                "sessions_held": held,
+            }
+            if gates is not None:
+                gates.annotate(trade, ticker, bars[t]["time"])
+                if not gates.keep(trade):
+                    continue
+            trades.append(trade)
+            emitted = True
+        return emitted
+
     for ticker, bars in bars_map.items():
         n = len(bars)
         if n < WARMUP_BARS + 2:
@@ -196,6 +296,19 @@ def run_backtest_on(cfg, bars_map, spy_bars, min_score=3, forced_strategy=None,
                 continue
             if date_hi is not None and sig_date >= date_hi:
                 continue
+            # Rebalance calendar: when supplied, signals may only fire on these
+            # dates. A daily-scored signal is a daily-turnover strategy no
+            # matter what horizon it measures; a 12-month formation window is
+            # only economically coherent if it is acted on monthly. Also cuts
+            # scoring cost by the stride. Default None = score every bar.
+            if signal_dates is not None and sig_date not in signal_dates:
+                continue
+            # Point-in-time universe membership: was this name investable ON
+            # sig_date, judged only on data available then? Without this the
+            # universe is a present-day snapshot applied retroactively — the
+            # survivorship channel in docs/AUDIT-2026-07-24.md FC-4.
+            if universe is not None and not universe.contains(ticker, sig_date):
+                continue
 
             spy_idx = spy_time_to_idx.get(bars[t]["time"])
             if spy_idx is None or spy_idx < WARMUP_BARS:
@@ -205,59 +318,26 @@ def run_backtest_on(cfg, bars_map, spy_bars, min_score=3, forced_strategy=None,
             if regime_set is not None and regime not in regime_set:
                 continue
 
-            if forced_strategy:
-                strategy = forced_strategy
-            else:
-                strategy = (select_strategy_for_regime(regime)
-                            if mode == "auto" else mode)
-
             if ticker in bear_only and regime != "downtrend":
                 continue
 
-            thresholds = resolve_thresholds(cfg, strategy)
-            hist = bars[: t + 1]
-            setups = score_ticker(ticker, hist, strategy, thresholds, spy_hist)
-            if not setups:
-                continue
-
-            for s in setups:
-                if s["direction"] != "bull":
-                    continue  # live system is long-only
-                if s["score"] < min_score:
+            if forced_strategy:
+                _emit_setups(ticker, bars, t, regime, spy_hist, forced_strategy)
+            else:
+                strategy = (select_strategy_for_regime(regime)
+                            if mode == "auto" else mode)
+                if strategy is None:
+                    # No strategy is cleared for autonomous trading in this
+                    # regime — stand flat. Modelling this in the backtest is the
+                    # point: the agent's realistic book must include the periods
+                    # it is required to do nothing.
                     continue
-                sim = simulate_long(bars, t, s["stop"], s["target"],
-                                    _max_hold(strategy, ticker, cfg),
-                                    atr=s.get("atr"),
-                                    exits_cfg=cfg.get("exits", {}))
-                if sim is None:
-                    continue
-                reason, exit_price, r, held = sim
-                r_net = r - _cost_r(bars[t + 1]["open"], s["stop"], cost_bps)
-                trade = {
-                    "ticker": ticker,
-                    # Leg pass-mask ("1101" = legs 1,2,4 passed) — lets ablate.py
-                    # re-evaluate leg subsets over one backtest's trade list.
-                    "legs": "".join("1" if l.get("pass") else "0"
-                                    for l in s.get("legs", [])),
-                    "strategy": strategy,
-                    "regime": regime,
-                    "vix_regime": estimate_vix_regime(spy_hist),
-                    "signal_date": sig_date,
-                    "score": s["score"],
-                    "weighted_score": s.get("weighted_score", s["score"]),
-                    "entry": round(bars[t + 1]["open"], 4),
-                    "stop": s["stop"],
-                    "target": s["target"],
-                    "exit_reason": reason,
-                    "exit_price": round(exit_price, 4),
-                    "r_multiple": round(r_net, 4),
-                    "sessions_held": held,
-                }
-                if gates is not None:
-                    gates.annotate(trade, ticker, bars[t]["time"])
-                    if not gates.keep(trade):
-                        continue
-                trades.append(trade)
+                emitted = _emit_setups(ticker, bars, t, regime, spy_hist, strategy)
+                # PEAD always-on: add its earnings-drift signal where the regime
+                # sleeve took nothing this bar (regime precedence — one entry per
+                # ticker/bar for the same underlying move).
+                if pead_on and not emitted:
+                    _emit_setups(ticker, bars, t, regime, spy_hist, "pead")
 
     return trades
 
@@ -360,9 +440,14 @@ def main():
     ap.add_argument("--strategy", default=None,
                     help="force a single strategy instead of regime-auto")
     ap.add_argument("--csv", default=None, help="write per-trade rows to this CSV")
-    ap.add_argument("--cost-bps", type=float, default=0.0,
+    ap.add_argument("--cost-bps", type=float, default=None,
                     help="round-trip transaction cost in basis points (e.g. 5)")
     args = ap.parse_args()
+    # Single source of truth for the cost assumption (costs.py / config.json
+    # "costs.round_trip_bps"). Audit FC-2: these defaults used to be 0.0 or 5.0
+    # per-CLI and the headline artifact was generated at 0 bps.
+    args.cost_bps = resolve_cost_bps(args.cost_bps,
+                                     getattr(args, "config", None))
 
     with open(args.config) as f:
         cfg = json.load(f)

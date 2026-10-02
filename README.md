@@ -1,9 +1,71 @@
 # AgentTradingLogic — shared trading engine
 
+> ### Status, 2026-07-25 — read `docs/RMX-RESULTS.md` before trusting any number below
+>
+> An adversarial audit (`docs/AUDIT-2026-07-24.md`) found the legacy sleeve
+> engine's headline result to be an artifact of zero costs, an uncapitalised
+> R-sum, IID statistics on overlapping trades, and a survivorship-biased
+> universe chosen by looking at the metric being reported. **None of the numbers
+> in the "Simulation & backtesting" sections below have been re-established.**
+>
+> `rhengine/alpha/` is the rebuilt research stack: point-in-time universe,
+> mark-to-market book, real cost curves, Newey-West statistics, benchmark alpha,
+> block bootstrap, and pre-registered holdouts. Five hypotheses were tested
+> against it and four were rejected.
+>
+> **The survivor is RMX-B** (`rhengine/alpha/rmxb.py`) — a 50/50 blend of two
+> cap-weighted large-cap sleeves: operating profitability and 12-1 momentum. On
+> Ken French's survivorship-free portfolios, 1963–2026, net of a punitive cost
+> charge, it returns **12.55%/yr against the market's 10.90%**, alpha
+> **+1.78%/yr with t=+2.54**, Sharpe 0.55 vs 0.47, beta 0.97, and beats the
+> market in **all four eras**. The blend's t-stat exceeds both of its legs
+> (+1.62 and +2.10) because their excess returns correlate only +0.18.
+>
+> **The boundary, stated up front:** a +1.78%/yr alpha against a 5.5%/yr
+> tracking error needs ~39 years to reach t=2, so this project's own 8-year S&P
+> 500 implementation can only be checked for consistency, never for
+> significance. The demonstration is French's 63 years. Expect to trail the
+> index in roughly 4 years out of 10.
+
+> **Working in this repo (human or agent)?** `CLAUDE.md` is the operating guide —
+> environment, hard rules, and the evidence contract — with
+> `docs/CLAUDE-RESEARCH-RULES.md`, `docs/CLAUDE-CODEMAP.md`,
+> `docs/CLAUDE-WORKFLOWS.md` and `docs/CLAUDE-PITFALLS.md` behind it.
+
 Single source of truth for the 6-strategy signal engine shared by
 **RobinhoodAgent** (autonomous Python app) and **Nydex** (client-side React app).
 Engine-only: no order planning, no autonomous orchestration, no meta-labeling ML —
 those stay app-side.
+
+## The post-audit research stack (`rhengine/alpha/`)
+
+| Path | What |
+|---|---|
+| `rhengine/alpha/panel.py` | **Point-in-time** panel: daily S&P 500 membership 1996→2026 reconstructed from component-change history, joined on date to Yahoo bars and Ken French factors. `eligible(D)` is provably invariant to appending future data (audit FC-4) |
+| `rhengine/alpha/book.py` | The **only** source of performance numbers: weight targets → daily mark-to-market equity, one-session execution lag, turnover-based cost, −30% delisting return, charged margin above 1.0× (fixes FC-1, FC-13) |
+| `rhengine/alpha/stats.py` | Newey-West alpha/beta on non-overlapping monthly returns, Deflated Sharpe at the true trial count (fixes FC-3, FC-6, FC-14) |
+| `rhengine/alpha/validation.py` | Stationary block bootstrap, random-selection and random-timing nulls, purged folds, bear-episode table, drop-best-months (fixes FC-5, FC-7, FC-10) |
+| `rhengine/alpha/signals.py` | Residual momentum at the horizon its citation actually uses — months, not days (fixes FC-8) |
+| `rhengine/alpha/timing.py` | RMX-D: 10-month trend gate + absolute-momentum risk-off leg |
+| `rhengine/alpha/rmxd.py` | RMX-D, frozen. **Rejected out-of-sample (1/11 gates)** |
+| `rhengine/alpha/fundamentals.py` | Point-in-time SEC XBRL accounting data with the Fama-French 6-month publication lag (audit O-4) |
+| `rhengine/alpha/rmxq.py` | The **quality leg**: operating-profitability tilt, cap- or equal-weighted. Also `adjusted_shares`, which reconciles split-adjusted prices against un-adjusted SEC share counts |
+| `rhengine/alpha/rmxb.py` | **RMX-B** — the deliverable: 50/50 quality + 12-1 momentum, cap-weighted, alpha t=+2.54 over 1963-2026 |
+| `docs/RMX-PREREGISTRATION.md` | Every hypothesis, parameter and kill criterion, written before its run; the trial ledger the audit demanded |
+| `docs/RMX-RESULTS.md` | **The answer**, with the numbers that decided each verdict |
+
+```bash
+py scripts/fetch_history.py            # 1,213 ever-S&P500 tickers, full history
+py scripts/fetch_sec_fundamentals.py   # SEC XBRL fundamentals, point-in-time
+py -m rhengine.alpha.panel             # coverage by year + PIT universe check
+py scripts/rmx_bias.py                 # survivorship inflation, measured vs RSP
+py scripts/rmxq_report.py --lo 2010-07-01 --hi 2018-12-31   # full gate report
+py scripts/ff_largecap_quality.py      # the 63-year quality-leg evidence
+py scripts/ff_blend.py                 # the blend: alpha t=+2.54, 4/4 eras
+py -m rhengine.alpha.rmxb              # RMX-B backtest
+py -m rhengine.alpha.rmxb --holdings   # the book as of today
+py scripts/rmxqt_power.py              # why no 8-year test can prove it
+```
 
 ## Contents
 
@@ -27,12 +89,17 @@ those stay app-side.
 | `rhengine/sanity.py` | Ten-check **sanity battery** on a trade list (sample size, t-stat, outlier/cost/concentration/degenerate-R/monotonicity/exit-mix). PASS/WARN/FAIL with a nonzero exit code for CI/agent gating (`py -m rhengine.sanity --trades-csv …`) |
 | `rhengine/nulltest.py` | Random-entry permutation test: does the ENTRY signal beat luck, or is the edge just exit engine + drift? (`py -m rhengine.nulltest`) |
 | `rhengine/mc_refined.py` | Trade harvest + vectorized Monte Carlo for the ablation-refined strategy set (full path matrix for fan charts) |
+| `rhengine/mc_books.py` | Monte Carlo for the **research-stack books** (RMX-B, RMX-C). They have no trades and no R-multiples, so this bootstraps their daily mark-to-market returns in stationary blocks over sessions — fully invested, no sizing dial — with SPY resampled on the same block indices so `P(< SPY)` is against a market that co-moves (`py -m rhengine.mc_books`) |
 | `rhengine/charts.py` | Dependency-free ASCII charts (equity curve, drawdown, histograms) — auto-shown by portfolio/montecarlo, or standalone: `py -m rhengine.charts --equity-csv equity_curve.csv --trades-csv backtest_trades.csv` |
 | `rhengine/viz.py` | Matplotlib chart helpers (fan/hist/IC series/signed & paired bars/sweep/IS-OOS scatter/heatmap/equity-drawdown/check-table) shared by the notebooks — one validated palette so every lab reads as one system |
 | `notebooks/` | Five validation labs (below): open in Jupyter to *see* what the CLIs print — distributions, fans, per-fold bars |
 | `rhengine/strategies.json` | **Canonical spec** — per-strategy legs, threshold defaults/ranges, exits, regime routing. Threshold defaults are the walk-forward-tuned values |
 | `fixtures/` | Golden vectors: deterministic bar series + expected `score_ticker` output. The cross-runtime drift guard |
 | `gen_fixtures.py` | Regenerates the golden vectors (only after a deliberate engine change) |
+| `docs/AGENT-SPEC.md` | **Parameter reference for the technical/tactical layer** — Weinstein stages, RRG/dual momentum, entry setups, ATR sizing, exits, options overlay, execution gates, validation thresholds. One table per module, every number sourced (75-source NotebookLM pass + the three `Research/` briefings), plus explicit COVERAGE GAPS and CONFLICTS lists. A spec, **not evidence** — nothing in it has been through `alpha/book.py`, and the GLD/SPY backtest figures it records are quarantined as unquotable |
+| `docs/AGENT-SPEC-VERDICT.md` | **The answer to "should we build it"** — external evidence audit of every module in the spec. Verdict: build nothing from Modules 1–5. Weinstein stage analysis has no peer-reviewed support and MA timing fails over 155 years; FVG has no academic literature; ORB assumes zero bid-ask spread. Survivors: the spread gate, and measuring the volatility risk premium |
+| `Research/` | The three practitioner briefings behind the R1/R2/R3 citations in the spec. Raw input, not a result |
+| `docs/notebooklm-findings.md` | The earlier 69-source pass the spec supersedes, and the record of which of those rules were built and how they scored |
 
 ## Consuming
 
@@ -44,6 +111,15 @@ JS (Nydex): import the spec — `import spec from '../engine/rhengine/strategies
 and test `indicators.js` against `fixtures/` with vitest (sync pass deferred).
 
 ## Simulation & backtesting (standalone, no API keys)
+
+> **Pre-audit section.** The tools below still run and are still the right tools;
+> the *numbers* they once produced were withdrawn on 2026-07-24 (zero costs,
+> uncapitalised R-sums, IID statistics on overlapping trades, a
+> survivorship-biased universe). Nothing here has been re-established. Treat
+> output as diagnostic, never as a performance claim — those come only from
+> `rhengine/alpha/book.py`. Costs now resolve from `config.json`
+> (`costs.round_trip_bps`, 30 bps) rather than each CLI's own default.
+> See `CLAUDE.md` and `docs/CLAUDE-RESEARCH-RULES.md`.
 
 The repo ships its own `config.json` with `data_source: "massive"` and
 `watchlist: "all"` so every tool below runs from this directory against the
@@ -57,7 +133,7 @@ explicit watchlist, not "all") or `alpaca` (instant but IEX-only volume,
 
 ```bash
 # 1. Signal-level backtest (R-multiples, by score tier / strategy / exit)
-py -m rhengine.backtest --lookback-days 400 --cost-bps 5 --csv backtest_trades.csv
+py -m rhengine.backtest --lookback-days 400 --csv backtest_trades.csv
 
 # 2. Account-level simulation (sizing + capacity constraints -> equity curve)
 py -m rhengine.portfolio --risk-pct 1 --max-positions 5 --equity-csv equity_curve.csv
@@ -79,11 +155,13 @@ produce the exact bar shape `run_backtest_on` consumes.
 
 Five more tools stress a configuration before it touches the live account. Each
 prints a verdict line and (via the notebooks) charts the distribution behind it.
-Always `--cost-bps 5`; cap the universe with `--max-tickers` while iterating.
+Omit `--cost-bps` — it resolves from `config.json` (`costs.round_trip_bps`, 30,
+measured) via `rhengine/costs.py`; pass it only to run a cost sweep. Cap the
+universe with `--max-tickers` while iterating.
 
 ```bash
 # Ablation — which legs carry the edge, which are drag (cut candidates)?
-py -m rhengine.ablate --strategy residualmomentum --cost-bps 5
+py -m rhengine.ablate --strategy residualmomentum
 py -m rhengine.ablate --strategy bollinger --regime choppy   # routed → ablate in-slot
 
 # Information Coefficient + t-stats — does a higher score rank a better outcome?
@@ -91,6 +169,7 @@ py -m rhengine.ic --strategy residualmomentum --max-tickers 300
 
 # Blocked cross-validation — edge everywhere, or one lucky quarter?
 py -m rhengine.crossval --strategy bollinger --folds 5
+py -m rhengine.crossval --strategy bollinger --by-regime   # macro-defense: which regime carries it?
 py -m rhengine.crossval --strategy bollinger --select --params volMult --folds 4
 
 # Sanity battery — ten mechanical lie-detectors (nonzero exit code gates CI)
@@ -104,7 +183,11 @@ py -m rhengine.nulltest --strategy bollinger --max-tickers 300
 `walkforward` (IS/OOS + forward-walk progressive tuning), `ic_tstats`,
 `crossval_sanity`, `montecarlo_refined`. Each caches its trades CSV under
 `tests/results/` and only recomputes when its `REFRESH` flag is `True`; all draw
-through `rhengine/viz.py`. Run one headless (UTF-8 guard per the Windows notes):
+through `rhengine/viz.py`. `montecarlo_refined` covers **both** systems —
+§1–6 the legacy sleeves in trade space, §7–9 RMX-B and RMX-C in returns space
+(`BOOK_REFRESH` / `BOOK_CSV`), with §9 putting them in one table behind an
+explicit `unit` column because the equity multiples are not comparable.
+Run one headless (UTF-8 guard per the Windows notes):
 
 ```powershell
 $env:PYTHONUTF8='1'; py -m jupyter execute --inplace notebooks/ablation.ipynb

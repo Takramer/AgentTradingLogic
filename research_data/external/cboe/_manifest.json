@@ -1,0 +1,47 @@
+{
+ "BXM": {
+  "bytes": 283910,
+  "end": "2026-07-17",
+  "fetched_at": "2026-08-01T06:51:34Z",
+  "path": "BXM.csv",
+  "rows": 9603,
+  "sha256": "b3a800bf958baf251bafb0965a81038f41a2983daffefd732575aa4d35bf491f",
+  "start": "1988-06-01",
+  "what": "CBOE S&P 500 BuyWrite \u2014 the covered-call half of the wheel",
+  "yahoo_symbol": "^BXM"
+ },
+ "GSPC": {
+  "bytes": 421064,
+  "end": "2026-07-31",
+  "fetched_at": "2026-08-01T06:51:35Z",
+  "path": "GSPC.csv",
+  "rows": 14266,
+  "sha256": "044ad5a6dc4f44703e0daee5a85ccae6ea7fbba569fec82e4061533f2055a69e",
+  "start": "1970-01-02",
+  "what": "S&P 500 PRICE index \u2014 kept only to show the ~1.8%/yr dividend gap a price benchmark hides",
+  "yahoo_symbol": "^GSPC"
+ },
+ "PUT": {
+  "bytes": 221245,
+  "end": "2026-07-31",
+  "fetched_at": "2026-08-01T06:51:34Z",
+  "path": "PUT.csv",
+  "rows": 7539,
+  "sha256": "12e64ea0155143ead7c98beab4ec395e742a4b2c38efa0612591d0aebfd4b3c0",
+  "start": "1996-08-02",
+  "what": "CBOE S&P 500 PutWrite \u2014 the cash-secured-put half",
+  "yahoo_symbol": "^PUT"
+ },
+ "SP500TR": {
+  "bytes": 280651,
+  "end": "2026-07-31",
+  "fetched_at": "2026-08-01T06:51:35Z",
+  "path": "SP500TR.csv",
+  "rows": 9717,
+  "sha256": "f13fd4f4f648ae815c82b0726b394648e186cb7ed072932d78a40f2aa6d71474",
+  "start": "1988-01-04",
+  "what": "S&P 500 TOTAL RETURN \u2014 the correct benchmark",
+  "yahoo_symbol": "^SP500TR"
+ },
+ "_note": "BXM and PUT are TOTAL-RETURN strategy indices. Benchmark them against SP500TR, never GSPC \u2014 the price index omits ~1.8%/yr of dividends the covered-call writer actually receives."
+}

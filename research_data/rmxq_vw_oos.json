@@ -1,0 +1,93 @@
+{
+  "window": [
+    "2019-06-28",
+    "2026-07-24"
+  ],
+  "oos": false,
+  "cost_bps": 10.0,
+  "rmxq": {
+    "cagr": 12.233644818421773,
+    "sharpe": 0.5440305792385983,
+    "max_dd": -36.26623681885721,
+    "total": 125.65615437090476
+  },
+  "spy": {
+    "cagr": 15.68110961254352,
+    "sharpe": 0.68955059534303,
+    "max_dd": -33.71724962452114,
+    "total": 179.3191160076182
+  },
+  "ew": {
+    "cagr": 15.293789810917357,
+    "sharpe": 0.6635511030980499
+  },
+  "alpha_vs_spy": {
+    "alpha_ann": -0.022018333410811417,
+    "alpha_t": -1.6061400143487197,
+    "beta": 0.9297634212374507,
+    "beta_t": 26.31731988892693,
+    "n": 86
+  },
+  "alpha_vs_ew": {
+    "alpha_ann": -0.01411326092523869,
+    "alpha_t": -0.9746715526526913,
+    "beta": 0.8842729797051976,
+    "beta_t": 18.521057321536777,
+    "n": 86
+  },
+  "dsr_excess": 1.0026508606939087e-05,
+  "mc": {
+    "paths": 1000,
+    "mean_block": 21,
+    "terminal_pct": {
+      "p5": 6.4714441013600394,
+      "p25": 67.01667907151558,
+      "p50": 133.32921737605196,
+      "p75": 204.09995976738404,
+      "p95": 344.6181964476461
+    },
+    "spy_terminal_pct": {
+      "p5": 30.752286300543062,
+      "p25": 109.0649299678458,
+      "p50": 190.75529746316712,
+      "p75": 286.95927336760604,
+      "p95": 448.5388976008413
+    },
+    "max_dd_mag_pct": {
+      "p50": 31.861497644307356,
+      "p75": 38.209909394868845,
+      "p95": 50.481657903087196,
+      "p99": 59.09703429882328
+    },
+    "p_loss": 0.038,
+    "p_underperform_spy": 0.974,
+    "realised_max_dd_mag_pct": 36.26623681885721
+  },
+  "null": {
+    "paths": 200,
+    "actual_pct": 125.65615437090476,
+    "percentile": 38.5,
+    "random_pct": {
+      "p5": 103.95061177353277,
+      "p25": 118.79870800961076,
+      "p50": 131.1758006604731,
+      "p75": 147.45675832745926,
+      "p95": 172.53227193603863
+    }
+  },
+  "turnover_ann": 0.36730603630358927,
+  "gates": {
+    "beats SPY on total return": false,
+    "beats SPY on CAGR after survivorship haircut": false,
+    "alpha t vs SPY >= 2.0": false,
+    "alpha t vs CW covered universe >= 2.0": false,
+    "Sharpe > SPY": false,
+    "max drawdown <= SPY": false,
+    "still beats SPY at 50 bps": false,
+    ">= 70% of folds beat SPY": false,
+    "selection >= 80th pct of random": false,
+    "P(underperform SPY) <= 0.30": false,
+    "deflated Sharpe (excess) > 0.95": false
+  },
+  "gates_passed": 0
+}

@@ -45,6 +45,8 @@ import json
 import numpy as np
 import pandas as pd
 
+from .costs import resolve_cost_bps
+
 from .backtest import WARMUP_BARS
 from .indicators import load_spec, resolve_thresholds
 
@@ -385,7 +387,11 @@ def sweep_strategy(strategy, m, th, exits_cfg, cost_bps, split_ts, verbose=True)
             price=m.open, open=m.open, high=m.high, low=m.low,
             sl_stop=sl_frac.values, tp_stop=tp_frac.values,
             stop_entry_price="fillprice", direction="longonly",
-            fees=cost_bps / 1e4, init_cash=10_000.0,
+            # vectorbt charges `fees` on EVERY order — entry and exit both — so
+            # a round-trip figure must be halved here or it is billed twice.
+            # (2026-07-27: it was not, mirroring the same units bug in
+            # backtest._cost_r. `cost_bps` is ROUND TRIP; see costs.py.)
+            fees=cost_bps / 2.0 / 1e4, init_cash=10_000.0,
             size=100.0, size_type="value", freq="1D")
 
         recs = pf.trades.records
@@ -452,7 +458,7 @@ def main():
     ap.add_argument("--strategy", default="all",
                     help="one of {} or 'all'".format("|".join(STRATEGIES)))
     ap.add_argument("--lookback-days", type=int, default=400)
-    ap.add_argument("--cost-bps", type=float, default=5.0,
+    ap.add_argument("--cost-bps", type=float, default=None,
                     help="cost per side in basis points (default 5)")
     ap.add_argument("--split", type=float, default=0.7,
                     help="IS/OOS date split fraction (default 0.7)")
@@ -462,6 +468,11 @@ def main():
                     help="flag rows under this many trades")
     ap.add_argument("--csv", default="ablation_vbt_results.csv")
     args = ap.parse_args()
+    # Single source of truth for the cost assumption (costs.py / config.json
+    # "costs.round_trip_bps"). Audit FC-2: these defaults used to be 0.0 or 5.0
+    # per-CLI and the headline artifact was generated at 0 bps.
+    args.cost_bps = resolve_cost_bps(args.cost_bps,
+                                     getattr(args, "config", None))
 
     strategies = STRATEGIES if args.strategy == "all" else (args.strategy,)
     for s in strategies:

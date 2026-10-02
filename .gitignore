@@ -17,3 +17,27 @@ finnhub_cache/
 # Regenerable lab artifacts under tests/results (CSVs already ignored via *.csv)
 tests/results/*
 !tests/results/.gitkeep
+
+# Research datasets rebuilt by scripts/fetch_history.py and
+# scripts/fetch_sec_fundamentals.py - large, and reproducible from the scripts.
+research_data/yahoo_long/
+research_data/sec/
+research_data/_panel_cache.pkl
+research_data/sp500_pit_raw.csv
+research_data/ff_daily.csv
+
+# Harvested published factor records (scripts/fetch_external_factors.py).
+# 134 MB and freely re-downloadable; the manifests record which vintage a
+# result came from, so they ARE tracked.
+research_data/external/*/*.csv
+research_data/external/*/*.zip
+research_data/external/*/*.xlsx
+!research_data/external/*/_manifest.json
+
+# Vendored clone of the i-have-adhd skill upstream. It carries its own .git,
+# so committing it would add a gitlink rather than the files. The INSTALLED
+# copy at .claude/skills/i-have-adhd/ is the one this repo uses.
+/i-have-adhd/
+
+# Throwaway backups taken before a --force refresh.
+research_data/*.bak-*

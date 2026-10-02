@@ -1,0 +1,81 @@
+{
+  "window": [
+    "1981-02-27",
+    "2015-12-31"
+  ],
+  "oos": false,
+  "cost_bps": 10.0,
+  "strategy": {
+    "cagr": 11.010079750206359,
+    "sharpe": 0.5379768981300749,
+    "max_dd": -33.078571418686565,
+    "total": 3720.3593538754903
+  },
+  "benchmark": {
+    "cagr": 10.07465397144145,
+    "sharpe": 0.3925806189980864,
+    "max_dd": -55.25313376295161,
+    "total": 2743.9915921503452
+  },
+  "alpha": {
+    "alpha_ann": 0.03393877166939601,
+    "alpha_t": 2.0705730516689513,
+    "beta": 0.5393304002585692,
+    "beta_t": 8.28005887101812,
+    "n": 419
+  },
+  "dsr_excess": 0.018992017072021902,
+  "mc": {
+    "paths": 1000,
+    "mean_block": 21,
+    "terminal_pct": {
+      "p5": 1099.8261852256232,
+      "p25": 2396.177886405001,
+      "p50": 3926.0613823234157,
+      "p75": 6252.191102249314,
+      "p95": 12117.411874442705
+    },
+    "spy_terminal_pct": {
+      "p5": 395.59410845990135,
+      "p25": 1426.4293772422088,
+      "p50": 2898.8949714460455,
+      "p75": 5370.293034166387,
+      "p95": 12867.341439057278
+    },
+    "max_dd_mag_pct": {
+      "p50": 31.486215090122805,
+      "p75": 35.53548924347325,
+      "p95": 44.681197695509724,
+      "p99": 51.17994633304463
+    },
+    "p_loss": 0.0,
+    "p_underperform_spy": 0.324,
+    "realised_max_dd_mag_pct": 33.078571418686565
+  },
+  "null": {
+    "paths": 200,
+    "actual_pct": 3720.3593538754903,
+    "percentile": 98.0,
+    "random_pct": {
+      "p5": 668.1228073930558,
+      "p25": 1109.2503144522461,
+      "p50": 1447.8705389682914,
+      "p75": 2110.314407287597,
+      "p95": 3358.46337056606
+    }
+  },
+  "gates": {
+    "beats index on total return": true,
+    "beats index on CAGR": true,
+    "alpha t >= 2.0": true,
+    "max drawdown <= index": true,
+    "Sharpe > index": true,
+    "still beats index at 50 bps": true,
+    ">= 70% of folds beat index": false,
+    ">= 3 independent bear episodes": true,
+    "timing >= 80th pct of random": true,
+    "P(underperform index) <= 0.30": false,
+    "deflated Sharpe (excess) > 0.95": false
+  },
+  "gates_passed": 8
+}

@@ -709,25 +709,66 @@ def score_consolidation(ticker, bars, thresholds):
 # ─────────────────────────────────────────────
 
 def score_residual_momentum(ticker, bars, thresholds, spy_bars=None):
-    if not spy_bars or len(spy_bars) < 40 or len(bars) < 40:
+    # HORIZON — parameterized 2026-07-24 (docs/AUDIT-2026-07-24.md FC-8).
+    #
+    # The defaults below (36 / 12 / 1) are TRADING DAYS. The literature this
+    # sleeve cites — Blitz, Huij & Martens, "Residual Momentum", J. Empirical
+    # Finance 18(3) 2011 — specifies 36 MONTHS of regression and a 12-MONTH
+    # formation window skipping the most recent month. The original
+    # implementation transposed months to days, so it trades a ~12-day horizon
+    # while claiming a ~12-month effect. At 12 days the documented US equity
+    # anomaly is short-term REVERSAL (Jegadeesh 1990; Lehmann 1990), not
+    # momentum. Defaults are unchanged here so golden fixtures stay pinned;
+    # the literature horizon is selected via config thresholds:
+    #     regBars 756, formBars 252, skipBars 21
+    #
+    # The estimation window and the formation window are ADJACENT, not
+    # overlapping: beta/alpha come from the OLDEST `regBars` returns, residuals
+    # are measured on the `formBars` returns that follow, ending `skipBars`
+    # before now. That is a cleaner construction than BHM (which regresses and
+    # forms on the same window) and is preserved at every horizon.
+    reg_bars  = int(thresholds.get("regBars", 36))
+    form_bars = int(thresholds.get("formBars", 12))
+    skip_bars = int(thresholds.get("skipBars", 1))
+    # window = reg + form + skip + 1 reproduces the original hardcoded 50.
+    window = reg_bars + form_bars + skip_bars + 1
+    min_bars = 40 if window <= 50 else window
+    if not spy_bars or len(spy_bars) < min_bars or len(bars) < min_bars:
         return None
 
-    N           = min(len(bars), len(spy_bars), 50)
-    stock_slice = bars[-N:]
-    spy_slice   = spy_bars[-N:]
+    # DATE ALIGNMENT (FC-9). The original sliced bars[-N:] and spy_bars[-N:] and
+    # paired them BY POSITION. 18.3% of cached tickers have at least one missing
+    # session, so for those the regression correlated returns from different
+    # dates — corrupting beta exactly for the thin names that dominate the
+    # universe by count. Pair on the bar timestamp instead. `alignByDate` 0
+    # restores the legacy behavior for A/B comparison.
+    if int(thresholds.get("alignByDate", 1)):
+        spy_close = {b["time"]: b["close"] for b in spy_bars}
+        matched = [(b["time"], b["close"], spy_close[b["time"]])
+                   for b in bars if b["time"] in spy_close]
+        if len(matched) < min_bars:
+            return None
+        matched = matched[-window:]
+        N = len(matched)
+        stock_rets = [math.log(matched[i][1] / matched[i - 1][1]) for i in range(1, N)]
+        spy_rets   = [math.log(matched[i][2] / matched[i - 1][2]) for i in range(1, N)]
+    else:
+        N           = min(len(bars), len(spy_bars), window)
+        stock_slice = bars[-N:]
+        spy_slice   = spy_bars[-N:]
+        stock_rets = [math.log(stock_slice[i]["close"] / stock_slice[i-1]["close"]) for i in range(1, N)]
+        spy_rets   = [math.log(spy_slice[i]["close"]   / spy_slice[i-1]["close"])   for i in range(1, N)]
 
-    stock_rets = [math.log(stock_slice[i]["close"] / stock_slice[i-1]["close"]) for i in range(1, N)]
-    spy_rets   = [math.log(spy_slice[i]["close"]   / spy_slice[i-1]["close"])   for i in range(1, N)]
     L = min(len(stock_rets), len(spy_rets))
     if L < 20:
         return None
 
-    reg_n = min(L, 36)
+    reg_n = min(L, reg_bars)
     ols   = _calc_ols(spy_rets[:reg_n], stock_rets[:reg_n])
     beta  = ols["beta"]
     alpha = ols["alpha"]
 
-    SKIP, FORM = 1, 12
+    SKIP, FORM = skip_bars, form_bars
     form_end   = L - SKIP
     form_start = max(0, form_end - FORM)
     form_stock = stock_rets[form_start:form_end]
@@ -987,29 +1028,120 @@ def classify_spy_regime(spy_bars):
     return "choppy"
 
 
-def select_strategy_for_regime(spy_regime):
+VALID_STATUSES = ("autonomous", "user_configurable", "manual", "retired")
+
+
+def strategy_status(name, spec=None):
+    """Deployment tier for one strategy. One of:
+
+      "autonomous"        — cleared for unattended auto-routing by the
+                            RobinhoodAgent
+      "user_configurable" — shipped in Nydex for a USER to configure and run on
+                            their own account, including unattended; never
+                            auto-routed by the agent
+      "manual"            — selectable by hand via --strategy in the research
+                            CLIs, attended experimentation only; not shipped as
+                            a user-runnable strategy
+      "retired"           — kept only so historical results stay reproducible;
+                            hidden from `scan --all`
+
+    Anything without an explicit status defaults to "manual". A strategy has to
+    earn autonomy; it does not get it by being present in the spec.
+
+    "user_configurable" exists because "manual" was describing the wrong thing.
+    It meant "a human picks it and is watching", but Nydex ships these sleeves
+    for users to configure and then leave running — a risk surface the tier had
+    never been evaluated for. Splitting the two makes the claim explicit rather
+    than implied. It is a product decision, NOT a validation result: a sleeve in
+    this tier has not passed G1, which is why the spec requires it to publish a
+    cost_profile (measured breakeven vs modelled cost) for the UI to surface.
     """
-    Map SPY regime → recommended strategy key.
+    spec = spec or load_spec()
+    s = (spec.get("strategies") or {}).get(name) or {}
+    if s.get("retired"):
+        return "retired"
+    return s.get("status", "manual")
 
-    Uptrend routes to residual momentum, not MACD. A walk-forward backtest
-    (optimize.py) showed MACD has NO out-of-sample edge in uptrends under any
-    parameterization (OOS avg R ≈ -0.14 to -0.22, profit factor < 1), while
-    residual momentum is consistently positive in-sample AND out-of-sample
-    (OOS avg R ≈ +0.10, PF ≈ 1.2) over a large trade sample. MACD remains
-    available and fully parameterized for manual use, just not auto-routed.
+
+def autonomous_strategies(spec=None):
+    """Strategies the unattended agent is permitted to route to."""
+    spec = spec or load_spec()
+    return sorted(n for n in (spec.get("strategies") or {})
+                  if strategy_status(n, spec) == "autonomous")
+
+
+def user_configurable_strategies(spec=None):
+    """Strategies Nydex offers users to configure and run themselves.
+
+    Deliberately disjoint from autonomous_strategies(): appearing here confers
+    no agent-routing permission whatsoever.
     """
-    return {
-        "uptrend":   "residualmomentum",
-        "downtrend": "residualmomentum",
-        "choppy":    "bollinger",
-    }.get(spy_regime, "vwap")
+    spec = spec or load_spec()
+    return sorted(n for n in (spec.get("strategies") or {})
+                  if strategy_status(n, spec) == "user_configurable")
 
 
-def load_spec():
-    """Load the canonical strategy spec (strategies.json, shipped with the engine)."""
-    import json, os
-    with open(os.path.join(os.path.dirname(__file__), "strategies.json")) as f:
-        return json.load(f)
+def strategy_cost_profile(name, spec=None):
+    """Measured cost economics for a strategy, or None if it publishes none.
+
+    Keys: breakeven_bps, modelled_bps, mean_r_gross, mean_r_at_modelled,
+    universe, window_days, measured, source. Nydex should render breakeven
+    against modelled cost wherever a user_configurable sleeve is offered — a
+    sleeve whose breakeven sits below the modelled cost of the universe it
+    trades is a losing configuration and the user is entitled to see that.
+    """
+    spec = spec or load_spec()
+    s = (spec.get("strategies") or {}).get(name) or {}
+    return s.get("cost_profile")
+
+
+def select_strategy_for_regime(spy_regime, spec=None):
+    """Map SPY regime → the strategy the AUTONOMOUS agent should trade, or None.
+
+    Returns None when no strategy is cleared for this regime. **None means trade
+    nothing.** That is the intended fail-safe: an unattended agent with no
+    validated edge for the current regime must stand flat, not fall back to
+    whatever sleeve happens to be next in a dict.
+
+    The routing table lives in strategies.json `regime_routing` (previously it
+    was a hardcoded dict here while `regime_routing` sat unread — two sources of
+    truth that could silently disagree; audit FC-20). A regime may only route to
+    a strategy whose status is "autonomous"; anything else is dropped even if
+    the routing table names it, so demoting a strategy to "manual" is sufficient
+    to pull it out of unattended trading.
+
+    Forcing a strategy explicitly (research CLIs' --strategy, Nydex personal
+    configuration) bypasses this and is unaffected.
+    """
+    spec = spec or load_spec()
+    name = (spec.get("regime_routing") or {}).get(spy_regime)
+    if not name or not isinstance(name, str):
+        return None
+    if strategy_status(name, spec) != "autonomous":
+        return None
+    return name
+
+
+_SPEC_CACHE = None
+
+
+def load_spec(refresh=False):
+    """Load the canonical strategy spec (strategies.json, shipped with the engine).
+
+    Cached: select_strategy_for_regime is called once per (ticker, bar) in the
+    backtest loop, so re-reading and re-parsing the file there would dominate
+    runtime. Pass refresh=True after editing the spec in a live session.
+    """
+    global _SPEC_CACHE
+    if _SPEC_CACHE is None or refresh:
+        import json, os
+        # Explicit utf-8: Windows defaults to cp1252, which cannot decode the
+        # spec if any note contains a non-ASCII character. The file itself is
+        # kept ASCII-safe (ensure_ascii) because the Nydex JS port reads it too.
+        path = os.path.join(os.path.dirname(__file__), "strategies.json")
+        with open(path, encoding="utf-8") as f:
+            _SPEC_CACHE = json.load(f)
+    return _SPEC_CACHE
 
 
 def spec_defaults(strategy):
@@ -1087,6 +1219,14 @@ def score_ticker(ticker, bars, strategy, thresholds, spy_bars=None):
     # are bypassed (annotated, counted as passing) so the setup's score clears
     # downstream min_score gates. Emission still requires the engine's >=2
     # passing-leg floor, matching what the ablation measured.
+    #
+    # EVERY leg also carries "raw_pass": the genuine evaluation, untouched by
+    # the bypass. Before 2026-07-25 the bypass overwrote "pass" and that was the
+    # only record, so backtest.py serialised "1111" for every trade and
+    # ablate.py — which discriminates on that bitstring — returned byte-
+    # identical stats for all 8 leg subsets. A blinded tool that reports a
+    # confident null. "pass" keeps the bypassed value so scoring, the scanner
+    # UI and downstream gates are unchanged; "raw_pass" is what analysis reads.
     mask = int(thresholds.get("legMask", 0))
     if results and mask:
         kept = []
@@ -1095,8 +1235,9 @@ def score_ticker(ticker, bars, strategy, thresholds, spy_bars=None):
             if not all(l["pass"] for i, l in enumerate(legs) if (mask >> i) & 1):
                 continue
             s = dict(s)
-            s["legs"] = [l if (mask >> i) & 1 else
+            s["legs"] = [dict(l, raw_pass=bool(l["pass"])) if (mask >> i) & 1 else
                          {"name": l["name"], "pass": True,
+                          "raw_pass": bool(l["pass"]),
                           "val": l["val"] + " (bypassed)"}
                          for i, l in enumerate(legs)]
             s["score"] = len(legs)

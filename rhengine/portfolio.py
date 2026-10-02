@@ -28,6 +28,8 @@ import json
 import math
 from bisect import bisect_right
 
+from .costs import resolve_cost_bps
+
 
 def sessions_from_bars(spy_bars):
     """Trading calendar (sorted ISO dates) from SPY bars."""
@@ -211,7 +213,7 @@ def main():
     ap.add_argument("--lookback-days", type=int, default=400)
     ap.add_argument("--min-score", type=int, default=3)
     ap.add_argument("--strategy", default=None)
-    ap.add_argument("--cost-bps", type=float, default=0.0)
+    ap.add_argument("--cost-bps", type=float, default=None)
     ap.add_argument("--start-equity", type=float, default=10_000)
     ap.add_argument("--risk-pct", type=float, default=1.0,
                     help="percent of current equity risked per trade (default 1)")
@@ -225,6 +227,11 @@ def main():
     ap.add_argument("--equity-csv", default=None, help="write equity curve CSV")
     ap.add_argument("--trades-csv", default=None, help="write taken trades CSV")
     args = ap.parse_args()
+    # Single source of truth for the cost assumption (costs.py / config.json
+    # "costs.round_trip_bps"). Audit FC-2: these defaults used to be 0.0 or 5.0
+    # per-CLI and the headline artifact was generated at 0 bps.
+    args.cost_bps = resolve_cost_bps(args.cost_bps,
+                                     getattr(args, "config", None))
 
     with open(args.config) as f:
         cfg = json.load(f)
