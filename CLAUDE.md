@@ -71,6 +71,12 @@ The engine is shared by **RobinhoodAgent** (autonomous Python) and **Nydex**
    | `manual` | `--strategy` in the research CLIs, attended only |
    | `retired` | kept so old results reproduce; hidden from `scan --all` |
 
+   The six legacy sleeves — `vwap`, `bollinger`, `macd`, `consolidation`,
+   `residualmomentum`, `pead` — are **retired** (2026-10-02). Scorers stay in
+   `indicators.py` so the rejections and the golden vectors still reproduce.
+   None is a Nydex user-runnable strategy. `books.rmxc` is a separate namespace
+   and is still `user_configurable`.
+
    `select_strategy_for_regime` returns `None` when no cleared strategy exists,
    and **None means trade nothing** — never fall back to another sleeve.
    Demoting to `manual` is sufficient to pull a strategy out of unattended

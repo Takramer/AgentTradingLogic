@@ -1,6 +1,6 @@
 {
   "_spec_version": 1,
-  "_notes": "Canonical strategy spec \u2014 single source of truth shared by RobinhoodAgent (Python) and Nydex (JS). Threshold defaults are RobinhoodAgent's walk-forward-tuned values (they win over Nydex UI defaults where they differ, e.g. bollinger adxMax 35). legs/slider metadata come from Nydex for its UI. Exit-engine params live in config.json exits (the duplicate block here was dead \u2014 no reader \u2014 and was removed 2026-07-24). Each strategy carries a `status`: autonomous | user_configurable | manual | retired \u2014 see indicators.strategy_status.",
+  "_notes": "Canonical strategy spec \u2014 single source of truth shared by RobinhoodAgent (Python) and Nydex (JS). Threshold defaults are RobinhoodAgent's walk-forward-tuned values (they win over Nydex UI defaults where they differ, e.g. bollinger adxMax 35). legs/slider metadata come from Nydex for its UI. Exit-engine params live in config.json exits (the duplicate block here was dead \u2014 no reader \u2014 and was removed 2026-07-24). Each strategy carries a `status`: autonomous | user_configurable | manual | retired \u2014 see indicators.strategy_status. 2026-10-02: all six legacy sleeves (vwap, bollinger, macd, consolidation, residualmomentum, pead) are retired. Scorers stay in indicators.py and the entries stay in this file so the rejections reproduce and the golden vectors still match the Nydex JS port. None is offered as a Nydex user-runnable strategy. The research-stack books are a separate namespace and were not part of this retirement.",
   "_deployment_tiers": {
     "autonomous": "Cleared for UNATTENDED auto-routing by the RobinhoodAgent. Must appear in regime_routing to actually trade. Earning this requires passing the gates in docs/AUDIT-2026-07-24.md section 10 (G1).",
     "user_configurable": "Shipped in Nydex for a USER to configure and run on their own account, including unattended. NEVER auto-routed by the RobinhoodAgent \u2014 that requires 'autonomous'. This tier is a product decision, not a validation result: a sleeve here has NOT passed G1. Every entry must carry a cost_profile so the UI can show measured breakeven against modelled cost.",
@@ -225,9 +225,10 @@
     "vwap": {
       "id": "vwap",
       "name": "VWAP Confluence",
-      "description": "Anchored-VWAP reclaim/rejection, EMA trend stack, volume confirmation, RSI momentum reset. Best in trending conditions.",
-      "status": "user_configurable",
-      "_status_note": "Never validated. It was the fallback target of the old hardcoded routing dict for any unrecognised regime, so it could auto-trade without ever having been tested; that fallback is removed. Zero trades in the 2025-09..2026-07 book.",
+      "description": "RETIRED 2026-10-02. Anchored-VWAP reclaim/rejection, EMA trend stack, volume confirmation, RSI momentum reset. Never validated; zero trades in the 2025-09..2026-07 book.",
+      "retired": true,
+      "status": "retired",
+      "_status_note": "RETIRED 2026-10-02. Pulled off the Nydex surface. Scorer and this entry stay so the rejection reproduces. Never validated. It was the fallback target of the old hardcoded routing dict for any unrecognised regime, so it could auto-trade without ever having been tested; that fallback is removed. Zero trades in the 2025-09..2026-07 book.",
       "regime": null,
       "legs": [
         {
@@ -326,9 +327,10 @@
     "bollinger": {
       "id": "bollinger",
       "name": "Bollinger Band Mean Reversion",
-      "description": "Band tag + RSI exhaustion + close back inside with volume. Hard-gated by ADX; choppy/range markets only.",
-      "status": "user_configurable",
-      "_status_note": "Best of a bad set: the only sleeve with day-clustered t > 2 on the massive window (+3.38), but on just 52 signal sessions. Deep-history scorecard is the deciding evidence; see docs/AUDIT-2026-07-24.md 12f.",
+      "description": "RETIRED 2026-10-02. Band tag + RSI exhaustion + close back inside with volume. Hard-gated by ADX; choppy/range markets only. The one legacy sleeve with a day-clustered t above 2 on 52 sessions; the deep-history net rate is negative.",
+      "retired": true,
+      "status": "retired",
+      "_status_note": "RETIRED 2026-10-02. Pulled off the Nydex surface. Scorer and this entry stay so the rejection reproduces. Best of a bad set: the only sleeve with day-clustered t > 2 on the massive window (+3.38), but on just 52 signal sessions. Deep-history scorecard is the deciding evidence; see docs/AUDIT-2026-07-24.md 12f.",
       "regime": "choppy",
       "legs": [
         {
@@ -427,9 +429,10 @@
     "macd": {
       "id": "macd",
       "name": "MACD Trend Continuation",
-      "description": "Early-stage MACD/signal cross with EMA50 trend confirmation and RSI band. Retired from auto-routing (no OOS edge); manual use only. Ablation 2026-07-18: CROSS+SUB-0 (legMask=3) is the OOS-strongest form (PF 1.37); EMA50/RSI legs are dead weight.",
-      "status": "user_configurable",
-      "_status_note": "Not auto-routed since before this audit and produced ZERO trades in the 2025-09..2026-07 book, yet config carried a tuned legMask=3 and docs claimed 'OOS PF 1.37' \u2014 a claim about a sleeve the system never traded.",
+      "description": "RETIRED 2026-10-02. Early-stage MACD/signal cross with EMA50 trend confirmation and RSI band. Scorer kept for reproduction. Ablation 2026-07-18: CROSS+SUB-0 (legMask=3) is the OOS-strongest form (PF 1.37); EMA50/RSI legs are dead weight. That PF is one window on a sleeve the live book never traded.",
+      "retired": true,
+      "status": "retired",
+      "_status_note": "RETIRED 2026-10-02. Pulled off the Nydex surface. Scorer and this entry stay so the rejection reproduces. Not auto-routed since before this audit and produced ZERO trades in the 2025-09..2026-07 book, yet config carried a tuned legMask=3 and docs claimed 'OOS PF 1.37' \u2014 a claim about a sleeve the system never traded.",
       "regime": null,
       "legs": [
         {
@@ -617,9 +620,10 @@
     "residualmomentum": {
       "id": "residualmomentum",
       "name": "Residual Momentum",
-      "description": "OLS-strips SPY beta to isolate idiosyncratic alpha momentum; 2-bar hold plus EMA and RSI confirmation. Auto-routed in uptrend and downtrend regimes.",
-      "status": "user_configurable",
-      "_status_note": "DEMOTED 2026-07-24. Carried 94% of the book. Day-clustered t +1.32 on the massive window; at 30 bps -3.69. O-1 rebuilt it at its cited Blitz/Huij/Martens horizon (756/252/21, monthly) over 7.7 years: t at 30 bps was -0.44 (ATR exits) and -0.02 (wide stops). Failed its predeclared kill criterion at every horizon.",
+      "description": "RETIRED 2026-10-02. OLS-strips SPY beta to isolate idiosyncratic alpha momentum; 2-bar hold plus EMA and RSI confirmation. Not auto-routed. Failed its predeclared kill criterion at every horizon.",
+      "retired": true,
+      "status": "retired",
+      "_status_note": "RETIRED 2026-10-02. Pulled off the Nydex surface. Scorer and this entry stay so the rejection reproduces. The cross-sectional residual idea, at the cited monthly horizon, lives in rhengine/alpha/signals.py and is a separate rejection. DEMOTED 2026-07-24. Carried 94% of the book. Day-clustered t +1.32 on the massive window; at 30 bps -3.69. O-1 rebuilt it at its cited Blitz/Huij/Martens horizon (756/252/21, monthly) over 7.7 years: t at 30 bps was -0.44 (ATR exits) and -0.02 (wide stops). Failed its predeclared kill criterion at every horizon.",
       "regime": "uptrend|downtrend",
       "legs": [
         {
@@ -739,9 +743,10 @@
     "pead": {
       "id": "pead",
       "name": "Post-Earnings Announcement Drift",
-      "description": "Event-driven, regime-agnostic sleeve: detects an earnings-like gap (price move + volume spike), then rides the drift 1-10 sessions with trend and momentum confirmation. Runs alongside the regime strategy; pools merged by (ticker, direction) keeping the stronger setup. Upgrade path: replace the price-proxy event detector with a real earnings/SUE feed (Nydex api/sue.js via FMP).",
-      "status": "user_configurable",
-      "_status_note": "Its edge lived in the excluded biotech names: on the biotech-excluded universe it is -0.05R / PF 0.89 / -186R. pead_always_on is false.",
+      "description": "RETIRED 2026-10-02. Event-driven, regime-agnostic sleeve: detects an earnings-like gap (price move + volume spike), then rides the drift 1-10 sessions with trend and momentum confirmation. Pooling is off (config.json strategy.pead_always_on is false). Do not upgrade the price-proxy to real SUE as a rescue: large-cap PEAD is among the most decayed post-2005 anomalies, and the price-proxy edge lived in excluded biotech.",
+      "retired": true,
+      "status": "retired",
+      "_status_note": "RETIRED 2026-10-02. Pulled off the Nydex surface. Scorer and this entry stay so the rejection reproduces. Its edge lived in the excluded biotech names: on the biotech-excluded universe it is -0.05R / PF 0.89 / -186R. pead_always_on is false.",
       "regime": "always-on",
       "legs": [
         {
