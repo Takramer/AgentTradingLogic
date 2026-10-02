@@ -960,42 +960,6 @@ def estimate_vix_regime(spy_bars, period=14):
         return "panic"
 
 
-def compute_trend_filter(spy_bars, period=200):
-    """Crash-avoidance overlay. Returns (risk_off: bool, sma: float|None).
-    risk_off is True when SPY closes below its `period`-day SMA — a simple,
-    evidenced regime filter that keeps new longs out of sustained downtrends
-    (drawdown clusters are what wreck Sharpe). Needs >= period bars; if history
-    is too short it returns (False, None) — i.e. it never blocks on missing data."""
-    if not spy_bars or len(spy_bars) < period:
-        return False, None
-    closes = [b["close"] for b in spy_bars]
-    sma = sum(closes[-period:]) / period
-    return closes[-1] < sma, sma
-
-
-def compute_realized_vol(spy_bars, lookback=20):
-    """Annualized realized volatility of SPY daily log returns over `lookback`."""
-    if not spy_bars or len(spy_bars) < lookback + 1:
-        return None
-    closes = [b["close"] for b in spy_bars][-(lookback + 1):]
-    rets = [math.log(closes[i] / closes[i - 1]) for i in range(1, len(closes))]
-    m = _mean(rets)
-    var = sum((r - m) ** 2 for r in rets) / (len(rets) - 1) if len(rets) > 1 else 0.0
-    return math.sqrt(var) * math.sqrt(252)
-
-
-def compute_vol_target_mult(spy_bars, target_annual_vol, bounds=(0.5, 1.5), lookback=20):
-    """Volatility-targeting size multiplier = clip(target / realized, bounds).
-    The most reliable Sharpe lever: lean into calm markets, cut exposure when
-    realized vol spikes. Continuous complement to the discrete VIX bands.
-    Returns (mult, realized_vol). mult defaults to 1.0 if vol can't be computed."""
-    rv = compute_realized_vol(spy_bars, lookback)
-    if not rv or rv <= 0 or not target_annual_vol:
-        return 1.0, rv
-    lo, hi = bounds
-    return max(lo, min(hi, target_annual_vol / rv)), rv
-
-
 def classify_spy_regime(spy_bars):
     """
     Classify SPY trend regime using EMA stack — same logic referenced in
