@@ -32,8 +32,13 @@
 > `docs/CLAUDE-RESEARCH-RULES.md`, `docs/CLAUDE-CODEMAP.md`,
 > `docs/CLAUDE-WORKFLOWS.md` and `docs/CLAUDE-PITFALLS.md` behind it.
 
-Single source of truth for the 6-strategy signal engine shared by
+Single source of truth for the signal engine shared by
 **RobinhoodAgent** (autonomous Python app) and **Nydex** (client-side React app).
+The six legacy sleeves (`vwap`, `bollinger`, `macd`, `consolidation`,
+`residualmomentum`, `pead`) are retired: scorers and `strategies.json` entries
+stay so old results and the golden vectors still reproduce, and none is offered
+as a user-runnable strategy. `scan --all` skips them. Explicit `--strategy`
+still scores one, which is the reproduction path.
 Engine-only: no order planning, no autonomous orchestration, no meta-labeling ML —
 those stay app-side.
 

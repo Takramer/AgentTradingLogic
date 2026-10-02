@@ -62,7 +62,7 @@
         "legMask": 3
       }
     },
-    "_thresholds_note": "Ablation cuts 2026-07-18 (docs/notebooklm-findings.md 4.1): residualmomentum trades its primary RA-RES leg alone (confirmations are OOS drag, t=-3.5 for the full set vs +8.9 primary-only); macd reduced to CROSS+SUB-0 (OOS PF 1.37). Spec defaults stay legMask=0 for Nydex JS compatibility; the cut lives in this config. Bollinger keeps all 4 legs (only OOS-positive config in choppy)."
+    "_thresholds_note": "Ablation cuts 2026-07-18 (docs/notebooklm-findings.md 4.1): residualmomentum trades its primary RA-RES leg alone (confirmations are OOS drag, t=-3.5 for the full set vs +8.9 primary-only); macd reduced to CROSS+SUB-0 (OOS PF 1.37). Spec defaults stay legMask=0; the cut lives in this config. Bollinger keeps all 4 legs (only OOS-positive config in choppy). All three sleeves were retired 2026-10-02; the masks stay so a --strategy reproduction still matches the run that rejected them."
   },
   "exits": {
     "_DEAD_KEYS_note": "stop_atr_mult and target_atr_mult below are READ BY NOTHING (verified 2026-07-31 by grep across rhengine/ and scripts/; only tests/test_sim.py mentions them, in a fixture it builds itself). The live stop/target multiples come from the SETUP, i.e. rhengine/strategies.json thresholds stopAtrMult/targetAtrMult, overridable per strategy through config.json strategy.thresholds.<strategy>. Editing the two keys below looks like retuning the exit and silently does nothing — that is why an exit sweep appeared to show 'no effect' until 2026-07-31. Left in place rather than deleted so this note has something to point at; the keys that DO bind in this block are trail_trigger_mult, chandelier_atr_mult, max_hold_sessions, min_stop_pct and winsor_r_cap.",

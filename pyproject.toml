@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rhengine"
 version = "0.1.0"
-description = "Shared trading signal engine: 6-strategy scorer, regime classifier, market data adapters, walk-forward backtest"
+description = "Shared trading signal engine: legacy scorers (retired), regime classifier, market data adapters, walk-forward backtest, research-stack books"
 requires-python = ">=3.9"
 dependencies = ["requests>=2.31.0"]
 

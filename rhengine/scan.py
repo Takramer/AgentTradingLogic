@@ -3,7 +3,7 @@ Live watchlist scanner — score today's setups across the config watchlist.
 
     py -m rhengine.scan                     # auto: regime-routed strategy
     py -m rhengine.scan --strategy pead     # force one strategy
-    py -m rhengine.scan --all               # merge all six strategies
+    py -m rhengine.scan --all               # every non-retired strategy
     py -m rhengine.scan --min-score 5 --top 20 --csv scan_results.csv
 
 Uses whatever data_source config.json names (yahoo needs no keys).
@@ -19,6 +19,7 @@ from .indicators import (
     resolve_thresholds,
     score_all_tickers,
     select_strategy_for_regime,
+    strategy_status,
     autonomous_strategies,
     load_spec,
 )
@@ -27,7 +28,8 @@ from .indicators import (
 def main():
     ap = argparse.ArgumentParser(description="Scan the watchlist for setups")
     ap.add_argument("--strategy", help="force one strategy key")
-    ap.add_argument("--all", action="store_true", help="scan all strategies")
+    ap.add_argument("--all", action="store_true",
+                    help="scan every non-retired strategy")
     ap.add_argument("--min-score", type=int, default=4)
     ap.add_argument("--top", type=int, default=25, help="rows to print")
     ap.add_argument("--lookback-days", type=int, default=400)
@@ -41,11 +43,17 @@ def main():
     regime = classify_spy_regime(spy_bars)
 
     if args.all:
-        strategies = [k for k, v in load_spec()["strategies"].items()
-                      if not v.get("retired")]
+        spec = load_spec()
+        strategies = [k for k in spec["strategies"]
+                      if strategy_status(k, spec) != "retired"]
+        if not strategies:
+            print("\nNo non-retired strategy. The legacy sleeves are retired; "
+                  "pass --strategy <name> to reproduce one.")
+            return
     elif args.strategy:
-        # Explicit selection = manual/Nydex path. Any non-retired strategy is
-        # allowed here; the autonomous restriction applies only to auto-routing.
+        # Explicit --strategy is the reproduction path. A retired sleeve still
+        # scores here so the rejection can be re-run. Auto-routing is the only
+        # path that requires status == autonomous.
         strategies = [args.strategy]
     else:
         auto = select_strategy_for_regime(regime)

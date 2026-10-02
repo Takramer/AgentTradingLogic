@@ -201,15 +201,24 @@ class UserConfigurableTierTest(unittest.TestCase):
             set(user_configurable_strategies(spec)) & set(autonomous_strategies(spec)),
             set())
 
-    def test_shipped_sleeves_are_user_configurable(self):
+    def test_no_legacy_sleeve_is_user_configurable(self):
+        """2026-10-02: the six legacy sleeves are retired. Nydex has nothing
+        in `strategies` to offer a user to leave running. Research-stack books
+        are a separate namespace and are not this list."""
         spec = load_spec()
-        self.assertEqual(
-            user_configurable_strategies(spec),
-            ["bollinger", "macd", "pead", "residualmomentum", "vwap"])
+        self.assertEqual(user_configurable_strategies(spec), [])
+
+    def test_legacy_sleeves_are_retired(self):
+        spec = load_spec()
+        for name in ("bollinger", "consolidation", "macd", "pead",
+                     "residualmomentum", "vwap"):
+            self.assertEqual(strategy_status(name, spec), "retired", name)
+            self.assertTrue(spec["strategies"][name].get("retired"), name)
 
     def test_each_publishes_a_cost_profile(self):
-        """The tier's price of admission: a user cannot judge a strategy whose
-        measured breakeven is hidden from them.
+        """The five measured sleeves keep their cost profiles after retirement.
+        A user cannot judge a strategy whose measured breakeven is hidden, and
+        deleting the profile would also delete the rejection.
 
         Cost is MEASURED from live quotes (2026-07-27), not assumed — every
         field here is in ROUND-TRIP bps, the unit the measurement is in. Do not
@@ -220,7 +229,9 @@ class UserConfigurableTierTest(unittest.TestCase):
         required = ("basis", "measured_cost_bps_round_trip",
                     "breakeven_bps_round_trip", "mean_r_at_measured_cost",
                     "t_day_clustered", "verdict", "measured", "caveat", "source")
-        for name in user_configurable_strategies(spec):
+        # Retirement must not drop the measured profiles. The guard follows the
+        # sleeves that published one, not whichever tier currently ships.
+        for name in ("bollinger", "macd", "pead", "residualmomentum", "vwap"):
             profile = strategy_cost_profile(name, spec)
             self.assertIsNotNone(profile, "{} publishes no cost_profile".format(name))
             for key in required:
@@ -233,7 +244,7 @@ class UserConfigurableTierTest(unittest.TestCase):
         """Breakeven above the measured cost must mean positive net R, and below
         it negative. Catches a profile edited in one field but not the other."""
         spec = load_spec()
-        for name in user_configurable_strategies(spec):
+        for name in ("bollinger", "macd", "pead", "residualmomentum", "vwap"):
             p = strategy_cost_profile(name, spec)
             if p["breakeven_bps_round_trip"] < p["measured_cost_bps_round_trip"]:
                 self.assertLess(p["mean_r_at_measured_cost"], 0, name)
@@ -250,7 +261,7 @@ class UserConfigurableTierTest(unittest.TestCase):
         per-trade and +0.45 day-clustered on the same data.
         """
         spec = load_spec()
-        for name in user_configurable_strategies(spec):
+        for name in ("bollinger", "macd", "pead", "residualmomentum", "vwap"):
             p = strategy_cost_profile(name, spec)
             self.assertLess(
                 abs(p["t_day_clustered"]), 1.5,
