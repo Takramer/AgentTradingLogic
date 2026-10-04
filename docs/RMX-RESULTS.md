@@ -32,6 +32,12 @@ implementation cannot confirm it.** A +1.78%/yr alpha against a 5.5%/yr tracking
 error needs ~39 years to reach t=2. The demonstration is French's 63 years; the
 implementation is checked for consistency, not significance.
 
+The same French portfolios clear the random-sample bar the old score failed.
+Through 2026-07, the 50/50 blend sits at the **100th percentile** of 200 random
+BIG-quintile draws (quality 97.5th, momentum 99.5th). Detail and the rejected
+panic-cut are in the 2026-10-04 section below. At 22 logged `rmx` trials,
+t = +2.54 has family-wise p = 0.215 and does not clear the Šidák bar of 3.04.
+
 Four other hypotheses were pre-registered and rejected on the numbers.
 
 | hypothesis | in-sample | out-of-sample | verdict |
@@ -219,6 +225,101 @@ missed the 6-trial Šidák bar of 2.63 (p = 0.067). It does not clear.
 `BIG HiOP LoINV` is still the higher t-stat on this file (t = +2.81) and is
 still not the strategy. Promoting it after seeing the table was forbidden when
 it was first scored.
+
+## 2026-10-04 — the rank beats a random BIG quintile; the panic-cut stays off
+
+Logged in `research_data/trials.jsonl` before any return was read. Script:
+`scripts/ff_random_null.py`. Sample **1963-07 through 2026-07** (757 months).
+The August 2026 month stayed outside this look. Costs are the same 20 bps
+round trip on 33%/yr and 200%/yr one-way turnover. The ledger rows carry
+config hash `fd0e5831891d86ed`, the file as logged. A later edit added the
+Sharpe point and the window label to the printout. The second run reproduced
+the same verdict.
+
+### Random quintile
+
+The feasible form of audit FC-7 on these files. The name-level null in
+`alpha/validation.py` needs the point-in-time panel, which is not in this
+checkout. Here the eligible set is the five value-weight quintiles inside the
+BIG size bucket. The ranked book always holds the top quintile. Each random
+path draws one of the five uniformly: quality once per July–June cohort,
+momentum every month, 200 paths, seed 11. The same cost drag is charged on
+the ranked book and on every random book. Random books pay no extra switch
+cost, which favors the null. The bar is the audit's: terminal wealth at or
+above the **80th percentile**.
+
+| book | percentile | CAGR | random median CAGR |
+|---|---|---|---|
+| quality, BIG HiOP | **97.5th** | 11.56% | 10.04% |
+| momentum, BIG HiPRIOR | **99.5th** | 13.17% | 9.51% |
+| **50/50 blend** | **100th** | **12.49%** | **9.90%** |
+
+All three clear. The blend finished above every one of the 200 random paths.
+The pre-registered rule was to report a leg under the bar and leave its weight
+alone. None was under the bar, and no weight moved.
+
+This is the gap between the retired technical score and this book. The old
+score-ranked portfolio sat at the **53rd percentile** of random names
+(`docs/AUDIT-2026-07-24.md`, FC-7). The quintile rank is the rule that clears
+the same kind of question on the published large-cap portfolios.
+
+Boundary: a quintile draw is coarser than drawing names. The spent 2019–2026
+panel null stays a separate, already-logged test (profitability was 100th
+in-sample and 88th on that window). This section leaves those two numbers in
+their original logs.
+
+### Panic-cut, left off
+
+Daniel & Moskowitz, *Journal of Financial Economics* 2016, forecast momentum
+crashes in panic states: a trailing 24-month market decline, and high market
+variance. Their dynamic weight is fit to the long-short WML portfolio, with
+GJR-GARCH coefficients estimated on the same sample they score. That fit is
+not portable onto a long-only monthly series, and re-estimating it here would
+be another in-sample search.
+
+The pre-registered translation uses no estimated coefficient. Momentum weight
+goes to 0, and quality to 1, only when both of these are known from returns
+before the month:
+
+- the prior 24-month market total return is negative, and
+- the prior 6-month market variance (population, ddof=0) is above the median
+  of earlier variance readings, with at least 60 of those readings.
+
+Otherwise the weight stays 50/50. A change in the momentum weight pays 20 bps
+on the one-way turnover. The rule fired in **82** of 757 months.
+
+| | unscaled | panic-cut | gate |
+|---|---|---|---|
+| alpha t | **+2.54** | +2.49 | t ≥ 2 passed; t above the unscaled book **failed** |
+| alpha/yr | +1.77% | +1.73% | |
+| worst month | −23.73% | −23.73% | a less severe worst month **failed** |
+| excess, 2016-01 → 2026-07 | +0.79 pp | +0.88 pp | within 1 pp, passed |
+| Sharpe, 95% CI | 0.55, **+0.29 to +0.80** | 0.54, **+0.29 to +0.80** | |
+| family-wise p, 22 `rmx` trials | **0.215** | 0.249 | p ≤ 0.05 **failed** |
+
+Market Sharpe on the same window is 0.47, CI **+0.21 to +0.72**. The intervals
+overlap. Required t at 22 trials is 3.04. E[max t] under the null is 1.94.
+**VERDICT: LEAVE OFF.** `rmxb.py` is unchanged.
+
+The published crash sits in the short leg: past losers rebound after a decline
+when volatility is high. This book is long the winners only. Cutting those
+winners in panic months gave back alpha and left the worst month at −23.73%.
+
+### Rules that stay closed
+
+Searched before this run. Each one already has a measured fate, so none of
+them was opened as a fresh trial.
+
+| proposed change | why it stays closed |
+|---|---|
+| Add value beside gross profitability | Novy-Marx, "The Quality Dimension of Value Investing," finds a long-only gain on the full sample. This repo's long-only screen already found the classic value ratios dead from 2010 onward. The modern window governs. |
+| Replace 12-1 momentum with months 7–12 only | Asness, Moskowitz & Pedersen: the skip-month 12-1 is the standard, and averaging reasonable measures is the guard against mining. Goyal & Wahal did not replicate the 7–12 version internationally. |
+| Constant-vol scaling of the momentum leg | Barroso & Santa-Clara. Run here on 2026-10-02. Alpha t rose to +2.57 and the worst month went from −23.73% to −24.00%. Left off. |
+| Promote BIG HiOP LoINV | Higher t (+2.81 on the August vintage). Choosing it after seeing the table was forbidden in the pre-registration. |
+
+The rule that beats a random BIG quintile is the one already shipped: the top
+operating-profitability quintile, the top 12-1 momentum quintile, 50/50,
+cap-weighted, large cap, next close.
 
 ---
 
