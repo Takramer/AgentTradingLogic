@@ -1,9 +1,15 @@
 """
 kalshi_paper.py — paper verification of the Kalshi v5 15-minute bot.
 
-The AutoHotkey script this ports is written for Nightshark, a paid Windows
-host. Log, LogStream, HttpGet, GetKalshiPrice and stopCode are Nightshark
-runtime calls. They are not required.
+The AutoHotkey script this ports is the paper script from
+https://code.processoverprofit.blog/docs/youtube-code/video-14-kalshi-v5/
+It is written for Nightshark, a paid Windows host, build July 27, 2026
+or newer. Log, LogStream, HttpGet, GetKalshiPrice and stopCode are
+Nightshark runtime calls. They are not required.
+
+The same page ships a live script with a different entry range
+(0.80–0.93) and a -200 balance stop. This module does not place orders
+and does not implement that script.
 
 This module runs the same rules against Kalshi's public market-data API
 and a public spot print (Coinbase, Kraken if Coinbase fails). It places no

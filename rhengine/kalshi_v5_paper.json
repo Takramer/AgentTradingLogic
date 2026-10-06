@@ -1,5 +1,5 @@
 {
-  "_note": "Paper verification of the Kalshi v5 15-minute script. Read by: py -m rhengine.kalshi_paper. No Nightshark account and no Kalshi API key. This process never places an order. Restarting starts a new $initialBalance account; the jsonl log is append-only.",
+  "_note": "Paper script from https://code.processoverprofit.blog/docs/youtube-code/video-14-kalshi-v5/ (not the live script on that page: live uses EntryRange [0.80, 0.93] and Daily_Loss_Target -200). Read by: py -m rhengine.kalshi_paper. No Nightshark account and no Kalshi API key. This process never places an order. Restarting starts a new $initialBalance account; the jsonl log is append-only.",
   "initialBalance": 1000,
   "timeDelay": 8,
   "EntryRange": [0.75, 0.85],

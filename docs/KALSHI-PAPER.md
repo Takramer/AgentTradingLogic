@@ -2,6 +2,22 @@
 
 Nightshark is paid. You do not need it to paper-trade this script.
 
+The rules are the **paper** script on
+[Video 14: Kalshi Trading Bot v5](https://code.processoverprofit.blog/docs/youtube-code/video-14-kalshi-v5/).
+That page also ships a **live** script. This runner does not. The live
+script places orders, and its settings are not the paper settings:
+
+| | Paper (this runner) | Live (that page, not built here) |
+|---|---|---|
+| Entry range | 0.75–0.85 | 0.80–0.93 |
+| Daily loss | -600, paper account | -200, Kalshi balance change |
+| Orders | none | real Kalshi orders |
+
+The original scripts need Nightshark dated **July 27, 2026** or newer.
+An older Nightshark install will not run them. Re-download from the
+Nightshark site if you want the AutoHotkey host. The live script also
+needs an API key file and a private key file inside that host.
+
 ```bash
 py -m rhengine.kalshi_paper --once
 py -m rhengine.kalshi_paper
