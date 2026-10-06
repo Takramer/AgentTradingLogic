@@ -124,7 +124,7 @@ through `rhengine/viz.py`.
 
 `test_adapters`, `test_alpha_pit` (incl. `test_universe_is_point_in_time`),
 `test_alpha_stack`, `test_backfill`, `test_engine`, `test_finnhub`, `test_gates`,
-`test_kalshi_paper`, `test_pit_universe`, `test_residmom_horizon`, `test_sim`,
+`test_kalshi_backtest`, `test_kalshi_paper`, `test_pit_universe`, `test_residmom_horizon`, `test_sim`,
 `test_sleeves` (29), `test_strategy_status`.
 
 If golden vectors fail, the engine drifted. Regenerate with `py gen_fixtures.py`
@@ -134,4 +134,6 @@ If golden vectors fail, the engine drifted. Regenerate with `py gen_fixtures.py`
 
 Paper verification of the Nightshark 15-minute script. Public market data,
 local cash account, no orders, no API key. Not a performance source.
-See [KALSHI-PAPER.md](KALSHI-PAPER.md).
+`rhengine/kalshi_backtest.py` replays those rules on KXBTC15M minute bars
+(30/90/180 days). The cache is `research_data/kalshi_paper/hist/` and is
+not committed. See [KALSHI-PAPER.md](KALSHI-PAPER.md).

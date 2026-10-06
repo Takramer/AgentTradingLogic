@@ -174,6 +174,7 @@ py -m rhengine.alpha.buywrite                         # does selling premium pay
 # Docs: docs/KALSHI-PAPER.md. The log is not a book.py number.
 py -m rhengine.kalshi_paper --once
 py -m rhengine.kalshi_paper
+py -m rhengine.kalshi_backtest   # 30/90/180-day minute-bar replay, also not book.py
 ```
 
 ## Skills

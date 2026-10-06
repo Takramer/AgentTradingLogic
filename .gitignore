@@ -42,6 +42,6 @@ research_data/external/*/*.xlsx
 # Throwaway backups taken before a --force refresh.
 research_data/*.bak-*
 
-# Live paper session from rhengine/kalshi_paper.py. Append-only log plus
-# the status file the loop rewrites. Not a result.
+# Live paper session from rhengine/kalshi_paper.py, plus the minute-bar
+# replay cache from rhengine/kalshi_backtest.py. Not a result.
 research_data/kalshi_paper/

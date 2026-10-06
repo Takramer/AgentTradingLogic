@@ -102,3 +102,47 @@ running it: the rules were supplied, not searched for.
 
 `equity` marks open and unsettled contracts. `cash` does not, until the
 result is in. Read equity while something is pending.
+
+## Replay
+
+```bash
+py -m rhengine.kalshi_backtest
+py -m rhengine.kalshi_backtest --offline
+```
+
+The first command downloads settled `KXBTC15M` minute bars into
+`research_data/kalshi_paper/hist/` (not committed) and replays the paper
+rules. `--offline` reruns the arithmetic on that cache. No orders.
+
+The live settled list starts **2026-07-31**. Contracts older than the
+**2026-08-07** historical cutoff are on `/historical/markets`. That
+archive is the same "BTC price up in next 15 mins?" series and goes back
+to **2025-12-10**. Paging only the live list makes 3 months and 6 months
+look empty. They are not.
+
+Windows are 30, 90, and 180 days, ending at the latest settled close in
+the cache. Those are the 1-month, 3-month, and 6-month rows. Each window
+is a fresh $1000 account. `kill on` is the script: the process stops once
+flat PnL is above +400 or below -600, compared in cents. `kill off` is
+the same rules with that stop removed, so one early halt does not hide
+the rest of the window.
+
+Minute bars are not the 700ms poll. Exits start the minute after entry.
+The replay assumes the process was already watching when the window
+opened.
+
+| Mode | What it books |
+|---|---|
+| `close` | The minute-end ask. Enter only when that close is inside 0.75–0.85. Stop only when a later close is below 0.40. A take-profit minute is booked at that close, which can be past fill+0.10 |
+| `touch` | Enter when the repaired high/low overlaps the band, at the highest price inside it. Take profit at the target. A stop needs the minute to finish below 0.40, filled at that close, so a crash is booked at the low close. A dip that recovers before the minute ends is kept |
+
+Empty-book prints of 0 and 1 are repaired when the close is a real price.
+A close that itself prints 0.00 or 1.00 is kept. `Delta` is 0. The check
+passes when `floor_strike` is present. The Coinbase path is not rebuilt.
+A contract with no strike does not enter. Fees are off, same as the script.
+
+The cash in the table is this replay. It is not an `rhengine.alpha.book`
+result. No Sharpe, no t-stat. One trial was logged before the run,
+family `kalshi-v5`, the three windows together, outcome inconclusive.
+The rules were supplied. The trial is the decision to measure these
+windows, not a search.
