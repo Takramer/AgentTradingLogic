@@ -9,6 +9,15 @@ import struct
 import unittest
 from datetime import datetime, timezone
 
+from polymarket_paper.backtest import (
+    completed_starts,
+    format_report,
+    naive_t,
+    parse_gamma_batch,
+    parse_history,
+    replay_window,
+    summarize_horizon,
+)
 from polymarket_paper.bot import PaperBot
 from polymarket_paper.market import (
     MarketFeed,
@@ -375,6 +384,175 @@ class BotTests(unittest.TestCase):
         restored = PaperBot.from_state(settings, feed, json.loads(json.dumps(bot.export_state())))
         self.assertEqual(restored.books["BTC"].position.side, "UP")
         self.assertAlmostEqual(restored.account.balance, bot.account.balance, places=6)
+
+
+class ReplayTests(unittest.TestCase):
+    def test_take_profit_fills_at_the_sample(self):
+        result = replay_window(
+            [(60, 0.50), (120, 0.70), (180, 0.85)],
+            start=0, end=900, up_won=False, settings=_settings(),
+        )
+        self.assertEqual(result.side, "UP")
+        self.assertEqual(result.entry, 0.70)
+        self.assertEqual(result.reason, "take_profit")
+        self.assertEqual(result.bot_exit, 0.85)
+        self.assertEqual(result.paid_exit, 0.85)
+        self.assertEqual(result.bot_pnl, 0.75)
+
+    def test_stop_fills_at_the_sample(self):
+        result = replay_window(
+            [(120, 0.70), (180, 0.30)],
+            start=0, end=900, up_won=True, settings=_settings(),
+        )
+        self.assertEqual(result.reason, "stop")
+        self.assertEqual(result.bot_exit, 0.30)
+        self.assertEqual(result.paid_exit, 0.30)
+        self.assertEqual(result.bot_pnl, -2.0)
+
+    def test_down_side_stops_when_up_rises(self):
+        result = replay_window(
+            [(120, 0.30), (180, 0.75)],
+            start=0, end=900, up_won=True, settings=_settings(),
+        )
+        self.assertEqual(result.side, "DOWN")
+        self.assertEqual(result.entry, 0.70)
+        self.assertEqual(result.reason, "stop")
+        self.assertEqual(result.bot_exit, 0.25)
+
+    def test_flat_when_neither_side_enters_the_band(self):
+        result = replay_window(
+            [(120, 0.50), (200, 0.55), (400, 0.45)],
+            start=0, end=900, up_won=True, settings=_settings(),
+        )
+        self.assertEqual(result.status, "flat")
+        self.assertIsNone(result.side)
+
+    def test_hold_bot_and_official_can_disagree(self):
+        agree = replay_window(
+            [(120, 0.70), (200, 0.65)],
+            start=0, end=900, up_won=True, settings=_settings(),
+        )
+        disagree = replay_window(
+            [(120, 0.70), (200, 0.65)],
+            start=0, end=900, up_won=False, settings=_settings(),
+        )
+        self.assertEqual(agree.reason, "held")
+        self.assertEqual(agree.bot_exit, 1.0)
+        self.assertEqual(agree.paid_exit, 1.0)
+        self.assertEqual(agree.bot_pnl, 1.5)
+        self.assertEqual(disagree.bot_exit, 1.0)
+        self.assertEqual(disagree.paid_exit, 0.0)
+        self.assertEqual(disagree.paid_pnl, -3.5)
+
+    def test_no_entry_in_the_last_30_seconds(self):
+        result = replay_window(
+            [(880, 0.70)],
+            start=0, end=900, up_won=True, settings=_settings(),
+        )
+        self.assertEqual(result.status, "flat")
+        self.assertIsNone(result.side)
+
+    def test_stop_inside_the_last_30_seconds_is_ignored(self):
+        result = replay_window(
+            [(120, 0.70), (880, 0.10)],
+            start=0, end=900, up_won=False, settings=_settings(),
+        )
+        self.assertEqual(result.reason, "held")
+        self.assertEqual(result.bot_exit, 1.0)
+        self.assertEqual(result.paid_exit, 0.0)
+
+    def test_time_delay_skips_early_prints(self):
+        result = replay_window(
+            [(60, 0.70), (700, 0.72)],
+            start=0, end=900, up_won=True, settings=_settings(timeDelay=5),
+        )
+        self.assertEqual(result.entry_ts, 700)
+        self.assertEqual(result.entry, 0.72)
+
+    def test_stop_is_strict_at_the_exit_price(self):
+        result = replay_window(
+            [(120, 0.70), (180, 0.40)],
+            start=0, end=900, up_won=True, settings=_settings(),
+        )
+        self.assertEqual(result.reason, "held")
+        self.assertEqual(result.bot_exit, 0.0)
+        self.assertEqual(result.paid_exit, 1.0)
+
+    def test_completed_starts_drop_the_open_window(self):
+        self.assertEqual(completed_starts(1800, 2, 900), [0, 900])
+        self.assertEqual(completed_starts(1800.5, 2, 900), [0, 900])
+        self.assertEqual(completed_starts(1799, 2, 900), [-900, 0])
+
+    def test_parsers_read_gamma_strings_and_history(self):
+        body = [{
+            "slug": "btc-updown-15m-1",
+            "closed": True,
+            "outcomes": "[\"Up\", \"Down\"]",
+            "clobTokenIds": "[\"111\", \"222\"]",
+            "outcomePrices": "[\"0\", \"1\"]",
+        }]
+        rows = parse_gamma_batch(body)
+        self.assertEqual(rows["btc-updown-15m-1"]["up_token"], "111")
+        self.assertIs(rows["btc-updown-15m-1"]["up_won"], False)
+        points = parse_history({
+            "history": [{"t": 100, "p": "0.7"}, {"t": 1_600_000_000_000, "p": 0.2}],
+        })
+        self.assertEqual(points[0], (100, 0.7))
+        self.assertEqual(points[1][0], 1_600_000_000)
+
+    def test_naive_t_uses_the_sample_standard_deviation(self):
+        self.assertAlmostEqual(naive_t([1, 1, 1, 3]), 3.0)
+        self.assertIsNone(naive_t([1, 1, 1, 1]))
+
+    def test_summary_splits_bot_and_paid_and_halts(self):
+        settings = _settings()
+        took = replay_window(
+            [(120, 0.70), (180, 0.85)],
+            start=0, end=900, up_won=True, settings=settings,
+        )
+        held = replay_window(
+            [(120, 0.70), (200, 0.65)],
+            start=0, end=900, up_won=False, settings=settings,
+        )
+        held.start = 900
+        summary = summarize_horizon(
+            [
+                {"start": 0, "missing": False, "points": 2, "replay": took},
+                {"start": 900, "missing": False, "points": 2, "replay": held},
+                {"start": 1800, "missing": True, "points": 0, "replay": None},
+            ],
+            settings=settings, days=1, label="test",
+        )
+        self.assertEqual(summary["trades"], 2)
+        self.assertEqual(summary["missing"], 1)
+        self.assertEqual(summary["flat"], 0)
+        self.assertEqual(summary["hold_disagree"], 1)
+        self.assertAlmostEqual(summary["bot"]["pnl_sum"], 2.25)
+        self.assertAlmostEqual(summary["paid"]["pnl_sum"], -2.75)
+        self.assertFalse(summary["bot"]["halted"])
+        text = format_report({
+            "asset": "BTC",
+            "timeframe": "15M",
+            "entry_min": 0.60,
+            "entry_max": 0.80,
+            "exit": 0.40,
+            "take_profit": 0.10,
+            "order_size": 5,
+            "initial_balance": 1000,
+            "fetch_errors": 0,
+            "horizons": [summary],
+        })
+        self.assertIn("Not a book.py result", text)
+
+        broke = _settings(initialBalance=1)
+        halted = summarize_horizon(
+            [{"start": 0, "missing": False, "points": 2, "replay": took}],
+            settings=broke, days=1, label="halt",
+        )
+        self.assertTrue(halted["bot"]["halted"])
+        self.assertEqual(halted["bot"]["filled"], 0)
+        self.assertEqual(halted["bot"]["final_balance"], 1)
+        self.assertEqual(halted["bot"]["pnl_sum"], 0.75)
 
 
 class FrameLengthTests(unittest.TestCase):

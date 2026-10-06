@@ -104,6 +104,15 @@ equity minus the starting balance.
 `Delta` is in the underlying's own units (dollars for BTC), not a percent.
 The shipped value is 0, so any live print is enough.
 
+## Replay
+
+`python3 -m polymarket_paper.backtest`
+
+Replays the shipped rule on public CLOB history and prints the 1-month,
+3-month, and 6-month slices together. Cache lands in `polymarket_paper/cache/`.
+The write-up is `polymarket_paper/REPLAY.md`. A number there is this paper
+rule on minute prints. It is not a `book.py` result.
+
 ## Tests
 
 `python3 -m unittest tests.test_polymarket_paper`
