@@ -1,0 +1,16 @@
+{
+  "initialBalance": 1000,
+  "assets": ["BTC"],
+  "TimeFrame": "15M",
+  "timeDelay": 15,
+  "EntryRange": [0.60, 0.80],
+  "Exit": 0.40,
+  "TakeProfitPts": 0.10,
+  "Delta": 0,
+  "orderSize": 5,
+  "pollIntervalMs": 600,
+  "pollJitterMaxMs": 600,
+  "marketRefreshMs": 3000,
+  "polymarketHttpTimeoutMs": 2000,
+  "feedMaxAgeMs": 60000
+}
