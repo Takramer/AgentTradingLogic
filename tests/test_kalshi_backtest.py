@@ -192,6 +192,34 @@ class TestReplay(unittest.TestCase):
         self.assertEqual(out["trade"]["reason"], "settlement")
         self.assertEqual(out["trade"]["exit"], 1.0)
 
+    def test_a_level_stop_fills_at_the_exit_unless_the_bar_opens_through_it(self):
+        bars = [
+            candle(6, flat(0.80)),
+            candle(5, (0.70, 0.70, 0.10, 0.15)),
+        ]
+        out = bt.replay_market(mkt(), bars, cfg(), "touch", stop_fill="level")
+        self.assertEqual(out["trade"]["reason"], "stop")
+        self.assertEqual(out["trade"]["exit"], 0.40)
+        gapped = bt.replay_market(
+            mkt(),
+            [candle(6, flat(0.80)), candle(5, (0.20, 0.20, 0.10, 0.15))],
+            cfg(), "touch", stop_fill="level")
+        self.assertEqual(gapped["trade"]["exit"], 0.20)
+
+    def test_side_filter_skips_the_other_side(self):
+        bid = flat(0.20)  # DOWN close 0.80, UP close 0.10
+        bars = [candle(5, flat(0.10), bid)]
+        down = bt.replay_market(mkt(result="no"), bars, cfg(), "close", sides=("DOWN",))
+        up = bt.replay_market(mkt(result="no"), bars, cfg(), "close", sides=("UP",))
+        self.assertEqual(down["trade"]["side"], "DOWN")
+        self.assertIsNone(up["trade"])
+
+    def test_trade_records_minutes_left_and_the_settlement_counterfactual(self):
+        out = one([candle(5, flat(0.80))], "close", result="yes")
+        self.assertEqual(out["trade"]["minutes_left"], 5)
+        self.assertEqual(out["trade"]["settle"], 1.0)
+        self.assertAlmostEqual(out["trade"]["settle_pnl"], 0.20)
+
     def test_a_crash_that_closes_below_the_exit_fills_at_the_close(self):
         bars = [
             candle(6, flat(0.80)),

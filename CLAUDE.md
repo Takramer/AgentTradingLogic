@@ -175,6 +175,7 @@ py -m rhengine.alpha.buywrite                         # does selling premium pay
 py -m rhengine.kalshi_paper --once
 py -m rhengine.kalshi_paper
 py -m rhengine.kalshi_backtest   # 30/90/180-day minute-bar replay, also not book.py
+py -m rhengine.kalshi_audit      # why that replay loses; pre-registered variants only
 ```
 
 ## Skills

@@ -251,19 +251,29 @@ def entry_quotes(up, down, cfg, mode):
     return _touch_fill(up, cfg), _touch_fill(down, cfg)
 
 
-def exit_signal(ohlc, entry, cfg, mode):
-    """Return (reason, price) or (None, None). Does not run on the entry bar."""
+def exit_signal(ohlc, entry, cfg, mode, stop_fill="path"):
+    """Return (reason, price) or (None, None). Does not run on the entry bar.
+
+    stop_fill "path" sells at the minute's own price. "level" sells at Exit
+    when the bar did not open already through the stop. That second fill is
+    a sensitivity for the one-second ping. It is not the published replay.
+    """
+    if stop_fill not in ("path", "level"):
+        raise ValueError("stop_fill must be path or level, got {!r}".format(stop_fill))
     open_, high, low, close = ohlc
     target = round(float(entry) + float(cfg.take_profit_pts), 4)
     level = float(cfg.exit)
+
+    def stop_px():
+        if open_ is not None and open_ < level:
+            return open_
+        if stop_fill == "level":
+            return level
+        return close
+
     if mode == "close":
         stop_hit = close is not None and close < level
         tp_hit = target <= 1 and close is not None and close >= target
-
-        def stop_px():
-            if open_ is not None and open_ < level:
-                return open_
-            return close
 
         def tp_px():
             return close
@@ -272,11 +282,6 @@ def exit_signal(ohlc, entry, cfg, mode):
             low is not None and close is not None
             and low < level and close < level)
         tp_hit = target <= 1 and high is not None and high >= target
-
-        def stop_px():
-            if open_ is not None and open_ < level:
-                return open_
-            return close
 
         def tp_px():
             if open_ is not None and open_ >= target:
@@ -309,9 +314,9 @@ def settlement_price(side, result):
     return 1.0 if won else 0.0
 
 
-def _trade(market, side, entry, exit_px, reason, size):
+def _trade(market, side, entry, exit_px, reason, size, minutes_left=None):
     pnl = (float(exit_px) - float(entry)) * float(size)
-    return {
+    trade = {
         "ticker": market.get("ticker"),
         "side": side,
         "entry": float(entry),
@@ -320,9 +325,22 @@ def _trade(market, side, entry, exit_px, reason, size):
         "reason": reason,
         "close_time": market.get("close_time"),
     }
+    if minutes_left is not None:
+        trade["minutes_left"] = float(minutes_left)
+    return trade
 
 
-def replay_market(market, candlesticks, cfg, mode):
+def _with_settlement(trade, market, entry, size):
+    settle = settlement_price(trade["side"], market.get("result"))
+    trade["settle"] = settle
+    if settle is None:
+        trade["settle_pnl"] = None
+    else:
+        trade["settle_pnl"] = (float(settle) - float(entry)) * float(size)
+    return trade
+
+
+def replay_market(market, candlesticks, cfg, mode, sides=("UP", "DOWN"), stop_fill="path"):
     """One 15-minute contract. covered is False when no usable bar survived."""
     close_ts = market.get("close_ts")
     if close_ts is None:
@@ -348,32 +366,42 @@ def replay_market(market, candlesticks, cfg, mode):
     if close_ts is None:
         return out
     delta = delta_value(market, cfg)
+    allowed = set(sides)
     side = None
     entry = None
+    entry_mins = None
+    size = cfg.order_size
     for _end, mins, up, down in bars:
         if side is None:
             if not (mins > 0 and mins <= float(cfg.time_delay) + 1e-9):
                 continue
             up_px, down_px = entry_quotes(up, down, cfg, mode)
+            if "UP" not in allowed:
+                up_px = None
+            if "DOWN" not in allowed:
+                down_px = None
             picked, price, _reason = choose_side(
                 up_px, down_px, cfg.entry_min, cfg.entry_max, delta, cfg.delta)
             if picked is None:
                 continue
-            side, entry = picked, price
+            side, entry, entry_mins = picked, price, mins
             continue
         ohlc = up if side == "UP" else down
-        reason, exit_px = exit_signal(ohlc, entry, cfg, mode)
+        reason, exit_px = exit_signal(ohlc, entry, cfg, mode, stop_fill=stop_fill)
         if reason is None:
             continue
-        out["trade"] = _trade(market, side, entry, exit_px, reason, cfg.order_size)
+        out["trade"] = _with_settlement(
+            _trade(market, side, entry, exit_px, reason, size, entry_mins),
+            market, entry, size)
         return out
     if side is not None:
         exit_px = settlement_price(side, market.get("result"))
         if exit_px is None:
             out["unresolved"] = True
             return out
-        out["trade"] = _trade(
-            market, side, entry, exit_px, "settlement", cfg.order_size)
+        out["trade"] = _with_settlement(
+            _trade(market, side, entry, exit_px, "settlement", size, entry_mins),
+            market, entry, size)
     return out
 
 
@@ -389,7 +417,7 @@ def daily_halt(pnl, cfg):
     return None
 
 
-def replay_book(markets, candles_for, cfg, mode, kill):
+def replay_book(markets, candles_for, cfg, mode, kill, sides=("UP", "DOWN"), stop_fill="path"):
     """Fresh account. markets are slim dicts with close_ts. kill stops the process."""
     rows = sorted(markets, key=lambda m: (m["close_ts"], m.get("ticker") or ""))
     balance = float(cfg.initial_balance)
@@ -412,7 +440,8 @@ def replay_book(markets, candles_for, cfg, mode, kill):
             missing += 1
             prepared.append(None)
             continue
-        outcome = replay_market(market, candles, cfg, mode)
+        outcome = replay_market(
+            market, candles, cfg, mode, sides=sides, stop_fill=stop_fill)
         if outcome["covered"]:
             with_bars += 1
         prepared.append(outcome)
