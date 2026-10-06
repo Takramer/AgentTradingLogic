@@ -10,6 +10,10 @@ same code path:
 | universe | live/whole-market scan | point-in-time S&P 500 |
 | status | shipped to two apps, **numbers not re-established after the 2026-07-24 audit** | the only place performance claims may come from |
 
+`polymarket_paper/` is a third space, walled off from both stacks: a paper
+account for the public Nightshark crypto up/down rule. Research numbers
+still come only from `rhengine/alpha/book.py`.
+
 The engine is shared by **RobinhoodAgent** (autonomous Python) and **Nydex**
 (React). Engine-only: no order planning, no orchestration, no ML.
 

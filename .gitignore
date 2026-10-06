@@ -10,6 +10,9 @@ yahoo_cache/
 *.egg-info/
 kalshi_cache/
 polymarket_cache/
+polymarket_paper/state.json
+polymarket_paper/state.json.tmp
+polymarket_paper/paper.log
 fred_cache/
 av_cache/
 finnhub_cache/

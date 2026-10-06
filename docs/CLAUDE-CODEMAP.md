@@ -120,12 +120,19 @@ ASCII-only so headless execution is safe. Each caches its trades CSV under
 `tests/results/` and recomputes only when its `REFRESH` flag is `True`. All draw
 through `rhengine/viz.py`.
 
-## F. Tests — `tests/`
+## F. Polymarket paper — `polymarket_paper/`
+
+Separate from both stacks. Paper account for the public Nightshark crypto
+up/down rule (`config.json` holds the video defaults). Orders stay unsent.
+A balance in `state.json` is a paper mark, and research numbers still come
+from `book.py`. Tests: `tests/test_polymarket_paper.py`.
+
+## G. Tests — `tests/`
 
 `test_adapters`, `test_alpha_pit` (incl. `test_universe_is_point_in_time`),
 `test_alpha_stack`, `test_backfill`, `test_engine`, `test_finnhub`, `test_gates`,
 `test_pit_universe`, `test_residmom_horizon`, `test_sim`, `test_sleeves` (29),
-`test_strategy_status`.
+`test_strategy_status`, `test_polymarket_paper`.
 
 If golden vectors fail, the engine drifted. Regenerate with `py gen_fixtures.py`
 **only** after a deliberate change, and review the fixture diff.
