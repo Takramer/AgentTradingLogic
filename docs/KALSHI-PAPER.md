@@ -178,3 +178,110 @@ This cash is the replay. It is not an `rhengine.alpha.book` result. No
 Sharpe, no t-stat. The `kalshi-v5` trial logged before the run stays
 inconclusive. The rules were supplied. The trial is the decision to
 measure these three windows together, not a search.
+
+## Why touch mode loses
+
+```bash
+py -m rhengine.kalshi_audit
+```
+
+Touch mode over the frozen 180 days, 2026-04-09T21:15:00Z through
+2026-10-06T21:15:00Z, is the published-rules row: 14,915 trades, win rate
+79.4%, average win +0.100, average loss −0.562, cash −536.07. That payoff
+needs an 84.9% win rate to break even. It is short by 5.4 points, which
+is −3.6 cents a trade.
+
+The entry causes it. Touch mode buys the highest price inside 0.75–0.85.
+The mean fill is 0.819, and 6,969 of the 14,915 fills are at the 0.85 cap.
+Those same contracts settle in your favor 78.4% of the time. A contract
+bought at 0.819 has to win 81.9% of the time to be worth what you paid.
+Holding every one of those entries to $1 or $0 loses **$518.50**. The
+take-profit and the stop together lose **$536.07**. The exit adds about
+$18. It is not the source of the loss.
+
+The cheap end of the band is the worst buy. The expensive end is where
+most of the fills land, and it is still short of the price.
+
+| Fill | Trades | Mean price | Settles as a win | Shortfall | Trade PnL |
+|---|---:|---:|---:|---:|---:|
+| 0.75–0.78 | 2646 | 0.758 | 68.7% | 7.1 cents | −195.85 |
+| 0.78–0.82 | 3103 | 0.795 | 74.2% | 5.3 cents | −187.24 |
+| 0.82–0.85 | 9166 | 0.845 | 82.7% | 1.8 cents | −152.98 |
+
+Stops are 3,067 trades and −$1,723.70. Held to settlement those same
+stops would have been −$1,765.21, and 23.4% of them would have won.
+Take-profits are 11,848 trades and +$1,187.63. Held to settlement they
+would have been +$1,246.71, and 92.7% of them would have won. The
+10-cent cap gives up about $59 of settlement value. The stop, filled at
+the minute close after the break, saves about $41 versus settling at 0.
+Net, the exit is a small drag on a bad purchase.
+
+The minute-close stop fill makes the dollar loss look larger than a
+one-second ping would. Selling at 0.40 when the bar did not open already
+through the stop loses $42.24 on the first half and $31.47 on the second
+half, about $74 together. That row is a fill sensitivity. It is still a
+loss. Resampling the 181 calendar days, the touch-mode −536.07 has a
+band of −601.31 to −471.35. One bad day does not carry it.
+
+Close mode is a different set of entries: it buys only when the minute
+ends inside the band, at a mean price of 0.800. Those entries, held to
+settlement, make +$51.68. The close-mode account makes +$62.39 because
+the take-profit is booked at the minute close (average win +0.141, not
++0.100). Its day-block band is +2.39 to +121.70, which includes a result
+next to zero. The win rate is 81.1% against an 80.3% breakeven.
+
+`KXBTC15M` is fee type `quadratic` with multiplier 1. The general schedule
+is `round up(0.07 × C × P × (1−P))` to the next cent. One contract at
+0.80 is 0.0112, which rounds up to 0.02. There is no settlement fee.
+Charging that taker fee on entry and on the exit takes the touch account
+from −536.07 to **−922.37** (day-block band −988.46 to −854.97) and the
+close account from +62.39 to **−247.02** (band −307.06 to −187.58). A
+resting take-profit on this series is not charged, because the fee type
+is `quadratic` and not `quadratic_with_maker_fees`. Leaving the
+take-profit uncharged and still charging the entry and the stop leaves
+touch at −803.89 and close at −162.30.
+
+## What was tried
+
+Eight rule changes were logged before they ran, plus the fee row and the
+stop-at-0.40 row. The screen is 2026-04-09 to 2026-07-08. The confirm
+half is 2026-07-08 to 2026-10-06, which is the 90-day touch row already
+printed above (−263.39). A variant had to beat the published touch rules
+on both halves, with at least 100 trades on each. Beating the baseline
+was not enough to edit `kalshi_v5_paper.json`. That file is the published
+script. Every variant that beat it was still a loss on both halves, so
+none of them was installed.
+
+| Variant | Apr 9–Jul 8 | Jul 8–Oct 6 | Result |
+|---|---:|---:|---|
+| Published touch rules | −272.68 / 7310 | −263.39 / 7605 | baseline, halves sum to −536.07 |
+| Hold to settlement | −280.21 / 7310 | −238.29 / 7605 | rejected, screen was worse |
+| Drop the stop, keep the take-profit | −294.45 / 7310 | −238.34 / 7605 | rejected, screen was worse |
+| Drop the take-profit, keep the stop | −235.81 / 7310 | −249.10 / 7605 | loses less, still about −485, not installed |
+| Band 0.75–0.80 only | −163.25 / 6783 | −155.78 / 7104 | −2.4 then −2.2 cents a trade, still a loss, not installed |
+| Band 0.80–0.85 only | −173.83 / 7298 | −180.63 / 7580 | −2.4 cents a trade on both halves, not installed |
+| Last 3 minutes only | −188.64 / 4065 | −236.14 / 4479 | −4.6 then −5.3 cents a trade, worse than the baseline's −3.7 / −3.5, not installed |
+| UP only | −233.92 / 4600 | −222.30 / 4733 | fewer bets, worse per trade than the baseline, not installed |
+| DOWN only | −174.30 / 4595 | −199.61 / 4796 | fewer bets, about the same per trade, not installed |
+| Stop filled at 0.40 unless the bar gaps | −42.24 / 7310 | −31.47 / 7605 | sensitivity, still a loss |
+
+Holding to settlement and dropping the stop both lost more on the screen
+half than the published rules. The loss is already in the purchase.
+Removing the 10-cent cap keeps the same trades and gives back a little of
+the tail to $1. It does not make the purchase worth the price. Restricting
+the band lowers the price touch mode is willing to pay, and the account
+is still down on both halves. Cutting the clock to 3 minutes, or trading
+one side, shrinks the dollar loss by placing fewer negative bets.
+
+Third-party Kalshi backtesters (a price-range engine, and a binary
+backtester with a fee model and a Brier score) want either a book
+snapshot or a settlement path. This cache is one-minute bid/ask bars.
+The two fills and the stop-at-0.40 row are the bracket those bars can
+support. No outside project was imported. The fee numbers use Kalshi's
+series record and the general quadratic schedule, checked in
+`tests/test_kalshi_audit.py` against the published one-contract and
+100-contract table.
+
+The eight rule trials and the two sensitivities are resolved in
+`research_data/trials.jsonl` as rejections or inconclusive measurements.
+None is kept. No Sharpe, no t-stat. This remains a paper account.

@@ -7,6 +7,7 @@ from rhengine.kalshi_audit import (
     eligible,
     kalshi_quadratic_fee,
     payoff,
+    render_variants,
     trade_fees,
 )
 
@@ -44,6 +45,21 @@ class TestPayoff(unittest.TestCase):
         self.assertAlmostEqual(stats["breakeven_win_rate"], 0.55 / 0.65)
         self.assertLess(stats["gap"], 0)
         self.assertAlmostEqual(stats["pnl"], 80 * 0.10 + 20 * -0.55)
+
+    def test_a_loss_that_beats_the_baseline_is_not_labeled_as_a_promotion(self):
+        text = render_variants([{
+            "label": "published rules",
+            "screen_pnl": -10, "screen_trades": 200,
+            "confirm_pnl": -10, "confirm_trades": 200,
+            "eligible": False, "sensitivity": False,
+        }, {
+            "label": "lower band",
+            "screen_pnl": -4, "screen_trades": 200,
+            "confirm_pnl": -3, "confirm_trades": 200,
+            "eligible": True, "sensitivity": False,
+        }])
+        self.assertIn("beats baseline, still a loss", text)
+        self.assertNotIn("ELIGIBLE", text)
 
     def test_a_variant_must_beat_both_halves_and_have_a_hundred_trades(self):
         self.assertTrue(eligible(-10, -20, 200, 200, -30, -40))

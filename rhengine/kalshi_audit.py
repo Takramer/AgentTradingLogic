@@ -389,8 +389,10 @@ def render_variants(rows):
             gate = "sensitivity"
         elif row["label"] == "published rules":
             gate = "baseline"
+        elif row["eligible"] and row["screen_pnl"] < 0 and row["confirm_pnl"] < 0:
+            gate = "beats baseline, still a loss"
         elif row["eligible"]:
-            gate = "ELIGIBLE"
+            gate = "beats baseline"
         else:
             gate = "rejected"
         lines.append("  {:<56} {:>8} {:>7} {:>8} {:>7}  {}".format(
