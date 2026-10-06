@@ -141,8 +141,40 @@ A close that itself prints 0.00 or 1.00 is kept. `Delta` is 0. The check
 passes when `floor_strike` is present. The Coinbase path is not rebuilt.
 A contract with no strike does not enter. Fees are off, same as the script.
 
-The cash in the table is this replay. It is not an `rhengine.alpha.book`
-result. No Sharpe, no t-stat. One trial was logged before the run,
-family `kalshi-v5`, the three windows together, outcome inconclusive.
-The rules were supplied. The trial is the decision to measure these
-windows, not a search.
+## Replay results
+
+Run on 2026-10-06. Latest settled close in the cache: **2026-10-06T21:15:00Z**.
+Each row starts at $1000, one contract, BTC only. The +400 / -600 stop
+never fired, so the kill-switch account and the no-kill account are the
+same numbers. Touch at 180 days finished at -536.07, still above -600.
+
+| Window | Markets with bars | Mode | Trades | Wins | Losses | Stop | Take profit | Held to settlement | PnL | End cash |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 30d, 2026-09-06 → 2026-10-06 | 2849 / 2849 | close | 1938 | 1596 | 342 | 342 | 1596 | 0 | +25.42 | 1025.42 |
+| 30d, 2026-09-06 → 2026-10-06 | 2849 / 2849 | touch | 2546 | 2023 | 523 | 523 | 2023 | 0 | -87.80 | 912.20 |
+| 90d, 2026-07-08 → 2026-10-06 | 8524 / 8530 | close | 5733 | 4660 | 1073 | 1073 | 4660 | 0 | +36.19 | 1036.19 |
+| 90d, 2026-07-08 → 2026-10-06 | 8524 / 8530 | touch | 7605 | 6046 | 1559 | 1559 | 6046 | 0 | -263.39 | 736.61 |
+| 180d, 2026-04-09 → 2026-10-06 | 17024 / 17032 | close | 11035 | 8952 | 2083 | 2083 | 8952 | 0 | +62.39 | 1062.39 |
+| 180d, 2026-04-09 → 2026-10-06 | 17024 / 17032 | touch | 14915 | 11848 | 3067 | 3067 | 11848 | 0 | -536.07 | 463.93 |
+
+No candle download missed. Five markets in the 90-day window and 25 in
+the 180-day window had no `floor_strike`, so they could not enter. The
+settled list has a weekly gap of about two hours, around 07:00–09:15 UTC.
+The three windows are different market sets. 180 days is inside the
+archive, which starts 2025-12-10.
+
+No trade was held to settlement. After a fill inside 0.75–0.85, a later
+minute went through the take-profit or through 0.40. On the 30-day book
+the close-mode take-profit exited at a median 0.944 (entry median 0.80)
+and the stop exited at a median 0.24. Touch-mode take-profits exited at
+the 0.10 target (median PnL +0.10) and stops exited at a median 0.28.
+That is why close mode's cash is up by tens of dollars and touch mode's
+cash is down by hundreds: close mode is paid the minute-end price after
+the target, and touch mode is paid the minute-end price after the crash.
+The script sells at the first poll that reaches fill+0.10, and its stop
+waits one second. Neither minute-bar fill is that poll.
+
+This cash is the replay. It is not an `rhengine.alpha.book` result. No
+Sharpe, no t-stat. The `kalshi-v5` trial logged before the run stays
+inconclusive. The rules were supplied. The trial is the decision to
+measure these three windows together, not a search.
