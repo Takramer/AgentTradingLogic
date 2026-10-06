@@ -108,8 +108,9 @@ The shipped value is 0, so any live print is enough.
 
 `python3 -m polymarket_paper.backtest`
 
-`python3 -m polymarket_paper.audit` explains that replay and scores the
-follow-ups in `AUDIT.md`. Log them first with `--log-trials`.
+`python3 -m polymarket_paper.audit` explains that replay. The exits turned
+a +508.5525 hold into the -525.1575 loss, and the taker fee is larger than
+the hold edge. The ten follow-ups in `AUDIT.md` all failed the keep rule.
 
 Replays the shipped rule on public CLOB history and prints the 1-month,
 3-month, and 6-month slices together. Cache lands in `polymarket_paper/cache/`.
