@@ -34,6 +34,7 @@ The engine is shared by **RobinhoodAgent** (autonomous Python) and **Nydex**
 | [docs/VIDEO-INTAKE-2026-08-14.md](docs/VIDEO-INTAKE-2026-08-14.md) | 368 more triaged in two batches (agent tooling, LLM-bot content, one FTC-settled day-trading channel, 9 quant curricula). **§Cluster G first**: what a result drawn from N backtests is worth, why the trial ledger exists, and the fact that RMX-B's +2.54 misses its own pre-registered 6-trial Šidák bar of 2.63. Then **§Cluster H** for the 10k/25k/143k sweep series and the trial-correlation correction. Full extraction: `research_data/video_corpus_2026-08-14.tsv` |
 | [docs/VIDEO-INTAKE-2026-08-17.md](docs/VIDEO-INTAKE-2026-08-17.md) | 5 more (394 cumulative). **Read §Gap 1 before quoting any Sharpe**: the 95% CI on this repo's 8-year Sharpe is ±0.5, RMX-B 0.84 / RMX-C 0.85 / SPY 0.90 are not distinguishable, and the Lo (2002) autocorrelation adjustment was built, measured, and found **unusable at n=193** |
 | [docs/REFERENCE-LIBRARIES.md](docs/REFERENCE-LIBRARIES.md) | Anything the repo leans on from outside itself. Part 1: public quant repos for technique + licence terms before you copy (**not evidence**). Part 2: `research_data/external/` — which archive settles which question, and which cannot. Part 3: the core/sim/analysis dependency tiers |
+| [docs/KALSHI-PAPER.md](docs/KALSHI-PAPER.md) | You are paper-verifying the Kalshi 15-minute bot, or asking whether Nightshark is required. It is not. No orders, no API key, and the log is not a `book.py` number |
 
 ## Environment
 
@@ -168,6 +169,11 @@ py -m rhengine.options_spec                           # source corpus + provenan
 py -m rhengine.options_spec --capital 2000            # what the account can hold
 py scripts/fetch_cboe_benchmarks.py                   # ^BXM ^PUT ^SP500TR ^GSPC
 py -m rhengine.alpha.buywrite                         # does selling premium pay?
+
+# Kalshi v5 paper — no Nightshark, no API key, no orders.
+# Docs: docs/KALSHI-PAPER.md. The log is not a book.py number.
+py -m rhengine.kalshi_paper --once
+py -m rhengine.kalshi_paper
 ```
 
 ## Skills

@@ -124,8 +124,14 @@ through `rhengine/viz.py`.
 
 `test_adapters`, `test_alpha_pit` (incl. `test_universe_is_point_in_time`),
 `test_alpha_stack`, `test_backfill`, `test_engine`, `test_finnhub`, `test_gates`,
-`test_pit_universe`, `test_residmom_horizon`, `test_sim`, `test_sleeves` (29),
-`test_strategy_status`.
+`test_kalshi_paper`, `test_pit_universe`, `test_residmom_horizon`, `test_sim`,
+`test_sleeves` (29), `test_strategy_status`.
 
 If golden vectors fail, the engine drifted. Regenerate with `py gen_fixtures.py`
 **only** after a deliberate change, and review the fixture diff.
+
+## G. Kalshi v5 paper — `rhengine/kalshi_paper.py`
+
+Paper verification of the Nightshark 15-minute script. Public market data,
+local cash account, no orders, no API key. Not a performance source.
+See [KALSHI-PAPER.md](KALSHI-PAPER.md).

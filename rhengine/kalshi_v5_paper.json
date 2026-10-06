@@ -1,0 +1,18 @@
+{
+  "_note": "Paper verification of the Kalshi v5 15-minute script. Read by: py -m rhengine.kalshi_paper. No Nightshark account and no Kalshi API key. This process never places an order. Restarting starts a new $initialBalance account; the jsonl log is append-only.",
+  "initialBalance": 1000,
+  "timeDelay": 8,
+  "EntryRange": [0.75, 0.85],
+  "Exit": 0.40,
+  "TakeProfitPts": 0.10,
+  "Delta": 0,
+  "assets": ["BTC"],
+  "orderSize": 1,
+  "Pings": 1,
+  "Daily_Profit_Target": 400,
+  "Daily_Loss_Target": -600,
+  "pollIntervalMs": 700,
+  "pollJitterMaxMs": 250,
+  "marketRefreshMs": 5000,
+  "priceRefreshMs": 1500
+}
