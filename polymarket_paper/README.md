@@ -110,8 +110,9 @@ The shipped value is 0, so any live print is enough.
 
 Replays the shipped rule on public CLOB history and prints the 1-month,
 3-month, and 6-month slices together. Cache lands in `polymarket_paper/cache/`.
-The write-up is `polymarket_paper/REPLAY.md`. A number there is this paper
-rule on minute prints. It is not a `book.py` result.
+The 2026-10-06 record is `polymarket_paper/REPLAY.md`. Six-month paid PnL
+was -525.1575 USDC from a 1000 start. The trial is rejected. Research
+claims stay in `rhengine/alpha/book.py`.
 
 ## Tests
 
