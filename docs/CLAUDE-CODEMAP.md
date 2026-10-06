@@ -126,7 +126,9 @@ Separate from both stacks. Paper account for the public Nightshark crypto
 up/down rule (`config.json` holds the video defaults). Orders stay unsent.
 A balance in `state.json` is a paper mark, and research numbers still come
 from `book.py`. `backtest.py` replays that same rule on public CLOB history.
-`REPLAY.md` records the 1/3/6 month slices. Those numbers are not `book.py`.
+`REPLAY.md` records the 1/3/6 month slices. `audit.py` explains that loss
+and scores the pre-registered follow-ups in `AUDIT.md`. Those numbers are
+not `book.py`.
 Tests: `tests/test_polymarket_paper.py`.
 
 ## G. Tests — `tests/`

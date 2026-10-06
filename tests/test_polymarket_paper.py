@@ -9,7 +9,20 @@ import struct
 import unittest
 from datetime import datetime, timezone
 
+from polymarket_paper.audit import (
+    FEE_LABEL,
+    VARIANTS,
+    block_bootstrap_interval,
+    classify_exit,
+    entry_bucket,
+    net_paid,
+    score_slots,
+    summarize_overlay,
+    taker_fee,
+    trial_labels,
+)
 from polymarket_paper.backtest import (
+    WindowReplay,
     completed_starts,
     format_report,
     naive_t,
@@ -553,6 +566,85 @@ class ReplayTests(unittest.TestCase):
         self.assertEqual(halted["bot"]["filled"], 0)
         self.assertEqual(halted["bot"]["final_balance"], 1)
         self.assertEqual(halted["bot"]["pnl_sum"], 0.75)
+
+
+def _replay_trade(**overrides):
+    fields = dict(
+        status="trade", points=2, start=0, side="UP", entry=0.70,
+        entry_ts=120, exit_ts=180, bot_exit=0.85, paid_exit=0.85,
+        reason="take_profit", bot_pnl=0.75, paid_pnl=0.75,
+    )
+    fields.update(overrides)
+    return WindowReplay(**fields)
+
+
+class AuditTests(unittest.TestCase):
+    def test_crypto_taker_fee_matches_the_published_table(self):
+        self.assertEqual(taker_fee(100, 0.70), 1.47)
+        self.assertEqual(taker_fee(100, 0.50), 1.75)
+        self.assertEqual(taker_fee(5, 0.70), 0.0735)
+        self.assertEqual(taker_fee(0.01, 0.01), 0.0)
+
+    def test_hold_override_does_not_stop_or_take_profit(self):
+        held = replay_window(
+            [(120, 0.70), (180, 0.30)],
+            start=0, end=900, up_won=False, settings=_settings(),
+            stop_price=-1, take_profit_pts=1,
+        )
+        self.assertEqual(held.reason, "held")
+        self.assertEqual(held.paid_exit, 0.0)
+        capped = replay_window(
+            [(120, 0.70), (180, 0.85)],
+            start=0, end=900, up_won=True, settings=_settings(),
+            take_profit_pts=1,
+        )
+        self.assertEqual(capped.reason, "held")
+        self.assertEqual(capped.paid_exit, 1.0)
+
+    def test_exit_overlay_separates_whipsaw_from_a_useful_stop(self):
+        base = [
+            _replay_trade(),
+            _replay_trade(start=900, entry_ts=1020, reason="stop", bot_exit=0.30, paid_exit=0.30, bot_pnl=-2.0, paid_pnl=-2.0),
+        ]
+        hold = [
+            _replay_trade(reason="held", exit_ts=None, bot_exit=1.0, paid_exit=1.0, bot_pnl=1.5, paid_pnl=1.5),
+            _replay_trade(start=900, entry_ts=1020, reason="held", exit_ts=None, bot_exit=0.0, paid_exit=0.0, bot_pnl=-3.5, paid_pnl=-3.5),
+        ]
+        self.assertEqual(classify_exit(base[0], hold[0]), "tp_capped")
+        self.assertEqual(classify_exit(base[1], hold[1]), "stop_helped")
+        summary = summarize_overlay(list(zip(base, hold)), window_seconds=900, size=5)
+        self.assertEqual(summary["cells"]["tp_capped"]["n"], 1)
+        self.assertEqual(summary["cells"]["stop_helped"]["n"], 1)
+        self.assertEqual(summary["paid"], -1.25)
+        self.assertEqual(summary["hold"], -2.0)
+        self.assertEqual(summary["exit_drag"], 0.75)
+        self.assertEqual(entry_bucket(0.80), "0.75-0.80")
+        self.assertEqual(entry_bucket(0.60), "0.60-0.65")
+
+    def test_keep_rule_requires_both_halves_after_fees(self):
+        winner = _replay_trade(paid_pnl=1.0, entry=0.70, paid_exit=0.90, reason="take_profit")
+        loser = _replay_trade(start=1, paid_pnl=-1.0, entry=0.70, paid_exit=0.50, reason="stop")
+        scored = score_slots([winner, loser], size=5, half=1)
+        self.assertLess(scored["net"], scored["paid"])
+        self.assertFalse(scored["kept"])
+        both = score_slots([winner, winner], size=5, half=1)
+        self.assertTrue(both["kept"])
+        self.assertEqual(len(trial_labels()), 10)
+        self.assertEqual(trial_labels()[-1], FEE_LABEL)
+        self.assertEqual(len(VARIANTS), 9)
+
+    def test_day_block_bootstrap_is_exact_when_every_window_matches(self):
+        interval = block_bootstrap_interval([1.0, 1.0, 1.0, 1.0], block=2, draws=20, seed=1)
+        self.assertEqual(interval["lo"], 4.0)
+        self.assertEqual(interval["hi"], 4.0)
+
+    def test_net_paid_charges_entry_and_exit_on_a_take_profit(self):
+        trade = replay_window(
+            [(120, 0.70), (180, 0.85)],
+            start=0, end=900, up_won=False, settings=_settings(),
+        )
+        self.assertEqual(trade.paid_pnl, 0.75)
+        self.assertAlmostEqual(net_paid(trade, 5), 0.75 - 0.0735 - 0.04463, places=6)
 
 
 class FrameLengthTests(unittest.TestCase):
