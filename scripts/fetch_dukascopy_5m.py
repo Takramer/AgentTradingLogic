@@ -45,6 +45,8 @@ def hours(start: datetime, end: datetime):
 
 
 _local = threading.local()
+_backoff_until = 0.0
+_backoff_lock = threading.Lock()
 
 
 def _opener():
@@ -60,9 +62,14 @@ def _opener():
 def fetch_hour(hour: datetime, retries: int = 3):
     """Return (hour, rows, ok). `ok` is False only when every attempt timed out,
     so the caller can leave that hour pending instead of punching a hole."""
+    global _backoff_until
     url = URL.format(y=hour.year, m0=hour.month - 1, d=hour.day, h=hour.hour)
     last = None
     for attempt in range(retries):
+        wait = _backoff_until - time.time()
+        if wait > 0:
+            time.sleep(min(wait, 20))
+        time.sleep(0.25)
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0",
                                                        "Connection": "close"})
@@ -73,8 +80,13 @@ def fetch_hour(hour: datetime, retries: int = 3):
             data = lzma.decompress(raw)
             return hour, bars_from_ticks(hour, data), True
         except urllib.error.HTTPError as e:
-            if e.code in (404, 500, 503):
+            # 404 is a closed hour. 503 is the rate limit; marking it done
+            # punches a hole in a week that actually traded.
+            if e.code == 404:
                 return hour, [], True
+            if e.code == 503:
+                with _backoff_lock:
+                    _backoff_until = time.time() + 15
             last = e
         except Exception as e:  # noqa: BLE001 — network is the failure mode
             last = e
@@ -123,6 +135,9 @@ def main():
     start = datetime.fromisoformat(args.start).replace(tzinfo=timezone.utc)
     end = datetime.fromisoformat(args.end).replace(tzinfo=timezone.utc)
     pending = [h for h in hours(start, end) if h.strftime("%Y-%m-%dT%H") not in done]
+    # Recent years first. A sustained pull gets throttled, and the windows
+    # that end in 2026 are the ones the backtest cannot start without.
+    pending.reverse()
     print(f"pending hours {len(pending)}  already done {len(done)}", flush=True)
     bars_path = OUT / "bars.parquet"
     frames = []

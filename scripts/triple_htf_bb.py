@@ -315,7 +315,7 @@ def _line(name: str, p: Perf, extra: str = "") -> str:
     ci = f"{p.sharpe_ci_lo:+.2f} .. {p.sharpe_ci_hi:+.2f}"
     return (f"{name:<22} {p.total_return_pct:>8.1f}% {p.cagr_pct:>7.2f}% "
             f"{p.vol_ann_pct:>6.1f}% {p.sharpe_monthly:>6.2f} {ci:>18} "
-            f"{p.max_dd_pct:>7.1f}% {p.n_months:>4}{extra}")
+            f"{p.max_dd_pct:>7.1f}% {p.n_days:>5}d {p.n_months:>3}m{extra}")
 
 
 def report_window(label: str, result: RunResult, benches: dict[str, pd.Series]) -> dict:
@@ -347,7 +347,7 @@ def report_window(label: str, result: RunResult, benches: dict[str, pd.Series]) 
 
 def print_block(rows: list[dict]) -> None:
     print(f"{'book':<22} {'total':>9} {'CAGR':>8} {'vol':>7} {'Sh(m)':>6} "
-          f"{'Sharpe 95% CI':>18} {'maxDD':>8} {'mo':>4}")
+          f"{'Sharpe 95% CI':>18} {'maxDD':>8} {'days':>6} {'mo':>4}")
     for row in rows:
         print(_line(row["label"], row["perf"]))
         for name, vs in row["vs"].items():
@@ -364,6 +364,7 @@ def print_block(rows: list[dict]) -> None:
               f"avg R {row['avg_r']:+.2f} gross / {row['avg_r_net']:+.2f} net  "
               f"median hold {row['hold_min']:.0f} min")
         print(f"{'':<22} time in market {row['time']*100:.1f}% of bars  "
+              f"round trips {row['turn']:.0f}/yr  "
               f"one-way turnover {row['turn']*100:.0f}%/yr  "
               f"avg round-trip cost {row['cost_bps']:.1f} bps")
         print()
@@ -549,6 +550,14 @@ def run_instrument(df: pd.DataFrame, name: str, benches_extra: dict[str, pd.Seri
             continue
         if df["close_ny"].max() < start:
             print(f"{name} {label}: data ends before the window. Skipped.")
+            continue
+        inside = df[(df["close_ny"] >= start) & (df["close_ny"] <= end)]
+        if inside.empty or inside["close_ny"].min() > start + pd.Timedelta(days=10):
+            print(f"{name} {label}: bars do not reach {start_s}. Skipped.")
+            continue
+        gap = inside["ts"].sort_values().diff().max()
+        if pd.notna(gap) and gap > pd.Timedelta(days=5):
+            print(f"{name} {label}: a {gap} hole inside the window. Skipped.")
             continue
         res = simulate(df, start, end, long_only=long_only, round_trip_bps=round_trip_bps)
         benches = {"index hold": buy_and_hold(df, start, end)}
