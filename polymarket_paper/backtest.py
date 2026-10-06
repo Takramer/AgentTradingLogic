@@ -208,8 +208,16 @@ def _finish(status, points, start, side, entry, entry_ts, exit_ts, bot_exit, pai
     )
 
 
-def replay_window(points, *, start: int, end: int, up_won, settings, live_delta: float = 0.0) -> WindowReplay:
-    """One window. `points` are (unix_sec, UP price). Empty input is missing."""
+def replay_window(points, *, start: int, end: int, up_won, settings, live_delta: float = 0.0,
+                  stop_price: float | None = None, take_profit_pts: float | None = None) -> WindowReplay:
+    """One window. `points` are (unix_sec, UP price). Empty input is missing.
+
+    `stop_price` and `take_profit_pts` override the shipped knobs for a
+    pre-registered ablation. The default path uses `settings` unchanged.
+    A stop_price below 0 never fires, because contract prices sit in [0, 1].
+    """
+    stop = settings.exit if stop_price is None else float(stop_price)
+    tp_pts = settings.take_profit_pts if take_profit_pts is None else float(take_profit_pts)
     raw = []
     for ts, price in points or []:
         try:
@@ -248,13 +256,13 @@ def replay_window(points, *, start: int, end: int, up_won, settings, live_delta:
             if chosen is None:
                 continue
             side, entry = chosen
-            target = cash(entry + settings.take_profit_pts)
+            target = cash(entry + tp_pts)
             entry_ts = ts
             last_mark = entry
             continue
         current = up if side == "UP" else down
         last_mark = current
-        decision = exit_decision(current, settings.exit, target)
+        decision = exit_decision(current, stop, target)
         if decision is None:
             continue
         return _finish(
