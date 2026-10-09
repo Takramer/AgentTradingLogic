@@ -340,6 +340,89 @@ class KalshiPerpsClient:
         self._not_implemented("get_funding_rate")
 
 
+
+# ------------------------------------------------------------ authenticated ----
+#
+# Kalshi issues no bearer token. Every authenticated request carries an
+# RSA-PSS-SHA256 signature over `timestamp + METHOD + path`, signed with the
+# private half of a key pair whose public half Kalshi holds. The private .pem
+# downloads once at key creation and cannot be re-fetched.
+#
+# Credentials come from secrets.json (gitignored): KALSHI_API_KEY_ID and
+# KALSHI_PRIVATE_KEY_PATH. The .pem itself lives OUTSIDE the repo.
+#
+# Read-only by design. This module signs GETs. Order placement is app-side and
+# stays that way -- see the four executor obligations in docs/GOLIVE-RUNBOOK.md.
+
+def _kalshi_creds():
+    """(key_id, private_key) or (None, None) when not configured."""
+    import json as _json
+    path = _app_path("secrets.json")
+    if not os.path.exists(path):
+        return None, None
+    with open(path, "r", encoding="utf-8") as f:
+        cfg = _json.load(f)
+    key_id = (cfg.get("KALSHI_API_KEY_ID") or "").strip()
+    pem_path = os.path.expanduser((cfg.get("KALSHI_PRIVATE_KEY_PATH") or "").strip())
+    if not key_id or not pem_path or not os.path.exists(pem_path):
+        return None, None
+    from cryptography.hazmat.primitives import serialization
+    with open(pem_path, "rb") as f:
+        return key_id, serialization.load_pem_private_key(f.read(), password=None)
+
+
+def kalshi_signed_headers(method, path, key_id=None, private_key=None):
+    """Headers for one authenticated Kalshi request.
+
+    `path` is the request path WITHOUT the query string -- signing the query
+    too produces a valid-looking signature that Kalshi rejects.
+    """
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.asymmetric import padding
+    if private_key is None:
+        key_id, private_key = _kalshi_creds()
+    if not private_key:
+        raise EnvironmentError(
+            "Kalshi API not configured: set KALSHI_API_KEY_ID and "
+            "KALSHI_PRIVATE_KEY_PATH in secrets.json")
+    ts = str(int(time.time() * 1000))
+    msg = (ts + method.upper() + path).encode("utf-8")
+    sig = private_key.sign(
+        msg,
+        padding.PSS(mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=hashes.SHA256().digest_size),
+        hashes.SHA256())
+    import base64
+    return {"KALSHI-ACCESS-KEY": key_id,
+            "KALSHI-ACCESS-TIMESTAMP": ts,
+            "KALSHI-ACCESS-SIGNATURE": base64.b64encode(sig).decode("ascii"),
+            "Content-Type": "application/json"}
+
+
+def kalshi_auth_get(path, params=None, timeout=20):
+    """Authenticated GET. Read-only: this helper does not do POST or DELETE."""
+    base = KALSHI_HOSTS[0]
+    # The signed path is everything after the host, including /trade-api/v2,
+    # and excludes the query string.
+    from urllib.parse import urlparse
+    signed_path = urlparse(base + path).path
+    headers = kalshi_signed_headers("GET", signed_path)
+    r = requests.get(base + path, params=params, headers=headers, timeout=timeout)
+    if r.status_code == 401:
+        raise PermissionError("Kalshi auth rejected: {}".format(r.text[:200]))
+    r.raise_for_status()
+    return r.json()
+
+
+def kalshi_is_authenticated():
+    """True if the configured key can read the account. Read-only probe."""
+    try:
+        kalshi_auth_get("/portfolio/balance")
+        return True
+    except Exception:
+        return False
+
+
 if __name__ == "__main__":
     # Smoke test — run: py -m rhengine.market_data_kalshi
     st = kalshi_is_tradable()
