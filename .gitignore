@@ -41,3 +41,18 @@ research_data/external/*/*.xlsx
 
 # Throwaway backups taken before a --force refresh.
 research_data/*.bak-*
+
+# --- secrets: belt and braces (2026-08-22) ---
+# secrets.json was already ignored and has never been committed. These widen
+# the net so a differently-named credential file cannot slip in by accident.
+secrets*.json
+*secret*.json
+*.pem
+*.key
+*_rsa
+*_rsa.pub
+credentials.json
+.envrc
+*.token
+api_keys*
+kalshi_private_key*
