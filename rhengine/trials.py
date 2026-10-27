@@ -302,7 +302,7 @@ def _print_report(family: str | None, alpha: float, path: str | None,
     fams = families(path)
     total = sum(fams.values())
     if not total:
-        print(f"ledger empty: {ledger_path()}")
+        print(f"ledger empty: {path or ledger_path()}")
         print("nothing has been logged, so every threshold below would be a lie.")
         return
 

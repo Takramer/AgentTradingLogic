@@ -41,3 +41,11 @@ research_data/external/*/*.xlsx
 
 # Throwaway backups taken before a --force refresh.
 research_data/*.bak-*
+
+# Local virtualenv (macOS dev box)
+.venv/
+
+# intraday market data (re-download with intraday/scripts/fetch_alpaca_bars.py)
+intraday/data/*.csv
+intraday/data/*.pkl
+intraday/data/*.log

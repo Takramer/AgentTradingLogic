@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- T10 paper record (intraday/scripts/paper_trade.py), weekdays 16:45 local (ET).
+     Places no orders. A Mac asleep at 16:45 runs it on wake; missed days are
+     filled in from the same bars on the next run.
+     Install:  cp intraday/scripts/paper_trade.plist ~/Library/LaunchAgents/com.thomaskramer.intraday-paper.plist
+               launchctl load ~/Library/LaunchAgents/com.thomaskramer.intraday-paper.plist
+     Remove:   launchctl unload ~/Library/LaunchAgents/com.thomaskramer.intraday-paper.plist -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.thomaskramer.intraday-paper</string>
+  <key>WorkingDirectory</key><string>/Users/thomaskramer/Downloads/aiProjects/AgentTradingLogic</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/thomaskramer/Downloads/aiProjects/AgentTradingLogic/.venv/bin/python</string>
+    <string>/Users/thomaskramer/Downloads/aiProjects/AgentTradingLogic/intraday/scripts/paper_trade.py</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>16</integer><key>Minute</key><integer>45</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>16</integer><key>Minute</key><integer>45</integer></dict>
+    <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>16</integer><key>Minute</key><integer>45</integer></dict>
+    <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>16</integer><key>Minute</key><integer>45</integer></dict>
+    <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>16</integer><key>Minute</key><integer>45</integer></dict>
+  </array>
+  <key>StandardOutPath</key><string>/Users/thomaskramer/Downloads/aiProjects/AgentTradingLogic/intraday/data/paper.log</string>
+  <key>StandardErrorPath</key><string>/Users/thomaskramer/Downloads/aiProjects/AgentTradingLogic/intraday/data/paper.log</string>
+</dict>
+</plist>
