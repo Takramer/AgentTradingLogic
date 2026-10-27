@@ -252,3 +252,28 @@ session, under the replacement rule written before round 3 ran.
   paper record needs a year or more to mean anything. Before that, read it for
   gross failure: trade counts far off 0.33/day, or a loss larger than the
   backtest's worst stretch.
+
+**Numbers to judge it by (dev backtest 2016–2024, $10k, computed 2026-10-27):**
+mean $1.77 a session, sd $26.03. Worst drawdown −$309 (2020-03-17 → 03-25).
+Worst rolling loss: −$207 over 21 sessions, −$247 over 60, −$264 over 120;
+the 5th percentile of any 60-session window is −$106. Proving it with paper
+alone, at t = 2, takes ~650 sessions (~2.6 years) if the backtest is right.
+
+- **Stop line:** a paper drawdown past −$309 (worse than anything in nine
+  years of backtest) means the rule is not behaving as tested. Stop and
+  investigate before trusting any further paper days.
+- **Trade-count check:** after 60 sessions, fewer than ~10 or more than ~30
+  trades (expected ~20) means the live data or the code differs from the
+  backtest.
+
+**Pre-flight 2026-10-27.** 40 intraday tests pass. The launchd job is loaded.
+A dry run of `record()`'s exact path (Alpaca fetch → engine → `new_rows`,
+written nowhere) ran on 2026-09-14 → 2026-10-27 bars: it marked 10-27 as
+incomplete, gave rule hash `0e229f5a8b71`, and produced 9 trades over the 21
+sessions 2026-09-28 → 10-26, net −$43.21.
+
+> **Those 21 sessions are holdout data, and they have now been seen** (they
+> fall inside 2025-01-02 → 2026-10-26). Nothing was changed in response; the
+> rule was frozen before the dry run. Any later holdout look must end on
+> 2026-09-25 to stay clean, or must report this look. The result is within
+> noise: the backtest's 5th percentile of a 21-session window is about −$100.

@@ -41,6 +41,8 @@ maths, `rhengine.alpha.stats`). A test enforces that, and that the ledger is
    Sharpe's 95% CI and the family-wise p beside any t-stat.
 3. **Holdout once.** `validate.holdout()` logs the look before it runs; a second
    look is not clean. As of 2026-10-27 it is unspent; T10 is paper-trading first.
+   Its last 21 sessions (2026-09-28 → 10-26) were seen in a pre-flight dry run,
+   so a later look must end 2026-09-25 or report that (RESULTS.md, paper record).
 4. **Costs are assumed** (`instruments.py`): MES at IBKR $4.28 round trip and
    $2,500 intraday margin; SPY at Robinhood $0 commission + SEC fee + 1 cent per
    side, long only, one full-size entry per session (settled cash). Raise
