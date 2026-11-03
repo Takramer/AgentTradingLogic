@@ -276,3 +276,11 @@ pip install -e . && python3 -m unittest discover tests
 
 If golden vectors fail: the engine drifted. Regenerate with `python3 gen_fixtures.py`
 only when the change was deliberate, and review the fixture diff.
+
+## Disclaimer
+
+Research and personal-use code, not financial advice. Nothing here promises a return. Backtests can overstate results, and trading real money can lose all of it. Read the code and run it on paper before you trust it.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
