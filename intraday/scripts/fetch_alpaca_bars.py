@@ -1,6 +1,7 @@
 """Download one-minute bars from Alpaca's market-data API (SIP feed) to CSV.
 
     python intraday/scripts/fetch_alpaca_bars.py SPY 2016-01-01 2026-10-26
+    python intraday/scripts/fetch_alpaca_bars.py SSO 2022-01-01 2026-11-04 15Min
 
 Writes intraday/data/<SYMBOL>_1m.csv (gitignored) with columns
 ts (UTC bar open), open, high, low, close, volume. Split-adjusted, extended
@@ -26,11 +27,11 @@ from rhengine.market_data import _get_credentials  # noqa: E402
 URL = "https://data.alpaca.markets/v2/stocks/bars"
 
 
-def iter_bars(symbol: str, start: str, end: str):
+def iter_bars(symbol: str, start: str, end: str, timeframe: str = "1Min"):
     """Yield (ts, open, high, low, close, volume) rows, oldest first."""
     key, secret = _get_credentials()
     headers = {"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret}
-    params = {"symbols": symbol, "timeframe": "1Min", "start": start, "end": end,
+    params = {"symbols": symbol, "timeframe": timeframe, "start": start, "end": end,
               "feed": "sip", "adjustment": "split", "limit": 10000, "sort": "asc"}
     while True:
         for attempt in range(5):
@@ -56,13 +57,14 @@ def iter_bars(symbol: str, start: str, end: str):
         params["page_token"] = tok
 
 
-def main(symbol: str, start: str, end: str) -> None:
-    out = os.path.join(ROOT, "intraday", "data", f"{symbol}_1m.csv")
+def main(symbol: str, start: str, end: str, timeframe: str = "1Min") -> None:
+    tag = timeframe.lower().replace("min", "m")
+    out = os.path.join(ROOT, "intraday", "data", f"{symbol}_{tag}.csv")
     n = 0
     with open(out + ".part", "w", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["ts", "open", "high", "low", "close", "volume"])
-        for row in iter_bars(symbol, start, end):
+        for row in iter_bars(symbol, start, end, timeframe):
             w.writerow(row)
             n += 1
             if n % 200_000 == 0:
@@ -72,4 +74,4 @@ def main(symbol: str, start: str, end: str) -> None:
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:4])
+    main(*sys.argv[1:5])

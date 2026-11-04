@@ -277,3 +277,50 @@ sessions 2026-09-28 → 10-26, net −$43.21.
 > rule was frozen before the dry run. Any later holdout look must end on
 > 2026-09-25 to stay clean, or must report this look. The result is within
 > noise: the backtest's 5th percentile of a 21-session window is about −$100.
+
+## T13–T17 — TrendSpider "SSO Opus 5.5 Swing 15m" (pre-registered 2026-11-04)
+
+Rules: https://share.trendspider.com/strategies/79a84053fa45a1b7f292091e.
+Script: `intraday/scripts/trendspider_sso.py`. Swing holds (overnight), so a
+standalone sim, not `engine.py`. SSO 15m Alpaca SIP, RTH.
+
+Selection rule, fixed before any T14–T17 run: the candidate for paper trading is
+the one with the highest t_NW on **2016-06-01..2022-06-30** (data the rule's
+author did not show), provided it beats SSO buy-and-hold on Sharpe there. It is
+then confirmed on 2022-07-01..2026-11-03 (T13's window; already seen for the
+as-published rule, not for T16/T17). No parameter is tuned.
+
+### Result (2026-11-04): no candidate. Nothing goes to paper.
+
+Fixes before the run: stats moved from compounding dollar PnL to daily returns;
+the 200-day rule keyed to the 15:45 bar (the causality check caught it reading
+the last bar in the file as the close); entries blocked on a window's last bar.
+
+| unseen 2016-06..2022-06 | total | max DD | Sharpe [95% CI] | t_NW |
+|---|---|---|---|---|
+| SSO buy & hold | +173.2% | -60.9% | 0.63 [-0.18, 1.43] | +1.73 |
+| T13/T14 as published | +32.6% | -26.7% | 0.37 [-0.43, 1.17] | +0.92 |
+| T13b VWAP read as close-above | +44.4% | -28.3% | 0.45 [-0.35, 1.26] | +1.14 |
+| T16 slot-relative volume | +25.3% | -18.6% | 0.37 [-0.43, 1.18] | +0.98 |
+| T17 daily 200-SMA | +78.3% | -43.4% | 0.52 [-0.29, 1.34] | +1.23 |
+
+On 2022-07..2026-11 (TrendSpider's window) T13 makes +144.9%, Sharpe 1.29
+[0.36, 2.21], and beats random entries with p = 0.008. On the six years before
+it, random entries under the same filter beat it with p = 0.634. That is the
+signature of a rule fitted to the window it was published on. 56% of its
+signals fired on the 09:30/15:45 auction bars; removing that (T16) halves the
+trades and makes it worse in both eras. No variant beat buy & hold's Sharpe on
+unseen data, so the pre-registered rule selects nothing. T17 cuts drawdown
+(-43% vs -61%, -18.5% vs -38.8%) at the cost of return — a risk choice, not an edge.
+
+### Diagnostics after hft.md/qt review (2026-11-04, no new trials)
+
+Daily returns regressed on SSO's (Newey-West, 5 lags). T13: alpha +1.7%/yr,
+t +0.27 on unseen 2016-22; +13.1%/yr, t +2.01 on the published window — the same
+fit-to-window story as the random-entry null. T17: alpha t +0.42 / +0.82, beta
+0.37 / 0.45, i.e. a lower-exposure SSO, not an edge.
+
+Kelly leverage on 1x S&P (SSO/2) estimates 3.2x on 2016-22 and 6.0x on 2022-26.
+The estimate nearly doubles between two bull eras: the mean is too noisy to size
+from, which is why fractional Kelly exists. Do not read either as licence to lever.
+Decision: T17 paper record dropped (Thomas, 2026-11-04).
