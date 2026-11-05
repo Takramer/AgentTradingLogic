@@ -19,7 +19,8 @@ analysis = ["numpy>=1.24", "pandas>=2.0", "matplotlib>=3.7", "scipy>=1.10",
             "vectorbt>=1.1.0", "nbformat", "nbclient", "ipykernel"]
 
 [tool.setuptools]
-packages = ["rhengine"]
+packages = ["rhengine", "polymarket_paper"]
 
 [tool.setuptools.package-data]
 rhengine = ["strategies.json"]
+polymarket_paper = ["config.json"]
