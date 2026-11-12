@@ -89,6 +89,7 @@ def part_a() -> None:
     k2 = res["lrs_vt_1515"]["maxdd"] >= res["lrs_vt_lag2"]["maxdd"]
     print(f"  KILL: CAGR >= lag 2 {'PASS' if k1 else 'FAIL'} | maxDD no worse "
           f"{'PASS' if k2 else 'FAIL'} -> {'ACCEPTED' if k1 and k2 else 'REJECTED'}")
+    return s
 
 
 # ── B. Treasuries when the trend is off ──────────────────────────────────────

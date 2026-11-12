@@ -324,3 +324,50 @@ Kelly leverage on 1x S&P (SSO/2) estimates 3.2x on 2016-22 and 6.0x on 2022-26.
 The estimate nearly doubles between two bull eras: the mean is too noisy to size
 from, which is why fractional Kelly exists. Do not read either as licence to lever.
 Decision: T17 paper record dropped (Thomas, 2026-11-04).
+
+## T18 — overnight-only SPY (logged 2026-11-12 before running)
+
+Rule: buy the last RTH bar's close + 1 cent, sell the next session's first RTH
+open − 1 cent, SEC fee on sales, $10,000 every night, dividends added on
+ex-dates. Development window only. Script: `intraday/scripts/overnight.py`.
+Kill: t ≥ the ledger's bar, Sharpe above buy-and-hold, both halves positive.
+
+### Result: rejected
+
+| 2016-01-05 .. 2024-12-31, $10k | net (gross) | t | Sharpe [95% CI] | 2016-20 | 2021-24 |
+|---|---|---|---|---|---|
+| overnight only | $6,931 ($8,813) | +2.06 | 0.66 [−0.03, 1.35] | $4,405 | $2,526 |
+| day only | $2,940 ($4,822) | +0.83 | 0.25 [−0.41, 0.90] | $1,173 | $1,767 |
+| hold all day | $13,707 | +2.80 | 0.85 [0.18, 1.52] | $8,098 | $5,610 |
+
+Bar at 35 trials: t ≥ 3.18; family-wise p 0.76. Overnight earned 65% of the
+gross move in this window, not most of it, and costs took a fifth of that.
+Splitting the day does not beat holding it. Not a candidate.
+
+## T10 holdout — the one look (criteria written 2026-11-12, before it ran)
+
+Thomas approved spending the holdout on T10 (2026-11-12). T10 failed one
+development check (deflated Sharpe 0.927 < 0.95), so this is not the
+"passes every check" case the pre-registration named; that is recorded, not hidden.
+
+- Window: 2025-01-02 → **2026-09-25** (the 21 sessions after it were seen in the
+  pre-flight dry run). Bars before 2025 feed the 14-day lookback only.
+- Rule frozen: `NoiseArea(exit_rule="vwap")`, SPY_RH, $10,000 per entry.
+- If the development backtest is the truth (mean $1.77, sd $26.03 a session),
+  ~436 sessions give expected net ≈ $772 and expected t ≈ 1.4. **The look is
+  underpowered:** P(t ≥ 1.65) ≈ 0.41 even if the edge is real, P(net > 0) ≈ 0.92.
+- Verdict rules: **CONFIRMS** if t_NW ≥ 1.65 (one look, one-sided 5%);
+  **CONSISTENT** if net > 0 and t < 1.65 (does not contradict, does not prove);
+  **CONTRADICTS** if net ≤ 0. Any drawdown past −$309 is reported as outside
+  the development range whatever the verdict.
+
+### Holdout result (run 2026-11-12, first and only look, clean): CONTRADICTS
+
+| 2025-01-02 → 2026-09-25, $10k | sessions | trades | net | t_NW | Sharpe [95% CI] | max DD |
+|---|---|---|---|---|---|---|
+| T10 | 434 | 141 | **−$617** | −1.51 | −1.13 [−2.61, 0.36] | **−$727** |
+
+By period: H1 2025 −$329, H2 2025 +$32, 2026 to Sept −$320. The drawdown is more
+than twice the worst in nine development years (−$309). **T10 is rejected and
+the holdout is spent.** No day-trading rule in this package has cleared.
+Daily PnL: `intraday/data/t10_holdout_daily.csv`.
