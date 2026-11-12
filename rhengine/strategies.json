@@ -16,6 +16,85 @@
   },
   "books": {
     "_note": "Research-stack PORTFOLIO books, added 2026-08-01. Deliberately a separate namespace from `strategies`: these are cross-sectional rank-and-hold books with weights, no legMask, no thresholds, no per-trade R-multiples and no stops. Putting them in `strategies` would hand a schema with none of their fields to every existing reader. Consumed via rhengine.alpha.live.emit(); the same four deployment tiers apply and are enforced there, exactly as indicators.select_strategy_for_regime enforces them for sleeves. Additive and backward-compatible \u2014 _spec_version stays 1 because no existing key changed meaning.",
+    "lrs2x": {
+      "id": "lrs2x",
+      "name": "LRS-2x — 2x S&P 500 above its 200-day average, T-bills below",
+      "description": "Gayed & Bilello (2016) Leverage Rotation Strategy. At each close, compare SPY's dividend-adjusted close to its 200-session simple average. Above: hold the 2x daily-reset S&P 500 fund. Otherwise: hold the T-bill fund. One instrument at a time, ~5 switches a year. Preferred execution: decide at 15:15 ET on the live SPY price (Robinhood MCP quote, `--live-price`) and trade then; fallback: the close of the session AFTER the decision.",
+      "module": "rhengine.alpha.lrs",
+      "status": "manual",
+      "_status_note": "NOT autonomous, and superseded: RobinhoodAgent runs books.lrs_vt, the same trend with a volatility cap (smaller drawdown, alpha t 3.68). Kept as the research reference.",
+      "signal": {"ticker": "SPY", "sma_sessions": 200, "price": "adjclose"},
+      "vehicles": {"risk_on": "SSO", "risk_off": "SGOV"},
+      "evidence": {
+        "source": "scripts/lrs_check.py on Ken French daily Mkt+RF 1926-2026, trial family index-leverage (n=2), pre-registered 2026-11-12",
+        "lag": 2,
+        "cagr": 0.1519,
+        "market_cagr": 0.1020,
+        "maxdd": -0.683,
+        "market_maxdd": -0.841,
+        "alpha_ann": 0.0636,
+        "alpha_t": 3.30,
+        "oos_window": "2016-07-01..2026-09-30 (after publication)",
+        "oos_cagr": 0.1930,
+        "oos_market_cagr": 0.1531,
+        "oos_maxdd": -0.421,
+        "oos_market_maxdd": -0.342,
+        "oos_alpha_t": 0.74,
+        "eras_beaten": "5/5",
+        "trails_market_10yr_windows": 0.17,
+        "model_vs_real_sso_2007_2026": "15.15% vs 15.02% CAGR, daily corr 0.996",
+        "live_1515_2016_2026": "scripts/lrs_1515_check.py on SPY 1-minute bars: 19.09% CAGR, maxDD -37.4% vs next-close 17.96%, -43.1%; signal differs from the close signal on 0.8% of days. Trial family index-leverage (n=3).",
+        "_bound": "The excess return is mostly extra market exposure, not skill: after publication alpha t=0.74 and Sharpe 0.75 vs the market's 0.74. It beats the index in raw return by holding ~1.7x on average and stepping out of long declines. One-day crashes are not avoided: invested on 19 Oct 1987 under next-close execution, -34.9% in one session. Post-2016 drawdown -42% was WORSE than the market's -34%."
+      },
+      "kill_switches": {
+        "flat_immediately_if": "the 2x fund's daily return differs from 2x SPY by more than 1 point on 3 sessions in 20 (the vehicle no longer tracks)",
+        "max_staleness_days": 5
+      }
+    },
+    "lrs_vt": {
+      "id": "lrs_vt",
+      "name": "LRS-VT \u2014 S&P 500 above its 200-day average, exposure capped by volatility; T-bills below",
+      "description": "At 15:15 ET compare SPY's live price with the mean of it and the prior 199 adjusted closes. Below: hold the T-bill fund. Above: target exposure = vol_target / annualized stdev of the last 21 daily returns (through yesterday's close), capped at max_exposure; held as SPY + SGOV up to 1x and SPY + SSO above. Trade only on entry/exit or when the target is more than band from the held exposure (~8 trades a year).",
+      "module": "rhengine.alpha.lrs",
+      "status": "manual",
+      "_status_note": "NOT autonomous. Setting this to 'autonomous' is one of the two arming edits; the other is lrs.enabled in RobinhoodAgent config.json. See docs/METHODOLOGY-2026-11.md section 6.",
+      "signal": {
+        "ticker": "SPY",
+        "sma_sessions": 200,
+        "price": "adjclose",
+        "vol_sessions": 21,
+        "vol_target": 0.3,
+        "max_exposure": 2.0,
+        "band": 0.25
+      },
+      "vehicles": {
+        "index": "SPY",
+        "levered": "SSO",
+        "cash": "SGOV"
+      },
+      "evidence": {
+        "source": "scripts/lrs_variants_check.py (French daily 1927-2026, lag 2) and scripts/lrs_vt_extra_check.py (SPY one-minute bars, 15:15 rule, 2016-07..2026-09); pre-registered, family index-leverage",
+        "cagr": 0.1457,
+        "market_cagr": 0.102,
+        "maxdd": -0.579,
+        "market_maxdd": -0.841,
+        "alpha_t": 3.68,
+        "avg_exposure": 1.37,
+        "trails_market_10yr_windows": 0.19,
+        "oos_window": "2016-07-01..2026-09-30",
+        "oos_cagr": 0.1687,
+        "oos_market_cagr": 0.1531,
+        "oos_maxdd": -0.35,
+        "oos_market_maxdd": -0.342,
+        "live_1515_2016_2026": "17.41% CAGR, maxDD -31.6% vs SPY 15.26%, -33.7%; LRS-2x at 15:15 19.09%, -37.4%",
+        "trades_per_year": 7.9,
+        "_bound": "Still mostly extra market exposure: alpha t 3.68 over a century but 0.47 over 2016-2026 alone. Worst loss -57.9% (1929-35) and -49.2% in 1987: a crash out of a calm market still hits at up to 2x. Gives up about 2 points a year to LRS-2x in strong bull markets."
+      },
+      "kill_switches": {
+        "flat_immediately_if": "the 2x fund's daily return differs from 2x SPY by more than 1 point on 3 sessions in 20 (the vehicle no longer tracks)",
+        "max_staleness_days": 5
+      }
+    },
     "rmxb": {
       "id": "rmxb",
       "name": "RMX-B \u2014 cap-weighted quality + 12-1 momentum",

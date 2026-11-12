@@ -1,14 +1,15 @@
 # Reference libraries — everything this repo leans on from outside itself
 
-Three unrelated things share the word "library". All three are here:
+Four unrelated things share the word "library". All four are here:
 
 | Part | Covers | Standing |
 |---|---|---|
 | [1 — external repos](#part-1--five-external-repos-and-what-each-is-actually-good-for) | five teaching/lookup GitHub repos | **not evidence.** Technique and vocabulary only |
 | [2 — the published record](#part-2--the-published-record) | `research_data/external/` — French, OSAP, JKP, AQR | **the only admissible evidence** (hard rule 4) |
 | [3 — Python dependencies](#part-3--the-python-dependencies) | the core / sim / analysis tier split | packaging; contains one known gap |
+| [4 — websites](#part-4--websites) | browse-only research sites (Screw Street, OpenMarket) | **not evidence.** Lookup and cross-checks only |
 
-Parts 2 and 3 added 2026-07-31.
+Parts 2 and 3 added 2026-07-31. Part 4 added 2026-10-27.
 
 ---
 
@@ -402,6 +403,96 @@ most often: Python is `py` (never `python`/`python3`), and after editing
 
 ---
 
+## Part 4 — websites
+
+Sites you open in a browser. None has an API this repo calls, and none is
+evidence: a site's numbers carry no `_manifest.json`, so under Part 2's rule
+they cannot support a claim.
+
+### Screw Street — [screwstreet.com](https://screwstreet.com/)
+
+Read 2026-10-27 (home, `/methodology`, `/terms`).
+
+**What it is.** A free US equity research site built on SEC EDGAR filings
+(10-K, 10-Q, 8-K, 13F, Forms 3/4/5), with FRED, FDIC, Treasury and FINRA
+short volume beside them. A screener over 5,679 US companies, insider and
+congressional trades, 13F holders, and filing-driven pages on dilution,
+takeovers, SEC comment letters and enforcement. It makes no return claims and
+gives no calls.
+
+**Where it could help.**
+
+- **Cross-checking a fundamental.** `/methodology` says XBRL values are kept
+  *as filed*, and a restated figure keeps both the original and the restated
+  value (restatements over a 0.5% move are tracked apart). That is the
+  point-in-time property the quality leg's OP/BE needs. Use it to spot-check
+  one company's number against the panel by hand, nothing more.
+- **Issuance and dilution.** `/research/dilution` covers the same ground as
+  the RMX-C issuance block. Useful for reading why one name screened in or out.
+- **Lookup.** Insider, 13F and comment-letter pages answer "what happened at
+  this company" faster than EDGAR full-text search.
+
+**What stops it being more.**
+
+- **No API and no bulk export.** The bulk files it lists are EDGAR's own, not
+  its own output. Any pull would mean scraping.
+- **Terms say nothing on scraping or reuse**, and name no legal entity — only
+  "Screw Street and its operators" and a contact address. Silence is not
+  permission; do not build a fetcher against it.
+- **Survivorship not stated.** Whether delisted companies stay in the screener
+  is not on the methodology page. Until that is known, a screen run there
+  inherits whatever bias it has.
+- **History depth not stated.** Serving tables are trimmed to recent history.
+- Self-described "Not SEC-registered", "research and education only", and
+  "data may contain errors".
+
+**If you want its data in the repo**, go to the source it reads: EDGAR XBRL
+frames and the 13F / Form 4 bulk files are public, documented, and give a
+provenance trail this site cannot.
+
+### OpenMarket — [openmarket.xyz](https://openmarket.xyz/)
+
+Read 2026-10-27 (home, `/risk-disclosure`, `/terms`). Run by Thalamus
+Technologies, Inc.; Delaware law.
+
+**What it is.** A charting platform — browser, desktop beta, Android — over
+crypto (4,000+ perps and spot pairs, 29 venues), US stocks and ETFs, CME
+futures, options, forex, Polymarket and Hyperliquid prediction-market odds, and
+economic series from 40 publishers. Order-book heatmaps, footprint and
+cumulative volume delta, liquidation maps, 80+ indicators, alerts to
+Telegram/Discord/webhook, an AI indicator writer (Kata), a WebAssembly
+scripting language (wrun), and a hook for outside AI agents including Claude
+Code. Charting is free; other pricing is not listed. It names no data vendors
+and warns its data can be delayed, incomplete or wrong.
+
+**Where it could help.**
+
+- **Eyeballing order flow on crypto.** Footprint, CVD and liquidation maps
+  across venues are views [BTC-2026-08-22.md](BTC-2026-08-22.md) and
+  [CRYPTO-2026-08-22.md](CRYPTO-2026-08-22.md) had to build from raw feeds.
+  Use it to look, then measure with `rhengine/crypto.py` / `btc.py`.
+- **Prediction-market odds beside the underlying.** A Polymarket line on one
+  chart with spot is a quick visual check on the price-lag question in
+  [INTAKE-2026-10-26.md](INTAKE-2026-10-26.md) §A. The measurement stays in
+  `rhengine/weather_lag.py`; the chart proves nothing.
+
+**What stops it being more.**
+
+- **Terms §7 forbid scraping its code or API**, and grant no right to use the
+  API or agent hook. Do not build a fetcher against it; the venues it charts
+  (Kalshi, Polymarket, exchange feeds) are reachable directly, and this repo
+  already reads several.
+- **No documented export** of bars, order book or odds.
+- **No named data source**, so a number read off its chart has no provenance.
+
+**Money-touching — read before connecting anything.** It links an Alpaca
+brokerage account and routes orders you enter there. Terms §5.4 allow only
+orders you enter and confirm one at a time; §7 forbid automated and copy
+orders. That matches this repo's rule: **do not connect a brokerage account to
+it, and never let an agent place an order through it**, test or otherwise.
+
+---
+
 ## Sources
 
 **Part 2 — the published record.** Provenance for every file is in the
@@ -420,3 +511,8 @@ these are the project pages.
 - [cantaro86/Financial-Models-Numerical-Methods](https://github.com/cantaro86/Financial-Models-Numerical-Methods) — AGPL-3.0
 - [LechGrzelak/Computational-Finance-Course](https://github.com/LechGrzelak/Computational-Finance-Course) — BSD-3-Clause · Oosterlee & Grzelak, *Mathematical Modeling and Computation in Finance* (World Scientific, 2019)
 - [romanmichaelpaolucci/Quant-Guild-Library](https://github.com/romanmichaelpaolucci/Quant-Guild-Library)
+
+**Part 4 — websites.**
+
+- [Screw Street](https://screwstreet.com/) · [methodology](https://screwstreet.com/methodology) · [terms](https://screwstreet.com/terms) — read 2026-10-27
+- [OpenMarket](https://openmarket.xyz/) · [risk disclosure](https://openmarket.xyz/risk-disclosure) · [terms](https://openmarket.xyz/terms) — Thalamus Technologies, Inc. · read 2026-10-27

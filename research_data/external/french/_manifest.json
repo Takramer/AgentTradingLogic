@@ -1,47 +1,74 @@
 {
   "source": "Ken French data library",
   "note": "Monthly research factors, momentum, short- and long-term reversal, and the 25 OP x INV portfolios. The daily file used by rhengine.alpha.panel is fetched separately.",
-  "fetched_utc": "2026-07-25T15:05:44Z",
+  "fetched_utc": "2026-11-12T16:21:31Z",
   "files": [
     {
       "file": "F-F_Research_Data_5_Factors_2x3.zip",
       "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_CSV.zip",
-      "bytes": 11888,
-      "cached": false,
-      "seconds": 0.4,
-      "sha256_16": "ddc0280b2bb8ca6c"
+      "bytes": 11971,
+      "cached": true,
+      "sha256_16": "17d7a575e71d6764"
     },
     {
       "file": "F-F_Momentum_Factor.zip",
       "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Momentum_Factor_CSV.zip",
-      "bytes": 5605,
-      "cached": false,
-      "seconds": 0.0,
-      "sha256_16": "37baf72ae4eace97"
+      "bytes": 5603,
+      "cached": true,
+      "sha256_16": "27ed60e5b2caa9ea"
     },
     {
       "file": "F-F_ST_Reversal_Factor.zip",
       "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_ST_Reversal_Factor_CSV.zip",
-      "bytes": 5575,
-      "cached": false,
-      "seconds": 0.0,
-      "sha256_16": "e0fc1859c8b7e56a"
+      "bytes": 5576,
+      "cached": true,
+      "sha256_16": "7ddb68bbaa507ec0"
     },
     {
       "file": "F-F_LT_Reversal_Factor.zip",
       "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_LT_Reversal_Factor_CSV.zip",
-      "bytes": 5320,
-      "cached": false,
-      "seconds": 0.0,
-      "sha256_16": "e2d061587e14eb24"
+      "bytes": 5339,
+      "cached": true,
+      "sha256_16": "baad3163e4c0a72e"
     },
     {
       "file": "25_Portfolios_OP_INV_5x5.zip",
       "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/25_Portfolios_OP_INV_5x5_CSV.zip",
-      "bytes": 383128,
+      "bytes": 385040,
+      "cached": true,
+      "sha256_16": "d92d01b211efa5de"
+    },
+    {
+      "file": "25_Portfolios_ME_OP_5x5.zip",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/25_Portfolios_ME_OP_5x5_CSV.zip",
+      "bytes": 384973,
       "cached": false,
-      "seconds": 0.2,
-      "sha256_16": "5811dcc7fe92b0cc"
+      "seconds": 0.3,
+      "sha256_16": "8315899edcbd6497"
+    },
+    {
+      "file": "25_Portfolios_ME_Prior_12_2.zip",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/25_Portfolios_ME_Prior_12_2_CSV.zip",
+      "bytes": 427495,
+      "cached": false,
+      "seconds": 0.1,
+      "sha256_16": "771c7ffd401b4b1b"
+    },
+    {
+      "file": "32_Portfolios_ME_OP_INV_2x4x4.zip",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/32_Portfolios_ME_OP_INV_2x4x4_CSV.zip",
+      "bytes": 487645,
+      "cached": false,
+      "seconds": 0.0,
+      "sha256_16": "5651baa7398a0390"
+    },
+    {
+      "file": "F-F_Research_Data_Factors_daily.zip",
+      "url": "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_Factors_daily_CSV.zip",
+      "bytes": 178326,
+      "cached": false,
+      "seconds": 0.0,
+      "sha256_16": "96c23b88e651cbff"
     }
   ]
 }
