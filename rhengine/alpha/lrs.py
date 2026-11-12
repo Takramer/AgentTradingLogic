@@ -13,8 +13,8 @@ book's status is exactly "autonomous". This module never places an order.
 
 --live-price is the SPY last trade the executor read from the Robinhood MCP at
 15:15 ET. It stands in for today's close, and the trade happens then, not at
-tomorrow's close (scripts/lrs_1515_check.py: 19.14% CAGR, -37.4% max DD vs
-18.01%, -43.1% for next-close, 2016-07..2026-09).
+tomorrow's close (scripts/lrs_1515_check.py: 19.09% CAGR, -37.4% max DD vs
+17.96%, -43.1% for next-close, 2016-07..2026-09).
 
 Importing this module needs only the standard library (and `requests` for
 `closes_before`): RobinhoodAgent's runtime Python has no pandas, and its

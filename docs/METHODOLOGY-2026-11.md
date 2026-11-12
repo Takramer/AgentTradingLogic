@@ -45,19 +45,19 @@ convention; the pre-registered lag 1 reads better and is in §2c).
 
 | | CAGR | vol | Sharpe | max DD | alpha/yr | alpha t | beta |
 |---|---|---|---|---|---|---|---|
-| **1927–2026 (103.7 yr)** | | | | | | | |
-| market | 9.78% | 17.1% | 0.45 | −84.1% | | | 1.00 |
-| 2x, always held | 11.93% | 34.3% | 0.41 | −98.4% | −1.22% | −5.27 | 2.02 |
-| LRS 1x | 9.59% | 11.4% | 0.60 | −41.1% | 3.31% | 3.37 | 0.47 |
-| **LRS 2x** | **14.50%** | 22.8% | 0.58 | −68.4% | 6.32% | 3.28 | 0.93 |
+| **1927–2026 (99.6 yr)** | | | | | | | |
+| market | 10.20% | 17.5% | 0.46 | −84.1% | | | 1.00 |
+| 2x, always held | 12.52% | 35.0% | 0.42 | −98.4% | −1.16% | −5.00 | 2.02 |
+| LRS 1x | 10.01% | 11.6% | 0.61 | −41.1% | 3.31% | 3.38 | 0.47 |
+| **LRS 2x** | **15.19%** | 23.2% | 0.59 | −68.3% | 6.36% | 3.30 | 0.93 |
 | **2016-07 → 2026-09, after publication (10.2 yr)** | | | | | | | |
-| market | 15.35% | 18.4% | 0.74 | −34.2% | | | 1.00 |
-| 2x, always held | 23.77% | 36.8% | 0.70 | −59.7% | −2.53% | −3.99 | 2.04 |
-| LRS 1x | 11.75% | 12.2% | 0.77 | −23.0% | 2.24% | 0.87 | 0.55 |
-| **LRS 2x** | **19.35%** | 24.5% | 0.75 | **−42.1%** | 3.71% | 0.74 | 1.09 |
+| market | 15.31% | 18.4% | 0.74 | −34.2% | | | 1.00 |
+| 2x, always held | 23.70% | 36.7% | 0.70 | −59.7% | −2.54% | −4.00 | 2.04 |
+| LRS 1x | 11.72% | 12.2% | 0.77 | −23.0% | 2.24% | 0.87 | 0.55 |
+| **LRS 2x** | **19.30%** | 24.5% | 0.75 | **−42.1%** | 3.71% | 0.74 | 1.09 |
 
-By era (CAGR, LRS-2x vs market): 1928–49 11.5% vs 3.9% · 1950–69 20.7% vs
-13.0% · 1970–89 13.7% vs 11.3% · 1990–2009 10.9% vs 8.4% · 2010–26 15.1% vs
+By era (CAGR, LRS-2x vs market): 1928–49 13.8% vs 4.6% · 1950–69 20.9% vs
+13.1% · 1970–89 13.8% vs 11.3% · 1990–2009 10.9% vs 8.4% · 2010–26 15.0% vs
 14.2%. **5 of 5.** The 1930s are not the whole story — CXO Advisory's critique
 of the paper is that its 1928 start flatters any trend rule; every later era
 still beats.
@@ -69,6 +69,15 @@ The 2x simulation, run on SPY, against the actual SSO fund, 2007–2026:
 assumptions are within 0.13 pp/yr of what the real fund delivered, including
 2008.
 
+**Checked twice, corrected once (2026-11-12).** The first version of these
+tables counted years as rows ÷ 252 and charged annual costs per row. Ken
+French's daily file has ~290 rows a year before 1952, when the NYSE traded on
+Saturdays, so every full-sample and pre-1952 CAGR read too low (market 9.78%,
+LRS-2x 14.50%). `lrs_check.py` now uses calendar years and accrues costs by
+days elapsed; no verdict changed. `scripts/lrs_crosscheck.py` recomputes
+every figure in §2 with quantstats (drawdown, compounding, Sharpe) and
+statsmodels (Newey-West alpha) and fails on any disagreement; all agree.
+
 ### 2c. Pre-registration and the multiple-testing bill
 
 Logged before the first run: family `index-leverage`, n=2 (1x and 2x), kill
@@ -77,13 +86,13 @@ drawdown no worse than the market's AND beat the market in ≥4/5 eras.
 
 | | lag 1 (pre-registered) | lag 2 (next close) |
 |---|---|---|
-| full CAGR vs market | 16.30% vs 9.77% | 14.50% vs 9.78% |
-| after-publication CAGR | 18.78% vs 15.35% | 19.35% vs 15.35% |
-| full max DD | −60.1% | −68.4% |
+| full CAGR vs market | 17.08% vs 10.20% | 15.19% vs 10.20% |
+| after-publication CAGR | 18.72% vs 15.31% | 19.30% vs 15.31% |
+| full max DD | −60.0% | −68.3% |
 | kill criterion | PASS 3/3 | PASS 3/3 |
 
-Alpha t = +3.28 (lag 2): family-wise p = 0.003 against its family's 3 trials,
-**p = 0.087 against all 88 trials in the repo — DOES NOT CLEAR the repo-wide
+Alpha t = +3.30 (lag 2): family-wise p = 0.003 against its family's 3 trials,
+**p = 0.082 against all 88 trials in the repo — DOES NOT CLEAR the repo-wide
 bar of 3.44.** After publication, alpha t = 0.74. Read the alpha as "it is
 mostly beta, timed", which is the honest description of the rule.
 
@@ -96,11 +105,11 @@ worse than next-close". SPY one-minute bars, 2016-07 → 2026-09, same costs:
 
 | | CAGR | vol | Sharpe | max DD |
 |---|---|---|---|---|
-| market (SPY) | 15.30% | 17.8% | 0.75 | −33.7% |
-| 2x, always held | 23.95% | 35.6% | 0.72 | −58.9% |
-| next close (lag 2) | 18.01% | 23.9% | 0.71 | −43.1% |
-| **15:15 live price** | **19.14%** | 24.1% | 0.75 | **−37.4%** |
-| same-day close (lag 1, not executable) | 19.53% | 23.9% | 0.77 | −37.7% |
+| market (SPY) | 15.26% | 17.8% | 0.75 | −33.7% |
+| 2x, always held | 23.88% | 35.5% | 0.71 | −58.9% |
+| next close (lag 2) | 17.96% | 23.9% | 0.71 | −43.1% |
+| **15:15 live price** | **19.09%** | 24.0% | 0.75 | **−37.4%** |
+| same-day close (lag 1, not executable) | 19.48% | 23.8% | 0.77 | −37.7% |
 
 **PASS 2/2, adopted.** The 15:15 signal disagrees with the closing signal on
 0.8% of days, so it recovers most of the gap between the lag-1 paper result
@@ -137,7 +146,7 @@ filtered version on return; the filter buys a smaller drawdown.
    and selling that buy before the proceeds settle is a good-faith violation.
    A flip and an immediate flip back is the case to watch; the executor checks
    settled cash before it buys.
-6. **LRS 1x does not beat the market** (9.59% vs 9.78%). The filter alone buys a
+6. **LRS 1x does not beat the market** (10.01% vs 10.20%). The filter alone buys a
    smoother ride, not more money. The excess comes from the leverage it makes
    survivable.
 7. **Do not swap in 3x (UPRO/SPXL).** Not tested, not pre-registered, and
@@ -181,36 +190,57 @@ shorting is out either way.
 
 ## 6. Putting it in RobinhoodAgent
 
-Built here, not wired there:
+Wired on RobinhoodAgent branch `feature/lrs2x`, **unarmed**. The engine side
+runs on its own:
 
 ```bash
 .venv/bin/python -m rhengine.alpha.lrs                       # dry-run target
-.venv/bin/python -m rhengine.alpha.lrs --positions pos.json  # + deltas
 .venv/bin/python -m rhengine.alpha.lrs --live-price 761.08    # 15:15 rule
+.venv/bin/python scripts/lrs_crosscheck.py                    # numbers, checked
 ```
 
-The payload has the same shape as `live.emit` and the same arming rule:
-`orders_permitted` is true only when `books.lrs2x.status` is exactly
-`"autonomous"` (`tests/test_lrs.py`). On 2026-11-12 it reads SPY 759.81 vs
-200-day 728.65 → **hold SSO**.
+On 2026-11-12: SPY 759.81 vs 200-day 728.65 → **hold SSO**.
 
-Owner decisions and fixes, in order:
+How the closing run uses it:
 
-1. **Stage 2 cannot log in.** Every run since 2026-11-06 fails with "OAuth
-   session expired". Run `claude` once on the Mac to re-authenticate.
-2. **The agentic account shows $0** since 2026-11-02 (decision_log). Fund it or
-   point the agent at the right account.
-3. **Un-ban SSO and SGOV.** `banned_instruments` / `bear_regime_only` block
-   leveraged funds (commit 849eb1f, written for the swing scanner's downtrend
-   holds — the opposite of how LRS uses SSO).
-4. **Bump the engine submodule.** RobinhoodAgent pins AgentTradingLogic at
-   `aa4e336` (2026-07-20), 27 commits back and older than the retirement of the
-   six legacy sleeves. Its selector can still route to them.
-5. **Wire the 15:15 run to `emit_lrs`**: Stage 2 reads SPY with
-   `get_equity_quotes`, runs `lrs --live-price <last> --positions <held>`,
-   then places the deltas: sell the held fund, buy the other with a
-   `dollar_amount` market order. If that run fails, Stage 1 runs it without
-   `--live-price` and the trade waits for the next close. The current
-   caps (10% per position, 20% cash floor, 5 positions) do not fit a one-fund
-   book; it needs its own sizing path, not a loosened swing validator.
-6. **Arm it**: `"status": "autonomous"` under `books.lrs2x`. Nothing else.
+1. Stage 2 adds SPY to its quotes and writes `spy_last` into `state.json`.
+2. `order_plan._build_lrs_actions` imports `lrs.book`, `lrs.decide` and
+   `lrs.closes_before` (stdlib only; the runtime Python has no pandas), takes
+   199 Yahoo closes plus `spy_last`, and picks SSO or SGOV. It sells the other
+   fund in full and buys the target with cash plus the sale proceeds.
+3. It skips LRS, and only LRS, before 15:00 ET, when `spy_last` is missing or
+   more than 30 minutes old, when Yahoo fails, when the last close is stale, or
+   when the engine's vehicles differ from SSO/SGOV. A skipped day is not
+   retried at the next close; the next closing run decides again.
+4. `validate_plan._validate_lrs` fails the plan if it trades anything but
+   SSO/SGOV, buys the wrong fund, buys more than the account holds, buys under
+   the kill switch (sells still go through), or buys before it sells.
+5. Swing exits and trailing stops ignore SSO/SGOV while LRS is on.
+
+Two keys arm it, and both must turn:
+
+| Key | Where | Shipped |
+|---|---|---|
+| `lrs.enabled` | RobinhoodAgent `config.json` | `false` |
+| `books.lrs2x.status == "autonomous"` | engine `rhengine/strategies.json` | `"manual"` |
+
+With only the first, the plan carries `dry_run_orders` that Stage 2 never
+places. SSO and SGOV were never banned; `banned_instruments` holds only inverse
+funds and VXX.
+
+The engine bump (pin `aa4e336` → this repo) needed three helpers that
+`signals_pipeline.py` imported and this repo deleted. They now live in
+`signals_pipeline.py`. On the new engine the swing scanner selects no strategy
+on a cold start, because all six sleeves are retired.
+
+Owner steps, in order:
+
+1. **Re-authenticate Stage 2.** Every run since 2026-11-06 fails with "OAuth
+   session expired". Run `claude` once on the Mac.
+2. **Fund the agentic account** (••2927 shows $0 since 2026-11-02).
+3. **Choose the book.** Set `entries_enabled: false` and `lrs.enabled: true`;
+   the validator refuses both on at once.
+4. **Arm the engine**: `"status": "autonomous"` under `books.lrs2x`.
+5. **Push AgentTradingLogic first, then RobinhoodAgent**, and merge
+   `feature/lrs2x` into `main`. The runtime clone pulls `main` the next
+   morning; the first trade is that day's 15:15 run.

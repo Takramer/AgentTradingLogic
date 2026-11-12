@@ -80,7 +80,7 @@ def main() -> None:
           f"max {gap.max():.3%}, days missing 15:15 bar: "
           f"{d.p1515.loc[LO:HI].isna().sum()}")
     s = run(d)
-    print(f"\n{s.index[0].date()} .. {s.index[-1].date()}  ({len(s) / 252:.1f} yr)")
+    print(f"\n{s.index[0].date()} .. {s.index[-1].date()}  ({L.years(s.index):.1f} yr)")
     print(f"15:15 signal disagrees with the close signal on {s.disagree.mean():.1%} of days")
     print(f"  {'':10}{'CAGR':>8}{'vol':>8}{'Sharpe':>8}{'maxDD':>9}")
     res = {}

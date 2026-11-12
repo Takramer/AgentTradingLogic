@@ -45,13 +45,23 @@ def load() -> pd.DataFrame:
     return df
 
 
+def years(idx: pd.DatetimeIndex) -> float:
+    """Calendar years spanned. Not rows / 252: before 1952 the NYSE traded on
+    Saturdays and French's daily file has ~290 rows a year (fixed 2026-11-12;
+    until then every pre-1952 CAGR here was understated)."""
+    return (idx[-1] - idx[0]).days / 365.25
+
+
 def strategies(df: pd.DataFrame, lag: int = 1) -> pd.DataFrame:
     idx = (1 + df.mkt).cumprod()
+    # Annual costs accrue by calendar time elapsed since the previous row, so a
+    # Saturday session does not pay a full trading day's fee.
+    dt = df.index.to_series().diff().dt.days.fillna(1) / 365.25
     on = (idx > idx.rolling(SMA).mean()).astype(float).shift(lag)  # lag 1: trade at close t; lag 2: close t+1
     out = pd.DataFrame(index=df.index)
     out["market"] = df.mkt
     for L in (1, 2):
-        lev = L * df.mkt - (L - 1) * (df.rf + SPREAD / 252) - ER[L] / 252
+        lev = L * df.mkt - (L - 1) * (df.rf + SPREAD * dt) - ER[L] * dt
         out[f"bh{L}x"] = lev
         switch = on.diff().abs().fillna(0) * SWITCH_BPS / 1e4
         out[f"lrs{L}x"] = on * lev + (1 - on) * df.rf - switch
@@ -61,14 +71,15 @@ def strategies(df: pd.DataFrame, lag: int = 1) -> pd.DataFrame:
 
 
 def perf(r: pd.Series, rf: pd.Series, mkt: pd.Series) -> dict:
-    yrs = len(r) / 252
+    yrs = years(r.index)
+    ppy = len(r) / yrs                                        # rows per year
     eq = (1 + r).cumprod()
     m = lambda s: (1 + s).resample("ME").prod() - 1          # noqa: E731
     ab = alpha_beta(m(r), m(mkt), m(rf))
     ex = r - rf
     return {"cagr": eq.iloc[-1] ** (1 / yrs) - 1,
-            "vol": r.std() * np.sqrt(252),
-            "sharpe": ex.mean() / ex.std() * np.sqrt(252),
+            "vol": r.std() * np.sqrt(ppy),
+            "sharpe": ex.mean() / ex.std() * np.sqrt(ppy),
             "maxdd": (eq / eq.cummax() - 1).min(),
             "alpha": ab["alpha_ann"], "alpha_t": ab["alpha_t"], "beta": ab["beta"]}
 
@@ -76,8 +87,8 @@ def perf(r: pd.Series, rf: pd.Series, mkt: pd.Series) -> dict:
 def table(s: pd.DataFrame, lo: str, hi: str, title: str) -> dict:
     w = s.loc[lo:hi]
     print(f"\n{title}  ({w.index[0].date()} .. {w.index[-1].date()}, "
-          f"{len(w) / 252:.1f} yr, in market {w.on.mean():.0%}, "
-          f"{w.on.diff().abs().sum() / (len(w) / 252):.1f} switches/yr)")
+          f"{years(w.index):.1f} yr, in market {w.on.mean():.0%}, "
+          f"{w.on.diff().abs().sum() / years(w.index):.1f} switches/yr)")
     print(f"  {'':8}{'CAGR':>8}{'vol':>8}{'Sharpe':>8}{'maxDD':>9}"
           f"{'alpha':>8}{'t':>7}{'beta':>7}")
     res = {}
@@ -109,7 +120,7 @@ def main() -> None:
     beats = 0
     for lo, hi in ERAS:
         w = s.loc[lo:hi]
-        c = {k: (1 + w[k]).prod() ** (252 / len(w)) - 1 for k in ("market", "lrs1x", "lrs2x", "bh2x")}
+        c = {k: (1 + w[k]).prod() ** (1 / years(w.index)) - 1 for k in ("market", "lrs1x", "lrs2x", "bh2x")}
         beats += c["lrs2x"] > c["market"]
         print(f"  {lo}-{hi}  market {c['market']:7.2%}  lrs1x {c['lrs1x']:7.2%}  "
               f"lrs2x {c['lrs2x']:7.2%}  bh2x {c['bh2x']:7.2%}")

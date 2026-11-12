@@ -92,6 +92,7 @@ audit and have **not** been re-established.
 | `rmxqt_power.py` | Why no 8-year test can prove it |
 | `lrs_check.py` | Leverage + 200-day trend on French daily 1926-2026, pre-registered (family `index-leverage`). `--lag 2` = trade at the next close |
 | `lrs_1515_check.py` | LRS-2x decided on the 15:15 ET price from SPY one-minute bars vs next-close; pre-registered, PASS |
+| `lrs_crosscheck.py` | Recomputes the LRS figures with quantstats + statsmodels (HAC); exits 1 on any mismatch. `notebooks/lrs.ipynb` charts the same numbers |
 | `verify_vol_scaling.py` | Barroso & Santa-Clara replicated on French momentum |
 | `rh_spreads.py` | Measured Robinhood quoted spreads → real cost in bps |
 | `measure_pit_cost.py` / `cost_crossover.py` | Where cost overtakes the edge |
