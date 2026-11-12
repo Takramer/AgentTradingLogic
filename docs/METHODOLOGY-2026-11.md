@@ -127,6 +127,54 @@ a 15-minute SSO swing rule) made +78% against SSO buy-and-hold's +173% over
 2016-06 → 2022-06. Same lesson as §3.3: since 2016, plain 2x has beaten the
 filtered version on return; the filter buys a smaller drawdown.
 
+### 2e. Cutting the drawdown: LRS-VT
+
+LRS-2x's worst loss, −68.3%, came in 1933–35: whipsaw at 2x after the 1932
+bottom. Its 1987 loss was −54.1%. Three variants were pre-registered (family
+`index-leverage`, now 6 trials; repo 91) and run by `scripts/lrs_variants_check.py`,
+lag 2, same costs. Exposure is held as SPY + T-bills up to 1x, SPY + SSO above.
+
+| 1927–2026 | CAGR | maxDD | Calmar | Sharpe | alpha t | avg exposure | trails 10-yr |
+|---|---|---|---|---|---|---|---|
+| market | 10.20% | −84.1% | 0.12 | 0.46 | — | 1.00 | — |
+| LRS-2x | 15.19% | −68.3% | 0.22 | 0.59 | 3.30 | 1.45 | 17% |
+| **LRS-VT** | **14.57%** | **−57.9%** | **0.25** | **0.63** | **3.68** | 1.37 | 19% |
+| LRS-1.5x | 12.76% | −56.2% | 0.23 | 0.60 | 3.31 | 1.09 | 31% |
+| VT alone | 13.30% | −92.1% | 0.14 | 0.49 | 1.52 | 1.79 | 27% |
+
+| 2016-07 – 2026-09 | CAGR | maxDD |
+|---|---|---|
+| market | 15.31% | −34.2% |
+| LRS-2x | 19.30% | −42.1% |
+| LRS-VT | 16.87% | −35.0% |
+| LRS-1.5x | 15.67% | −33.1% |
+
+**LRS-VT**: in the trend, exposure = min(2, 0.30 ÷ 21-day realized vol);
+rebalance only when the target moves more than 0.25x. It passed all five
+pre-registered checks. Alpha t 3.68 clears the repo-wide bar (3.45; p 0.021
+across 91 trials, 0.0014 within the family) — the first result here that does.
+It costs 0.6 points a year against LRS-2x over a century and 2.4 points since
+2016, for 10 points less drawdown, and trades about 8 times a year instead of 5.
+
+VT alone (no trend) lost 92% in 1929–32: the trend filter dodges slow crashes,
+the vol cap trims fast ones. LRS-1.5x passes but trails the market in 31% of
+decades. None of these fixes the lag: any 200-day rule trails in V-shaped years.
+
+**At 15:15 on the live price** (`scripts/lrs_vt_extra_check.py`, pre-registered,
+SPY one-minute bars 2016-07 – 2026-09): LRS-VT made 17.41% a year with a worst
+loss of −31.6%, against SPY's 15.26% / −33.7% and LRS-VT at the next close
+16.29% / −36.6%. Accepted. It beat SPY on both return and drawdown here, but ten
+years alone prove little (alpha t 0.47); the century-long test carries the weight.
+
+**Treasuries instead of T-bills when the trend is off**: rejected. The bond is
+rebuilt from 10-year yields since 1962 (daily correlation 0.947 with IEF; the
+model earns 0.7 points a year less than IEF). It helped from 1963 to 2026
+(13.79% vs 12.84%), all of it while rates fell. In 2022 stocks and bonds fell
+together and its drawdown reached −43.4%, against −35.0% with T-bills.
+
+After these two trials the family holds 8 and the repo 93; LRS-VT's alpha t 3.68
+still clears the bar (p 0.021 across 93). Not wired into RobinhoodAgent.
+
 ## 3. What breaks it — say these before arming
 
 1. **It is leverage, and the filter cannot dodge a one-day crash.** Under
@@ -167,7 +215,7 @@ qualitative methods it had not touched.
 | Day trading (`intraday/`) | nothing cleared | T10 paper-trading since 2026-10-28 |
 | Prediction markets, BTC hourly, weather | closed; code removed today | not tradable through the Robinhood MCP |
 | Congress trade copying | no | abnormal returns fell after the 2012 STOCK Act; buying after disclosure earned negative alpha in a House-purchase study (Gothenburg) |
-| Insider purchases (Form 4) | untested here | 82 bps/month for "opportunistic" buys (Cohen, Malloy & Pomorski 2012), concentrated in small, poorly governed firms; needs a Form 4 feed and a trial |
+| Insider purchases (Form 4) | **failed** | `scripts/insider_check.py`, pre-registered: officers' and directors' buys ≥ $25k, held a month, 2006–2026. 6.78%/yr vs SPY 11.06%; −1.42%/yr against a survivor control after 30 bps costs (t −1.12). Before costs +2.43%/yr (t 1.71); monthly turnover eats 3.56%/yr. Only 54% of events could be priced (Yahoo lacks delisted stocks), which flatters it |
 | LLM news sentiment | untested here | next-day predictability (Lopez-Lira & Tang, v6 2025) is an underreaction story that needs real-time news and fast fills; the MCP has no news feed |
 | Shorting, futures | unavailable | the MCP has no short or futures orders (ROBINHOOD_MCP.md) |
 

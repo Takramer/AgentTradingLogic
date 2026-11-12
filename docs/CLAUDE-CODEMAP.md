@@ -93,6 +93,10 @@ audit and have **not** been re-established.
 | `lrs_check.py` | Leverage + 200-day trend on French daily 1926-2026, pre-registered (family `index-leverage`). `--lag 2` = trade at the next close |
 | `lrs_1515_check.py` | LRS-2x decided on the 15:15 ET price from SPY one-minute bars vs next-close; pre-registered, PASS |
 | `lrs_crosscheck.py` | Recomputes the LRS figures with quantstats + statsmodels (HAC); exits 1 on any mismatch. `notebooks/lrs.ipynb` charts the same numbers |
+| `lrs_variants_check.py` | LRS-VT (vol-capped), VT alone, LRS-1.5x vs LRS-2x; pre-registered, family `index-leverage`. LRS-VT accepted, alpha t 3.68 |
+| `lrs_vt_extra_check.py` | LRS-VT at 15:15 (accepted: 17.41% / −31.6% vs SPY 15.26% / −33.7%, 2016-26) and with Treasuries when off (rejected: 2022) |
+| `fetch_form345.py` | SEC insider-transaction data sets 2006+ → `research_data/sec/form345_purchases.csv.gz` (gitignored). Sends the repo SEC contact UA |
+| `insider_check.py` | Officer/director Form 4 purchases, hold 21 sessions, vs a survivor control; pre-registered, family `insider`. Failed after costs |
 | `verify_vol_scaling.py` | Barroso & Santa-Clara replicated on French momentum |
 | `rh_spreads.py` | Measured Robinhood quoted spreads → real cost in bps |
 | `measure_pit_cost.py` / `cost_crossover.py` | Where cost overtakes the edge |
