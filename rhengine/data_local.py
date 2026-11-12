@@ -38,13 +38,15 @@ DAY_MS = 86_400_000
 
 # ---------------------------------------------------------------- Yahoo ----
 
-def _cache_path(ticker):
-    return os.path.join(CACHE_DIR, ticker.upper() + ".json.gz")
+def _cache_path(ticker, adjust=True):
+    # Raw and adjusted bars must not share a file: until 2026-11-12 they did,
+    # so fetch_yahoo(adjust=False) after an adjusted fetch returned ADJUSTED bars.
+    return os.path.join(CACHE_DIR, ticker.upper() + ("" if adjust else ".raw") + ".json.gz")
 
 
-def _cache_load(ticker, period1):
+def _cache_load(ticker, period1, adjust=True):
     """Return cached bars if fetched today (UTC) and covering period1, else None."""
-    path = _cache_path(ticker)
+    path = _cache_path(ticker, adjust)
     if not os.path.exists(path):
         return None
     try:
@@ -62,9 +64,9 @@ def _cache_load(ticker, period1):
     return blob.get("bars")
 
 
-def _cache_save(ticker, period1, bars):
+def _cache_save(ticker, period1, bars, adjust=True):
     os.makedirs(CACHE_DIR, exist_ok=True)
-    path = _cache_path(ticker)
+    path = _cache_path(ticker, adjust)
     tmp = path + ".tmp"
     blob = {
         "fetched": datetime.now(timezone.utc).date().isoformat(),
@@ -85,7 +87,7 @@ def fetch_yahoo(ticker, lookback_days=400, adjust=True, _retries=2):
     """
     now = int(_time.time())
     period1 = now - lookback_days * 86400
-    cached = _cache_load(ticker, period1)
+    cached = _cache_load(ticker, period1, adjust)
     if cached is not None:
         return [b for b in cached if b["time"] >= period1 * 1000]
 
@@ -137,7 +139,7 @@ def fetch_yahoo(ticker, lookback_days=400, adjust=True, _retries=2):
             "volume": v,
         })
     bars.sort(key=lambda b: b["time"])
-    _cache_save(ticker, period1, bars)
+    _cache_save(ticker, period1, bars, adjust)
     return bars
 
 

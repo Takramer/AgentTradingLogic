@@ -1,47 +1,39 @@
 {
   "source": "aqr.com/library/data-sets",
   "note": "QMJ (Asness, Frazzini & Pedersen), BAB (Frazzini & Pedersen), TSMOM (Moskowitz, Ooi & Pedersen), HML Devil. US series start 1926-1957 depending on factor.",
-  "fetched_utc": "2026-07-25T15:05:44Z",
+  "fetched_utc": "2026-11-12T16:20:53Z",
   "files": [
     {
       "file": "quality-minus-junk-factors-monthly.xlsx",
       "url": "https://www.aqr.com/-/media/AQR/Documents/Insights/Data-Sets/Quality-Minus-Junk-Factors-Monthly.xlsx",
-      "bytes": 2255724,
+      "bytes": 2265582,
       "cached": false,
-      "seconds": 0.9,
-      "sha256_16": "bddfe3a235ada05e"
-    },
-    {
-      "file": "quality-minus-junk-10-portfolios-monthly.xlsx",
-      "url": "https://www.aqr.com/-/media/AQR/Documents/Insights/Data-Sets/Quality-Minus-Junk-Ten-Quality-Sorted-Portfolios-Monthly.xlsx",
-      "bytes": 49445,
-      "cached": false,
-      "seconds": 0.2,
-      "sha256_16": "d40d8af5434ab7e7"
+      "seconds": 0.7,
+      "sha256_16": "d26f09cd8f58977f"
     },
     {
       "file": "betting-against-beta-equity-factors-monthly.xlsx",
       "url": "https://www.aqr.com/-/media/AQR/Documents/Insights/Data-Sets/Betting-Against-Beta-Equity-Factors-Monthly.xlsx",
-      "bytes": 2495385,
+      "bytes": 2504680,
       "cached": false,
       "seconds": 0.5,
-      "sha256_16": "f65a40851a8799d6"
+      "sha256_16": "9f4ee5eb1dfc28ea"
     },
     {
       "file": "time-series-momentum-factors-monthly.xlsx",
       "url": "https://www.aqr.com/-/media/AQR/Documents/Insights/Data-Sets/Time-Series-Momentum-Factors-Monthly.xlsx",
       "bytes": 139830,
       "cached": false,
-      "seconds": 0.0,
+      "seconds": 0.1,
       "sha256_16": "33470930e2269c0d"
     },
     {
       "file": "the-devil-in-hmls-details-factors-monthly.xlsx",
       "url": "https://www.aqr.com/-/media/AQR/Documents/Insights/Data-Sets/The-Devil-in-HMLs-Details-Factors-Monthly.xlsx",
-      "bytes": 1939435,
+      "bytes": 1947762,
       "cached": false,
-      "seconds": 0.4,
-      "sha256_16": "b20c3604e3d4e9dc"
+      "seconds": 0.5,
+      "sha256_16": "c8b5ca163bc3c610"
     }
   ]
 }

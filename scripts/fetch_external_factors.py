@@ -121,6 +121,22 @@ FRENCH_FILES = {
     "F-F_ST_Reversal_Factor.zip": f"{FRENCH_BASE}/F-F_ST_Reversal_Factor_CSV.zip",
     "F-F_LT_Reversal_Factor.zip": f"{FRENCH_BASE}/F-F_LT_Reversal_Factor_CSV.zip",
     "25_Portfolios_OP_INV_5x5.zip": f"{FRENCH_BASE}/25_Portfolios_OP_INV_5x5_CSV.zip",
+    "25_Portfolios_ME_OP_5x5.zip": f"{FRENCH_BASE}/25_Portfolios_ME_OP_5x5_CSV.zip",
+    "25_Portfolios_ME_Prior_12_2.zip": f"{FRENCH_BASE}/25_Portfolios_ME_Prior_12_2_CSV.zip",
+    "32_Portfolios_ME_OP_INV_2x4x4.zip":
+        f"{FRENCH_BASE}/32_Portfolios_ME_OP_INV_2x4x4_CSV.zip",
+    "F-F_Research_Data_Factors_daily.zip":
+        f"{FRENCH_BASE}/F-F_Research_Data_Factors_daily_CSV.zip",
+}
+# The ff_*.py scripts and alpha/panel.py read these names from research_data/.
+# Until 2026-11-12 nothing in the repo produced them, so RMX-B's headline
+# evidence could not be rebuilt on a fresh machine.
+FRENCH_RMX_CSV = {
+    "ff5_monthly.csv": "F-F_Research_Data_5_Factors_2x3.zip",
+    "port_me_op_5x5.csv": "25_Portfolios_ME_OP_5x5.zip",
+    "port_me_prior_5x5.csv": "25_Portfolios_ME_Prior_12_2.zip",
+    "port_me_op_inv.csv": "32_Portfolios_ME_OP_INV_2x4x4.zip",
+    "ff_daily.csv": "F-F_Research_Data_Factors_daily.zip",
 }
 
 
@@ -337,6 +353,15 @@ def fetch_french(force: bool = False) -> list[dict]:
         except Exception as exc:                     # noqa: BLE001
             print(f"    {local:<52} FAILED {type(exc).__name__}: {exc}")
             recs.append({"file": local, "error": f"{type(exc).__name__}: {exc}"})
+    for csv_name, zip_name in FRENCH_RMX_CSV.items():
+        src = os.path.join(folder, zip_name)
+        if not os.path.exists(src):
+            continue
+        with zipfile.ZipFile(src) as z:
+            member = next(m for m in z.namelist() if m.lower().endswith(".csv"))
+            with open(os.path.join(ROOT, "research_data", csv_name), "wb") as f:
+                f.write(z.read(member))
+        print(f"    -> research_data/{csv_name}")
     _write_manifest(folder, recs, "Ken French data library",
                     "Monthly research factors, momentum, short- and long-term "
                     "reversal, and the 25 OP x INV portfolios. The daily file "

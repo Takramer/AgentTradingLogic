@@ -24,6 +24,7 @@ The **only** place performance numbers may come from.
 | `rmxd.py` | RMX-D, frozen. **Rejected out-of-sample, 1/11 gates.** Do not tune |
 | `timing.py` | RMX-D's 10-month trend gate + absolute-momentum risk-off leg |
 | `rmx.py` | Shared research plumbing |
+| `lrs.py` | **LRS-2x** — SSO above SPY's 200-day average, SGOV below. `emit_lrs` returns the `live.emit` payload shape with the same arming rule. `--live-price` = decide and trade at 15:15 ET on the MCP quote. Evidence: `scripts/lrs_check.py`, `docs/METHODOLOGY-2026-11.md` |
 
 **Rejected code stays in the tree, out of `DEFAULT_SLEEVES`**, so the rejection
 is reproducible.
@@ -89,6 +90,8 @@ audit and have **not** been re-established.
 | `cap_cost_profile.py` | Labels a book's holdings by market-cap tier and re-costs it per name. Prints the tier weights, the effective bps, and CAGR/alpha under flat vs `tier-lo/point/hi`. Run before quoting any cost-sensitive number for a book |
 | `ff_size_ladder.py` | The same question down the WHOLE size ladder, each bucket benchmarked against its own cap-weighted return so the size premium is netted out. **Answered and rejected 2026-08-01** — no gradient over 63 years, momentum's gradient decayed to nothing, quality now best in BIG. See [SIZE-LADDER-2026-08-01.md](SIZE-LADDER-2026-08-01.md); do not re-litigate without reading it |
 | `rmxqt_power.py` | Why no 8-year test can prove it |
+| `lrs_check.py` | Leverage + 200-day trend on French daily 1926-2026, pre-registered (family `index-leverage`). `--lag 2` = trade at the next close |
+| `lrs_1515_check.py` | LRS-2x decided on the 15:15 ET price from SPY one-minute bars vs next-close; pre-registered, PASS |
 | `verify_vol_scaling.py` | Barroso & Santa-Clara replicated on French momentum |
 | `rh_spreads.py` | Measured Robinhood quoted spreads → real cost in bps |
 | `measure_pit_cost.py` / `cost_crossover.py` | Where cost overtakes the edge |
@@ -100,7 +103,7 @@ audit and have **not** been re-established.
 
 **Caches (gitignored, rebuildable):** `yahoo_cache/`, `massive_cache/`,
 `av_cache/`, `finnhub_cache/`, `fred_cache/`, `kalshi_cache/`,
-`polymarket_cache/`.
+`polymarket_cache/`. The prediction-market research code (btc, crypto, kalshi_ws, news, weather_lag, xvenue*) was removed 2026-11-12; it lives on local branch `backup/prediction-markets-2026-11-12`.
 
 **`research_data/`** — `external/` (published factors; CSVs ignored but
 `_manifest.json` files **are tracked**, because they record which vintage a

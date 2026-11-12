@@ -13,7 +13,8 @@ same code path:
 The engine is shared by **RobinhoodAgent** (autonomous Python) and **Nydex**
 (React). Engine-only: no order planning, no orchestration, no ML.
 
-**Start here:** [docs/RMX-RESULTS.md](docs/RMX-RESULTS.md) (the answer) →
+**Start here:** [docs/METHODOLOGY-2026-11.md](docs/METHODOLOGY-2026-11.md) (what can beat the S&P 500 in the Robinhood account: LRS-2x, and why it is beta, not skill) →
+[docs/RMX-RESULTS.md](docs/RMX-RESULTS.md) (the stock-selection answer) →
 [docs/RMX-C.md](docs/RMX-C.md) (current work) →
 [docs/AUDIT-2026-07-24.md](docs/AUDIT-2026-07-24.md) (why everything older was thrown out).
 
@@ -33,15 +34,16 @@ The engine is shared by **RobinhoodAgent** (autonomous Python) and **Nydex**
 | [docs/VIDEO-INTAKE-2026-07-31.md](docs/VIDEO-INTAKE-2026-07-31.md) | Someone sends a video/course. 21 triaged; **read §Cluster C before any options or 0DTE work** — the data blockers and the BXM prior are there |
 | [docs/VIDEO-INTAKE-2026-08-14.md](docs/VIDEO-INTAKE-2026-08-14.md) | 368 more triaged in two batches (agent tooling, LLM-bot content, one FTC-settled day-trading channel, 9 quant curricula). **§Cluster G first**: what a result drawn from N backtests is worth, why the trial ledger exists, and the fact that RMX-B's +2.54 misses its own pre-registered 6-trial Šidák bar of 2.63. Then **§Cluster H** for the 10k/25k/143k sweep series and the trial-correlation correction. Full extraction: `research_data/video_corpus_2026-08-14.tsv` |
 | [docs/VIDEO-INTAKE-2026-08-17.md](docs/VIDEO-INTAKE-2026-08-17.md) | 5 more (394 cumulative). **Read §Gap 1 before quoting any Sharpe**: the 95% CI on this repo's 8-year Sharpe is ±0.5, RMX-B 0.84 / RMX-C 0.85 / SPY 0.90 are not distinguishable, and the Lo (2002) autocorrelation adjustment was built, measured, and found **unusable at n=193** |
-| [docs/REFERENCE-LIBRARIES.md](docs/REFERENCE-LIBRARIES.md) | Anything the repo leans on from outside itself. Part 1: public quant repos for technique + licence terms before you copy (**not evidence**). Part 2: `research_data/external/` — which archive settles which question, and which cannot. Part 3: the core/sim/analysis dependency tiers |
+| [docs/INTAKE-2026-10-26.md](docs/INTAKE-2026-10-26.md) | 8 videos (402 cumulative), 11 repos, the Polymarket weather wallet, the Jev bot prompt. **§A first**: the wallet is real (+$21.5k last 30 days, not $1,230/day). The hourly capture (`weather_lag.py`) ran once and was removed 2026-11-12 with the rest of the prediction-market code — restore from branch `backup/prediction-markets-2026-11-12` |
+| [docs/REFERENCE-LIBRARIES.md](docs/REFERENCE-LIBRARIES.md) | Anything the repo leans on from outside itself. Part 1: public quant repos for technique + licence terms before you copy (**not evidence**). Part 2: `research_data/external/` — which archive settles which question, and which cannot. Part 3: the core/sim/analysis dependency tiers. Part 4: browse-only research sites (Screw Street — as-filed EDGAR fundamentals; OpenMarket — crypto order-flow and prediction-market charts, terms forbid scraping, **never connect a broker to it**; neither is evidence) |
 | [intraday/CLAUDE.md](intraday/CLAUDE.md) | You are working on **day trading**. That is a separate project in `intraday/` with its own guide, ledger and rules; nothing in this file's research content (verdicts, rejections, holdouts, trial counts) applies there |
 
 ## Environment
 
-- Python is `py`, never `python` or `python3`. Run from the repo root.
-- Windows. Notebooks headless need `$env:PYTHONUTF8='1'`.
+- macOS since 2026-11. Python is `.venv/bin/python` (3.14); the `py` in every command below is the old Windows launcher — substitute. Run from the repo root.
+- Fresh machine: `.venv/bin/python scripts/fetch_external_factors.py --only french aqr` writes the French CSVs the `ff_*.py` scripts and `alpha/panel.py` read. The PIT panel (`_panel_cache.pkl`, `sec/`, `yahoo_long/`) is NOT on this Mac; `fetch_history.py` + `fetch_sec_fundamentals.py` rebuild it (~1 h).
 - `tzdata` is required and installed. Stooq is blocked; Yahoo works.
-- Tests: `py -m unittest discover tests` (404 passing, 2026-08-17) or `py -m pytest tests/test_sleeves.py -q`.
+- Tests: `.venv/bin/python -m unittest discover tests` (413 passing, 2026-11-12).
 - After editing `rhengine/`, **Restart Kernel** in a notebook — Run All keeps the old module.
 
 ## Hard rules
