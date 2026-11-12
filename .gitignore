@@ -42,6 +42,10 @@ research_data/external/*/*.xlsx
 # Throwaway backups taken before a --force refresh.
 research_data/*.bak-*
 
+# Hourly weather-lag capture (rhengine/weather_lag.py), ~13 MB/day.
+research_data/weather_lag/capture.jsonl
+research_data/weather_lag/launchd.log
+
 # Local virtualenv (macOS dev box)
 .venv/
 
