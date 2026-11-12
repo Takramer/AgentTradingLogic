@@ -24,7 +24,7 @@ The **only** place performance numbers may come from.
 | `rmxd.py` | RMX-D, frozen. **Rejected out-of-sample, 1/11 gates.** Do not tune |
 | `timing.py` | RMX-D's 10-month trend gate + absolute-momentum risk-off leg |
 | `rmx.py` | Shared research plumbing |
-| `lrs.py` | **LRS-2x** — SSO above SPY's 200-day average, SGOV below. `emit_lrs` returns the `live.emit` payload shape with the same arming rule. `--live-price` = decide and trade at 15:15 ET on the MCP quote. Evidence: `scripts/lrs_check.py`, `docs/METHODOLOGY-2026-11.md` |
+| `lrs.py` | **LRS-2x** (SSO above SPY's 200-day average, SGOV below) and **LRS-VT** (`--vt`: same trend, exposure 0.30 / 21-day vol, max 2x, as SPY + SSO/SGOV; the book RobinhoodAgent runs). `emit_lrs` returns the `live.emit` payload shape with the same arming rule. `--live-price` = decide and trade at 15:15 ET on the MCP quote. The stdlib functions `vt_exposure`, `split`, `held_exposure`, `needs_trade` are what RobinhoodAgent's planner calls. Evidence: `scripts/lrs_check.py`, `scripts/lrs_variants_check.py`, `docs/METHODOLOGY-2026-11.md` |
 
 **Rejected code stays in the tree, out of `DEFAULT_SLEEVES`**, so the rejection
 is reproducible.

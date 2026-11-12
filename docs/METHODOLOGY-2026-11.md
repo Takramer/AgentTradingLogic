@@ -238,43 +238,56 @@ shorting is out either way.
 
 ## 6. Putting it in RobinhoodAgent
 
-Wired on RobinhoodAgent branch `feature/lrs2x`, **unarmed**. The engine side
-runs on its own:
+RobinhoodAgent runs **LRS-VT** (`books.lrs_vt`), not LRS-2x. Wired on
+RobinhoodAgent branch `feature/lrs2x`, **unarmed**. `books.lrs2x` stays as the
+research reference. The engine side runs on its own:
 
 ```bash
-.venv/bin/python -m rhengine.alpha.lrs                       # dry-run target
-.venv/bin/python -m rhengine.alpha.lrs --live-price 761.08    # 15:15 rule
-.venv/bin/python scripts/lrs_crosscheck.py                    # numbers, checked
+.venv/bin/python -m rhengine.alpha.lrs --vt                     # dry-run target
+.venv/bin/python -m rhengine.alpha.lrs --vt --live-price 761.08 # 15:15 rule
+.venv/bin/python scripts/lrs_variants_check.py                  # the evidence
 ```
 
-On 2026-11-12: SPY 759.81 vs 200-day 728.65 → **hold SSO**.
+On 2026-11-12: SPY above its 200-day average, 21-day vol 22.1% → target
+exposure 1.36x = **64% SPY, 36% SSO, 0% SGOV**.
 
 How the closing run uses it:
 
 1. Stage 2 adds SPY to its quotes and writes `spy_last` into `state.json`.
-2. `order_plan._build_lrs_actions` imports `lrs.book`, `lrs.decide` and
-   `lrs.closes_before` (stdlib only; the runtime Python has no pandas), takes
-   199 Yahoo closes plus `spy_last`, and picks SSO or SGOV. It sells the other
-   fund in full and buys the target with cash plus the sale proceeds.
-3. It skips LRS, and only LRS, before 15:00 ET, when `spy_last` is missing or
+2. `order_plan._build_lrs_actions` imports `lrs.book("lrs_vt")`,
+   `closes_before`, `vt_exposure`, `held_exposure`, `split` and `needs_trade`
+   (stdlib only; the runtime Python has no pandas). Target exposure is 0 when
+   `spy_last` is not above the 200-day average, else 0.30 / the 21-day
+   realized vol of closes through yesterday, capped at 2x.
+3. The book owns the whole account: cash plus SPY, SSO and SGOV. It trades
+   only on entry, exit, or when held exposure is more than 0.25 from the
+   target (~8 trades a year). Then it sells down what is over weight (in full
+   when a fund's target is under 2% of the book, else a partial quantity),
+   and buys what is under weight with cash plus the sale proceeds, sells
+   first. Inside the band it only parks idle cash in SGOV. Legs under 2% of
+   the book are skipped.
+4. It skips LRS, and only LRS, before 15:00 ET, when `spy_last` is missing or
    more than 30 minutes old, when Yahoo fails, when the last close is stale, or
-   when the engine's vehicles differ from SSO/SGOV. A skipped day is not
-   retried at the next close; the next closing run decides again.
-4. `validate_plan._validate_lrs` fails the plan if it trades anything but
-   SSO/SGOV, buys the wrong fund, buys more than the account holds, buys under
-   the kill switch (sells still go through), or buys before it sells.
-5. Swing exits and trailing stops ignore SSO/SGOV while LRS is on.
+   when the engine's vehicles differ from SPY/SSO/SGOV. A skipped day is not
+   retried; the next closing run decides again. Under the kill switch it still
+   sells SPY and SSO toward the target but buys nothing and sells no SGOV.
+5. `validate_plan._validate_lrs` fails the plan if it trades anything but
+   SPY/SSO/SGOV, if the plan's weights do not sum to 1 or exceed 2x exposure,
+   if it buys a fund whose target weight is 0, trades one fund twice, lists a
+   buy before a sell, buys more than the account holds, or buys under the
+   kill switch. It reads the book's status from the engine itself.
+6. Swing exits and trailing stops ignore SPY/SSO/SGOV while LRS is on.
 
 Two keys arm it, and both must turn:
 
 | Key | Where | Shipped |
 |---|---|---|
 | `lrs.enabled` | RobinhoodAgent `config.json` | `false` |
-| `books.lrs2x.status == "autonomous"` | engine `rhengine/strategies.json` | `"manual"` |
+| `books.lrs_vt.status == "autonomous"` | engine `rhengine/strategies.json` | `"manual"` |
 
 With only the first, the plan carries `dry_run_orders` that Stage 2 never
-places. SSO and SGOV were never banned; `banned_instruments` holds only inverse
-funds and VXX.
+places. None of the three funds is banned; `banned_instruments` holds only
+inverse funds and VXX.
 
 The engine bump (pin `aa4e336` → this repo) needed three helpers that
 `signals_pipeline.py` imported and this repo deleted. They now live in
@@ -283,12 +296,13 @@ on a cold start, because all six sleeves are retired.
 
 Owner steps, in order:
 
-1. **Re-authenticate Stage 2.** Every run since 2026-11-06 fails with "OAuth
-   session expired". Run `claude` once on the Mac.
-2. **Fund the agentic account** (••2927 shows $0 since 2026-11-02).
+1. ~~Re-authenticate Stage 2~~ — done 2026-11-12; the login holds until
+   2026-12-11.
+2. **Fund the agentic account** (••2927 shows $0 since 2026-11-02). At $50,
+   a 36% SSO leg is $18; the 2% floor skips legs under $1.
 3. **Choose the book.** Set `entries_enabled: false` and `lrs.enabled: true`;
    the validator refuses both on at once.
-4. **Arm the engine**: `"status": "autonomous"` under `books.lrs2x`.
+4. **Arm the engine**: `"status": "autonomous"` under `books.lrs_vt`.
 5. **Push AgentTradingLogic first, then RobinhoodAgent**, and merge
    `feature/lrs2x` into `main`. The runtime clone pulls `main` the next
    morning; the first trade is that day's 15:15 run.

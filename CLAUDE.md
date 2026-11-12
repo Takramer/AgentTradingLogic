@@ -13,7 +13,7 @@ same code path:
 The engine is shared by **RobinhoodAgent** (autonomous Python) and **Nydex**
 (React). Engine-only: no order planning, no orchestration, no ML.
 
-**Start here:** [docs/METHODOLOGY-2026-11.md](docs/METHODOLOGY-2026-11.md) (what can beat the S&P 500 in the Robinhood account: LRS-2x, and why it is beta, not skill) →
+**Start here:** [docs/METHODOLOGY-2026-11.md](docs/METHODOLOGY-2026-11.md) (what can beat the S&P 500 in the Robinhood account: LRS-2x and its vol-capped version LRS-VT, and why both are beta, not skill) →
 [docs/RMX-RESULTS.md](docs/RMX-RESULTS.md) (the stock-selection answer) →
 [docs/RMX-C.md](docs/RMX-C.md) (current work) →
 [docs/AUDIT-2026-07-24.md](docs/AUDIT-2026-07-24.md) (why everything older was thrown out).
@@ -43,7 +43,7 @@ The engine is shared by **RobinhoodAgent** (autonomous Python) and **Nydex**
 - macOS since 2026-11. Python is `.venv/bin/python` (3.14); the `py` in every command below is the old Windows launcher — substitute. Run from the repo root.
 - Fresh machine: `.venv/bin/python scripts/fetch_external_factors.py --only french aqr` writes the French CSVs the `ff_*.py` scripts and `alpha/panel.py` read. The PIT panel (`_panel_cache.pkl`, `sec/`, `yahoo_long/`) is NOT on this Mac; `fetch_history.py` + `fetch_sec_fundamentals.py` rebuild it (~1 h).
 - `tzdata` is required and installed. Stooq is blocked; Yahoo works.
-- Tests: `.venv/bin/python -m unittest discover tests` (415 passing, 6 skipped, 2026-11-12).
+- Tests: `.venv/bin/python -m unittest discover tests` (422 passing, 6 skipped, 2026-11-12).
 - After editing `rhengine/`, **Restart Kernel** in a notebook — Run All keeps the old module.
 
 ## Hard rules

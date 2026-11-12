@@ -1,7 +1,12 @@
-"""lrs.py — the LRS-2x book: 2x S&P 500 above its 200-day average, T-bills below.
+"""lrs.py — the LRS books: S&P 500 exposure above its 200-day average, T-bills below.
 
-Evidence and its limits: docs/METHODOLOGY-2026-11.md, scripts/lrs_check.py,
-`strategies.json` -> books.lrs2x.
+    lrs2x   2x (SSO) above the average, SGOV below.
+    lrs_vt  the same trend, exposure capped at vol_target / 21-day realized vol
+            (max 2x), held as SPY + SGOV up to 1x and SPY + SSO above. This is
+            the book RobinhoodAgent runs (vt_exposure / split / needs_trade).
+
+Evidence and its limits: docs/METHODOLOGY-2026-11.md §2 and §2e,
+scripts/lrs_check.py, scripts/lrs_variants_check.py, scripts/lrs_vt_extra_check.py.
 
 Emits the same payload shape as `live.emit` so one executor can consume both,
 and inherits its arming rule unchanged: orders are permitted only when the
@@ -10,6 +15,7 @@ book's status is exactly "autonomous". This module never places an order.
     .venv/bin/python -m rhengine.alpha.lrs                          # target only
     .venv/bin/python -m rhengine.alpha.lrs --positions pos.json     # + deltas
     .venv/bin/python -m rhengine.alpha.lrs --live-price 761.08      # 15:15 ET rule
+    .venv/bin/python -m rhengine.alpha.lrs --vt --live-price 761.08 # LRS-VT target
 
 --live-price is the SPY last trade the executor read from the Robinhood MCP at
 15:15 ET. It stands in for today's close, and the trade happens then, not at
@@ -18,7 +24,8 @@ tomorrow's close (scripts/lrs_1515_check.py: 19.09% CAGR, -37.4% max DD vs
 
 Importing this module needs only the standard library (and `requests` for
 `closes_before`): RobinhoodAgent's runtime Python has no pandas, and its
-planner calls `book`, `decide` and `closes_before` directly. pandas loads only
+planner calls `book`, `closes_before`, `vt_exposure`, `held_exposure`,
+`split` and `needs_trade` directly. pandas loads only
 inside `emit_lrs` / `main`. tests/test_lrs.py guards that.
 """
 from __future__ import annotations
@@ -68,6 +75,52 @@ def closes_before(today: dt.date, ticker: str = "SPY",
     if not rows:
         raise ValueError(f"no {ticker} closes before {today}")
     return [c for _, c in rows], rows[-1][0]
+
+
+def realized_vol(closes, n: int = 21) -> float | None:
+    """Annualized sample stdev of the last `n` daily returns of `closes`
+    (pandas `rolling(n).std() * sqrt(252)`). None when there are too few."""
+    xs = [float(x) for x in closes if x == x]
+    if len(xs) < n + 1:
+        return None
+    r = [b / a - 1 for a, b in zip(xs[-n - 1:-1], xs[-n:])]
+    m = sum(r) / n
+    return (sum((x - m) ** 2 for x in r) / (n - 1)) ** 0.5 * 252 ** 0.5
+
+
+def vt_exposure(closes, live_price: float | None = None, b: dict | None = None) -> float | None:
+    """LRS-VT target exposure: 0 when the price is not above its 200-day
+    average, else vol_target / realized vol, capped at max_exposure. The trend
+    uses the live price; the vol uses closes only (the tested 15:15 rule)."""
+    s = (b or book("lrs_vt"))["signal"]
+    on = decide(closes, live_price, int(s["sma_sessions"]))
+    vol = realized_vol(closes, int(s["vol_sessions"]))
+    if on is None or not vol:
+        return None
+    return min(float(s["max_exposure"]), float(s["vol_target"]) / vol) if on else 0.0
+
+
+def split(e: float, vehicles: dict) -> dict:
+    """Exposure as portfolio weights: index + cash fund up to 1x, index + 2x fund above."""
+    lev = max(e - 1.0, 0.0)
+    idx = min(e, 1.0) - lev
+    return {vehicles["index"]: idx, vehicles["levered"]: lev, vehicles["cash"]: 1.0 - idx - lev}
+
+
+def held_exposure(values: dict, total: float, vehicles: dict) -> float:
+    """Market exposure of current holdings ($ by ticker) per $ of account."""
+    if total <= 0:
+        return 0.0
+    return (values.get(vehicles["index"], 0.0) + 2 * values.get(vehicles["levered"], 0.0)) / total
+
+
+def needs_trade(target: float, held: float, band: float, dust: float = 0.02) -> bool:
+    """The backtest's band: always trade into or out of the market, otherwise
+    only when the target is more than `band` from what is held.
+    ponytail: live `held` drifts with prices; the backtest held the band value."""
+    if (target == 0) != (held < dust):
+        return True
+    return abs(target - held) > band
 
 
 def signal(adj, sma: int = 200) -> bool | None:
@@ -161,7 +214,17 @@ def main() -> None:
     ap.add_argument("--live-price", type=float,
                     help="SPY last trade at 15:15 ET from the Robinhood MCP")
     ap.add_argument("--out")
+    ap.add_argument("--vt", action="store_true", help="print the LRS-VT target instead")
     a = ap.parse_args()
+    if a.vt:
+        b = book("lrs_vt")
+        closes, last = closes_before(dt.datetime.now(_ET).date())
+        e = vt_exposure(closes, a.live_price, b)
+        print(json.dumps({"book": "lrs_vt", "status": b["status"], "last_close": str(last),
+                          "live_price": a.live_price, "target_exposure": e,
+                          "vol": realized_vol(closes, int(b["signal"]["vol_sessions"])),
+                          "weights": None if e is None else split(e, b["vehicles"])}, indent=2))
+        return
     import pandas as pd
 
     from ..data_local import fetch_yahoo
