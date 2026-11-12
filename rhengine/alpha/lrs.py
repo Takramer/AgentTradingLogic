@@ -15,34 +15,77 @@ book's status is exactly "autonomous". This module never places an order.
 15:15 ET. It stands in for today's close, and the trade happens then, not at
 tomorrow's close (scripts/lrs_1515_check.py: 19.14% CAGR, -37.4% max DD vs
 18.01%, -43.1% for next-close, 2016-07..2026-09).
+
+Importing this module needs only the standard library (and `requests` for
+`closes_before`): RobinhoodAgent's runtime Python has no pandas, and its
+planner calls `book`, `decide` and `closes_before` directly. pandas loads only
+inside `emit_lrs` / `main`. tests/test_lrs.py guards that.
 """
 from __future__ import annotations
 
 import argparse
 import datetime as dt
 import json
+from pathlib import Path
+from zoneinfo import ZoneInfo
 
-import pandas as pd
+_SPEC = Path(__file__).resolve().parent.parent / "strategies.json"
+_ET = ZoneInfo("America/New_York")
 
-from . import live
+
+def book(name: str = "lrs2x", spec: dict | None = None) -> dict:
+    """The book's block from strategies.json (status, signal, vehicles, ...)."""
+    spec = spec or json.loads(_SPEC.read_text(encoding="utf-8"))
+    return spec["books"][name]
 
 
-def signal(adj: pd.Series, sma: int = 200) -> bool | None:
-    """True when the last close is above its `sma`-session mean; None if too short."""
-    adj = adj.dropna()
-    if len(adj) < sma:
+def decide(closes, live_price: float | None = None, sma: int = 200) -> bool | None:
+    """True when the latest price is above the mean of the last `sma` prices.
+
+    `closes`: adjusted closes, oldest first. `live_price`, if given, is
+    appended as today's price (the 15:15 rule). None when there are too few.
+    """
+    xs = [float(x) for x in closes if x == x]            # x == x drops NaN
+    if live_price is not None:
+        xs.append(float(live_price))
+    if len(xs) < sma:
         return None
-    return bool(adj.iloc[-1] > adj.iloc[-sma:].mean())
+    window = xs[-sma:]
+    return window[-1] > sum(window) / sma
 
 
-def emit_lrs(adj: pd.Series, positions: dict | None = None, asof: str | None = None,
+def closes_before(today: dt.date, ticker: str = "SPY",
+                  lookback_days: int = 400) -> tuple[list[float], dt.date]:
+    """Yahoo adjusted closes for sessions strictly before `today` (New York).
+
+    While the market is open Yahoo's last bar is live, so today's bar is
+    always dropped. Returns (closes oldest first, date of the last close).
+    """
+    from ..data_local import fetch_yahoo
+    rows = [(dt.datetime.fromtimestamp(b["time"] / 1000, _ET).date(), b["close"])
+            for b in fetch_yahoo(ticker, lookback_days=lookback_days)]
+    rows = [(d, c) for d, c in rows if d < today]
+    if not rows:
+        raise ValueError(f"no {ticker} closes before {today}")
+    return [c for _, c in rows], rows[-1][0]
+
+
+def signal(adj, sma: int = 200) -> bool | None:
+    """`decide` on a pandas Series of closes."""
+    return decide(adj.dropna().tolist(), None, sma)
+
+
+def emit_lrs(adj, positions: dict | None = None, asof: str | None = None,
              spec: dict | None = None, name: str = "lrs2x",
              live_price: float | None = None) -> dict:
-    """Target book from SPY's adjusted closes (DatetimeIndex, New York dates).
+    """Target book from SPY's adjusted closes (pandas Series, New York dates).
 
     live_price: today's 15:15 ET SPY price. Appended as today's value, so the
     signal and the trade both happen today. `adj` must then end before today.
     """
+    import pandas as pd
+
+    from . import live
     spec = spec or live._load(live._SPEC)
     bs = live.book_spec(name, spec)
     status = live.book_status(name, spec)
@@ -119,6 +162,8 @@ def main() -> None:
                     help="SPY last trade at 15:15 ET from the Robinhood MCP")
     ap.add_argument("--out")
     a = ap.parse_args()
+    import pandas as pd
+
     from ..data_local import fetch_yahoo
     bars = fetch_yahoo("SPY", lookback_days=400)
     adj = pd.Series([b["close"] for b in bars],

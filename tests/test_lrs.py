@@ -1,6 +1,8 @@
 """LRS-2x book: the signal, the vehicle choice, staleness, and the arming rule."""
 
 import json
+import subprocess
+import sys
 import unittest
 
 import numpy as np
@@ -49,6 +51,23 @@ class LRS(unittest.TestCase):
         self.assertIn("15:15", on["execution_rule"])
         with self.assertRaises(ValueError):              # today's bar already present
             lrs.emit_lrs(_closes(0.0), asof="2026-11-10", spec=_spec("manual"), live_price=100)
+
+    def test_stdlib_path_needs_no_pandas(self):
+        # RobinhoodAgent's runtime Python has no pandas; its planner imports this.
+        code = ("import sys; sys.modules['pandas'] = None\n"
+                "from rhengine.alpha import lrs\n"
+                "assert lrs.book()['vehicles'] == {'risk_on': 'SSO', 'risk_off': 'SGOV'}\n"
+                "assert lrs.decide([1.0] * 199, 2.0) is True\n"
+                "assert lrs.decide([1.0] * 199, 0.5) is False\n"
+                "assert lrs.decide([1.0] * 198, 2.0) is None\n")
+        r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
+                           cwd=str(live._SPEC.parent.parent))
+        self.assertEqual(r.returncode, 0, r.stderr)
+
+    def test_decide_matches_signal(self):
+        for move in (+0.05, -0.05, +0.001, -0.001):
+            s = _closes(move)
+            self.assertEqual(lrs.decide(s.tolist()), lrs.signal(s))
 
     def test_stale_refuses(self):
         with self.assertRaises(live.StaleBook):
