@@ -211,8 +211,11 @@ qualitative methods it had not touched.
 | Quality + 12-1 momentum, cap-weighted (RMX-B) | **kept, manual** | +1.81%/yr alpha, t=+2.61, 4/4 eras, French 1963–2026 (rebuilt today); trails 42% of calendar years, 9% of 10-yr windows. Needs ~96 names |
 | Trend timing of the stock book (RMX-D) | rejected | −6.22 pp/yr out of sample |
 | Covered calls / wheel / premium selling | closed | BXM alpha t=+0.62 against total return (OPTIONS-SOURCES §6) |
+| Weekly premium selling (Cboe WPUT, BXMW) | **failed** | `scripts/shortdated_check.py`, pre-registered 2026-11-12: WPUT 2006–2026 4.75%/yr, Sharpe 0.31, −2.02%/yr (t −1.57) against the same beta held passively; BXMW −1.19%/yr (t −0.87). Weekly is worse than monthly: WPUT 4.60% vs PUT 7.52% on the same days |
+| 0DTE options | not tested here; published record is poor | Vilkov, *0DTE Trading Rules* (SSRN 4641356, rev. 2026-03, 2016-09..2026-02 real quotes): the same-day premium is "small and difficult to monetize after realistic frictions", P&L is driven by tails; only some 10:00 ET conditional rules made money out of sample. Retail 0DTE trades lose ~4.6% each (Anatomy of Retail Option Trading, 2025). The agent account (level 2, cash) can only buy options, the losing side. Testing needs paid one-minute OPRA quotes; the free accumulator stopped on 2026-08-01 with 10 quotes |
+| Overnight-only SPY (close → next open) | **failed** | `intraday/scripts/overnight.py`, T18: dev 2016–2024 $6,931 on $10k, t +2.06 against a bar of 3.18, Sharpe 0.66 vs 0.85 for holding all day |
 | LEAPS stock replacement | same bet as LRS, worse vehicle at this size | one deep-ITM SPY or XSP LEAP controls ~$76,000 of index and costs over $10,000, plus option spreads; SSO is fractional from $1 |
-| Day trading (`intraday/`) | nothing cleared | T10 paper-trading since 2026-10-28 |
+| Day trading (`intraday/`) | **failed** | T10, the last candidate, lost $617 on its one holdout look (2025-01 → 2026-09, t −1.51, drawdown −$727 vs a −$309 development worst). Holdout spent (`intraday/docs/RESULTS.md`) |
 | Prediction markets, BTC hourly, weather | closed; code removed today | not tradable through the Robinhood MCP |
 | Congress trade copying | no | abnormal returns fell after the 2012 STOCK Act; buying after disclosure earned negative alpha in a House-purchase study (Gothenburg) |
 | Insider purchases (Form 4) | **failed** | `scripts/insider_check.py`, pre-registered: officers' and directors' buys ≥ $25k, held a month, 2006–2026. 6.78%/yr vs SPY 11.06%; −1.42%/yr against a survivor control after 30 bps costs (t −1.12). Before costs +2.43%/yr (t 1.71); monthly turnover eats 3.56%/yr. Only 54% of events could be priced (Yahoo lacks delisted stocks), which flatters it |
@@ -306,3 +309,46 @@ Owner steps, in order:
 5. **Push AgentTradingLogic first, then RobinhoodAgent**, and merge
    `feature/lrs2x` into `main`. The runtime clone pulls `main` the next
    morning; the first trade is that day's 15:15 run.
+
+## 7. From a $5,000 start — backtest, out of sample, forward (2026-11-12)
+
+Pre-registered in the ledger (family index-leverage) before it ran. Rules
+frozen; nothing re-tuned. `scripts/lrs_5k_check.py`, `scripts/lrs_paper.py`.
+
+| $5,000 in | SPY | LRS-2x | LRS-VT |
+|---|---|---|---|
+| 1950 → 2026-09, next close | $22.6M, 11.59%/yr, −54.6% | $241M, 15.08%, −54.1% | $202M, 14.82%, **−49.2%** |
+| 2000 → 2026-09, next close | $44,067, 8.48%, −54.6% | $62,760, 9.92%, −47.6% | $63,452, 9.97%, **−37.4%** |
+| 2016-07 → 2026-09, 15:15 (the live rule) | $21,357, 15.22%, −33.7% | $29,966, 19.09%, −37.4% | $25,911, 17.41%, −31.6% |
+
+Read it like this:
+
+- **Out of sample, LRS still beat the index.** LRS-2x was published in 2016 on
+  older data; since then it made 18.52%/yr against 14.92% (alpha t +0.76, too
+  short a window to be significant).
+- **The parameters are not fitted.** Re-picking vol target and band every five
+  years on the prior twenty gives Sharpe 0.60 against the fixed rule's 0.61, and
+  all 15 grid cells beat the market's Sharpe (0.58–0.62 against 0.54).
+- **But the edge is small next to its noise.** LRS-VT's alpha t is 1.91 on
+  1950–2026, under the family bar of 3.04; the 3.68 from 1927 rests on the
+  1929–32 crash. It beats SPY by ~4%/yr with 14% tracking error, so a live
+  record needs ~48 years to prove itself at t = 2. Over the live rule's ten
+  years its Sharpe (0.74) equals SPY's (0.75).
+- **Worst case is a crash while levered.** LRS-VT's third-worst drawdown is
+  −49% (Aug 1987 → Aug 1988): it held ~2x into October 19, 1987.
+- **Bootstrap, 10 years from $5,000** (5,000 paths, 63-day blocks, 1953–2026):
+  median $18,765 vs SPY $14,853; ahead of SPY in 72% of paths; behind $5,000 in
+  3%; a drawdown past −40% in 34% of paths vs 21% for SPY. One year out, a
+  loss is about as likely as for SPY (26% vs 23%).
+- **Rolling windows since 1950:** ahead of SPY in 57% of 1-year, 74% of 5-year
+  and 79% of 10-year windows.
+- **Costs:** 30 bps a switch takes 1950–2026 CAGR from 14.82% to 13.40%; 50 bps
+  and +1% financing to 11.22%, still below SPY's 11.59%.
+
+**Forward paper record** (`research_data/paper/lrs_vt_5k.jsonl`): $5,000 from
+2026-10-01, the first session after the design data, at real 15:15 SPY/SSO/SGOV
+prices, through the same engine functions RobinhoodAgent calls. Re-run
+`.venv/bin/python scripts/lrs_paper.py record` any day; the whole path is
+recomputed from bars and stored rows must match it. First 31 sessions: −4.07%
+(max drawdown −12.2%) against SPY −0.96%: held 2x through a choppy October.
+Six weeks says nothing; judge it after 250 sessions.

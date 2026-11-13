@@ -4,9 +4,10 @@ A separate project inside AgentTradingLogic: backtesting **day-trading** rules o
 one-minute futures bars, MES first. It is not the swing-trading research in
 `rhengine/`, and the parent CLAUDE.md's research content does not apply here.
 
-**No day-trading rule has cleared.** The leading candidate is T10, the noise-area
-rule with a VWAP trailing stop, long-only on Robinhood SPY, paper-trading from
-2026-10-28; see [docs/RESULTS.md](docs/RESULTS.md) for every
+**No day-trading rule has cleared.** T10, the noise-area rule with a VWAP
+trailing stop, was the last candidate; it lost $617 on the one holdout look
+(2025-01 → 2026-09, t −1.51) and is rejected. **The holdout is spent.** See
+[docs/RESULTS.md](docs/RESULTS.md) for every
 trial run and why it stopped where it did. Do not carry over the swing work's
 rejected signals, verdicts, holdouts, trial count or performance figures as
 rules or priors. Ideas live in [docs/IDEAS.md](docs/IDEAS.md); the workflow and
@@ -40,9 +41,9 @@ maths, `rhengine.alpha.stats`). A test enforces that, and that the ledger is
 2. **Quote numbers only from `validate.evaluate`**, on daily net PnL, with the
    Sharpe's 95% CI and the family-wise p beside any t-stat.
 3. **Holdout once.** `validate.holdout()` logs the look before it runs; a second
-   look is not clean. As of 2026-10-27 it is unspent; T10 is paper-trading first.
-   Its last 21 sessions (2026-09-28 → 10-26) were seen in a pre-flight dry run,
-   so a later look must end 2026-09-25 or report that (RESULTS.md, paper record).
+   look is not clean. **Spent on T10, 2026-11-12** (`data/holdout.jsonl`). A new
+   rule needs new unseen data: paper sessions after 2026-09-25 are the only
+   clean sample left.
 4. **Costs are assumed** (`instruments.py`): MES at IBKR $4.28 round trip and
    $2,500 intraday margin; SPY at Robinhood $0 commission + SEC fee + 1 cent per
    side, long only, one full-size entry per session (settled cash). Raise
